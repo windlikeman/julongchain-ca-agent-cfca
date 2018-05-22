@@ -15,6 +15,12 @@ public enum ClientConfig {
      * 单例实现,被所有命令持有,只有一份
      */
     INSTANCE;
+
+    /**
+     * 配置文件 MSPDIR 的默认值
+     */
+    public static final String DEFAULT_CONFIG_MSPDIR_VAL = "<<<MSPDIR>>>";
+
     /**
      * 连接ca地址: "http://localhost:7054" opt:"u" help:"URL of cfca-ca-server"
      */

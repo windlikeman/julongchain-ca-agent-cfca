@@ -63,6 +63,10 @@ public class RAServerException extends Exception {
      * REGISTER 命令失败:update注册用户数据文件失败
      */
     public static final int REASON_CODE_REGISTER_SERVICE_UPDATE_REGISTER_STORE = 0x6006;
+    /**
+     * REGISTER 命令失败:插入新注册用户信息失败
+     */
+    public static final int REASON_CODE_REGISTER_SERVICE_INSERT_USER = 0x6007;
 
     /**
      * REENROLL 命令失败:验证token失败
@@ -186,15 +190,6 @@ public class RAServerException extends Exception {
     public static final int REASON_CODE_CA_READ_CACHAIN_FILE = 0xc009;
 
     /**
-     * USER_STORE:读取用户信息数据库异常
-     */
-    public static final int REASON_CODE_USER_STORE_LOAD_EXCEPTION = 0xd001;
-    /**
-     * USER_STORE:更新用户信息数据库异常
-     */
-    public static final int REASON_CODE_USER_STORE_UPDATE_EXCEPTION = 0xd002;
-
-    /**
      * ENROLLIDSTORE:更新ENROLLID失败
      */
     public static final int REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE = 0xe001;
@@ -221,6 +216,7 @@ public class RAServerException extends Exception {
             put(REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "register service failed with must enroll first");
             put(REASON_CODE_REGISTER_SERVICE_LOAD_REGISTER_STORE, "register service failed to load register store");
             put(REASON_CODE_REGISTER_SERVICE_UPDATE_REGISTER_STORE, "register service failed to update register store");
+            put(REASON_CODE_REGISTER_SERVICE_INSERT_USER, "register service failed to insert user into register store");
 
             put(REASON_CODE_REENROLL_SERVICE_VERIFY_TOKEN, "reenroll service failed to verify token");
             put(REASON_CODE_REENROLL_SERVICE_NOT_ENROLL, "reenroll service failed with must enroll first");
@@ -255,9 +251,6 @@ public class RAServerException extends Exception {
             put(REASON_CODE_CA_CHECK_ID_REGISTERED, "ca fail to check id registered");
             put(REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE, "ca fail to read chain file due to not found");
             put(REASON_CODE_CA_READ_CACHAIN_FILE, "ca fail to read chain file");
-
-            put(REASON_CODE_USER_STORE_LOAD_EXCEPTION, "user store fail to load");
-            put(REASON_CODE_USER_STORE_UPDATE_EXCEPTION, "user store fail to update");
 
             put(REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE, "enrollid store fail to update enroll id dat file");
             put(REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE, "enrollid store fail to load update enroll id dat file");

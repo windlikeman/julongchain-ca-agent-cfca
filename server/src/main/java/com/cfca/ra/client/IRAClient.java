@@ -1,7 +1,6 @@
 package com.cfca.ra.client;
 
 import cfca.ra.common.vo.response.CertServiceResponseVO;
-import com.cfca.ra.ServerRequestContext;
 import com.cfca.ra.beans.EnrollmentRequestNet;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.ReenrollmentRequestNet;
@@ -17,21 +16,21 @@ import com.cfca.ra.beans.RevokeRequestNet;
 public interface IRAClient {
     /**
      * 签发证书
-     * @param enrollmentRequestNet
-     * @param serverRequestContext
+     * @param enrollmentRequestNet 网络请求
+     * @param enrollmentID 身份ID
      * @return CertServiceResponseVO
-     * @throws RAServerException
+     * @throws RAServerException 遇到异常则返回
      */
-    CertServiceResponseVO enroll(EnrollmentRequestNet enrollmentRequestNet, ServerRequestContext serverRequestContext) throws RAServerException;
+    CertServiceResponseVO enroll(EnrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException;
 
     /**
      * 重新签发证书
-     * @param enrollmentRequestNet
-     * @param serverRequestContext
+     * @param enrollmentRequestNet 网络请求
+     * @param enrollmentID 身份ID
      * @return CertServiceResponseVO
-     * @throws RAServerException
+     * @throws RAServerException 遇到异常则返回
      */
-    CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, ServerRequestContext serverRequestContext) throws RAServerException;
+    CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException;
 
     String revoke(RevokeRequestNet data) throws RAServerException;
 }

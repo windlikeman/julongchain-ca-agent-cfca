@@ -39,8 +39,8 @@ public final class RevokeCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
-            logger.error("Useage : " + getUseage());
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
+            logger.error("Usage : " + getUsage());
             throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_ARGS_INVALID, "fail to build revoke command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
@@ -55,8 +55,7 @@ public final class RevokeCommand extends BaseClientCommand {
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         return "ca-client revoke -h host -p port -a <json string>";
-
     }
 }

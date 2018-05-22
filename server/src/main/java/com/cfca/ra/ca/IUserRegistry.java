@@ -3,6 +3,7 @@ package com.cfca.ra.ca;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.register.IUser;
 import com.cfca.ra.register.UserInfo;
+import com.cfca.ra.repository.RegistryStore;
 
 import java.util.Map;
 
@@ -14,6 +15,10 @@ import java.util.Map;
  * @since v3.0.0
  */
 public interface IUserRegistry {
+
+    RegistryStore getRegistryStore();
+
+    boolean containsUser(String id, String[] attrs) throws RAServerException;
 
     IUser getUser(String id, String[] attrs) throws RAServerException;
 

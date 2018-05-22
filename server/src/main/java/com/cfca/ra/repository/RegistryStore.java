@@ -3,20 +3,25 @@ package com.cfca.ra.repository;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.register.DefaultUser;
 import com.cfca.ra.register.IUser;
+import com.cfca.ra.register.UserAttrs;
 import com.cfca.ra.register.UserInfo;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,9 +54,24 @@ public enum RegistryStore implements IRegistryStore {
 
         @Override
         public void insertUser(UserInfo user) throws RAServerException {
-            registerStore.put(user.getName(), new DefaultUser(user));
-            updateRegistrationFile();
+            try {
+                final String name = user.getName();
+                final String s = name + ":" + user.getPass();
+                final String s1 = Base64.toBase64String(s.getBytes("UTF-8"));
+                UserInfo newUserInfo = new UserInfo(user, s1);
+                registerStore.put(name, new DefaultUser(newUserInfo));
+                updateRegistrationFile();
+            } catch (UnsupportedEncodingException e) {
+                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INSERT_USER,e);
+            }
+        }
 
+        @Override
+        public boolean containsUser(String id, String[] attrs) throws RAServerException {
+            if (registerStore == null) {
+                registerStore = loadRegisterStoreFile();
+            }
+            return registerStore.containsKey(id);
         }
 
         private void updateRegistrationFile() throws RAServerException {
@@ -59,7 +79,8 @@ public enum RegistryStore implements IRegistryStore {
                 return;
             }
             try {
-                final String json = new Gson().toJson(registerStore);
+                Gson gson = new GsonBuilder().disableHtmlEscaping().enableComplexMapKeySerialization().create();
+                final String json = gson.toJson(registerStore);
                 logger.info("updateRegistrationFile<<<<<< json : \n" + json);
                 final String registerFilePath = String.join(File.separator, getHomeDir(), "register.dat");
                 final File registerFile = new File(registerFilePath);
@@ -73,12 +94,17 @@ public enum RegistryStore implements IRegistryStore {
 
             try {
                 Map<String, IUser> registerStore = new HashMap<String, IUser>();
+                String admin = "admin";
+                String pass = "YWRtaW46MTIzNA==";
+
+                registerStore.put(admin, new DefaultUser(new UserInfo(admin, pass, admin, "", null, -1, 1)));
                 final String s;
                 final String registerFilePath = String.join(File.separator, getHomeDir(), "register.dat");
                 final File registerFile = new File(registerFilePath);
                 if (registerFile.exists()) {
                     s = FileUtils.readFileToString(registerFile);
                     if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        registerFile.delete();
                         return registerStore;
                     }
                     Type elemType = new TypeToken<Map<String, DefaultUser>>() {

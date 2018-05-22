@@ -33,8 +33,8 @@ public enum CertCertStore implements ICACertStore {
         }
 
         @Override
-        public void storeCert(String username, String b64cert) throws RAServerException {
-            if (StringUtils.isBlank(username)) {
+        public void storeCert(String enrollmentID, String b64cert) throws RAServerException {
+            if (StringUtils.isBlank(enrollmentID)) {
                 throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_CERT_INVALID_ARGS, "ca[" + caName + "] fail to store cert to file, username is empty");
             }
 
@@ -46,7 +46,7 @@ public enum CertCertStore implements ICACertStore {
             try {
                 decode = Base64.decode(b64cert);
                 final String homeDir = getHomeDir();
-                final String certFile = buildCertFile(homeDir, username);
+                final String certFile = buildCertFile(homeDir, enrollmentID);
                 if (logger.isInfoEnabled()) {
                     logger.info("storeCert<<<<<< store cert to :" + certFile);
                 }

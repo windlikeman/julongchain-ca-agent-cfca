@@ -8,7 +8,6 @@ import cfca.ra.common.vo.response.TxResponseVO;
 import cfca.ra.toolkit.RAClient;
 import cfca.ra.toolkit.exception.RATKException;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ServerRequestContext;
 import com.cfca.ra.beans.EnrollmentRequestNet;
 import com.cfca.ra.beans.ReenrollmentRequestNet;
 import com.cfca.ra.beans.RevokeRequestNet;
@@ -31,8 +30,8 @@ public class RAClientImpl implements IRAClient {
     private final RAClient client = new RAClient(RA_SERVER_URL, CONNECT_TIMEOUT, READ_TIMEOUT);
 
     @Override
-    public CertServiceResponseVO enroll(EnrollmentRequestNet enrollmentRequestNet, ServerRequestContext serverRequestContext) throws RAServerException {
-        CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet, serverRequestContext);
+    public CertServiceResponseVO enroll(EnrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException {
+        CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet, enrollmentID);
 
         try {
             CertServiceResponseVO certServiceResponseVO = (CertServiceResponseVO) client.process(certServiceRequestVO);
@@ -43,8 +42,8 @@ public class RAClientImpl implements IRAClient {
     }
 
     @Override
-    public CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, ServerRequestContext serverRequestContext) throws RAServerException {
-        CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet, serverRequestContext);
+    public CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException {
+        CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet, enrollmentID);
 
         try {
             CertServiceResponseVO certServiceResponseVO = (CertServiceResponseVO) client.process(certServiceRequestVO);
@@ -63,10 +62,10 @@ public class RAClientImpl implements IRAClient {
                 certServiceRequestVO.setTxCode("2901");
                 certServiceRequestVO.setDn(dn);
                 final TxResponseVO certServiceResponseVO = client.process(certServiceRequestVO);
-                logger.info("revoke<<<<<<"+certServiceResponseVO.getResultCode());
-                logger.info("revoke<<<<<<"+certServiceResponseVO.getResultMessage());
+                logger.info("revoke<<<<<<" + certServiceResponseVO.getResultCode());
+                logger.info("revoke<<<<<<" + certServiceResponseVO.getResultMessage());
                 return "revoke success";
-            }else {
+            } else {
                 throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, "the dn of cert want to be revoked not found in server ");
             }
         } catch (RATKException e) {
@@ -94,7 +93,7 @@ public class RAClientImpl implements IRAClient {
         }
     }
 
-    private CertServiceRequestVO buildCertServiceRequestVO(EnrollmentRequestNet data, ServerRequestContext serverRequestContext) throws RAServerException {
+    private CertServiceRequestVO buildCertServiceRequestVO(ReenrollmentRequestNet data, String enrollmentID) throws RAServerException {
         try {
             // 普通证书 普通：1 高级：2
             // 复合证书 单单1-1 单双1-2 双单2-1 双双2-2
@@ -105,7 +104,7 @@ public class RAClientImpl implements IRAClient {
             String identNo = data.getProfile();
 
             String branchCode = "678";
-            String email = "test@demo.com";
+            String email = "zc@demo.com";
 
             String caName = data.getCaname();
             String p10 = data.getRequest();
@@ -120,7 +119,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setCaName(caName);
             certServiceRequestVO.setCertType(certType);
             certServiceRequestVO.setCustomerType(customerType);
-            certServiceRequestVO.setUserName(serverRequestContext.getEnrollmentID());
+            certServiceRequestVO.setUserName(enrollmentID);
             certServiceRequestVO.setIdentType(identType);
             certServiceRequestVO.setIdentNo(identNo);
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
@@ -134,7 +133,7 @@ public class RAClientImpl implements IRAClient {
         }
     }
 
-    private CertServiceRequestVO buildCertServiceRequestVO(ReenrollmentRequestNet data, ServerRequestContext serverRequestContext) throws RAServerException {
+    private CertServiceRequestVO buildCertServiceRequestVO(EnrollmentRequestNet data, String enrollmentID) throws RAServerException {
         try {
             // 普通证书 普通：1 高级：2
             // 复合证书 单单1-1 单双1-2 双单2-1 双双2-2
@@ -142,14 +141,12 @@ public class RAClientImpl implements IRAClient {
             // 个人证书：1 企业证书：2 设备证书：6  场景证书：7  个人生物识别证书：8  企业生物识别证书:9
             String customerType = "1";
             String identType = "Z";
-            String identNo = data.getProfile();
-
             String branchCode = "678";
             String email = "test@demo.com";
 
+            String identNo = data.getProfile();
             String caName = data.getCaname();
             String p10 = data.getRequest();
-
             //密钥算法"SM2"
             String keyAlg = data.getCsrInfo().getKey().getAlgo();
             //密钥长度"256"
@@ -160,7 +157,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setCaName(caName);
             certServiceRequestVO.setCertType(certType);
             certServiceRequestVO.setCustomerType(customerType);
-            certServiceRequestVO.setUserName(serverRequestContext.getEnrollmentID());
+            certServiceRequestVO.setUserName(enrollmentID);
             certServiceRequestVO.setIdentType(identType);
             certServiceRequestVO.setIdentNo(identNo);
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));

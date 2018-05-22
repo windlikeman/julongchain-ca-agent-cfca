@@ -15,4 +15,6 @@ public interface IRegistryStore {
     IUser getUser(String id, String[] attrs) throws RAServerException;
 
     void insertUser(UserInfo user) throws RAServerException;
+
+    boolean containsUser(String id, String[] attrs) throws RAServerException;
 }

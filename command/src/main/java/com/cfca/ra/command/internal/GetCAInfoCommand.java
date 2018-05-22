@@ -42,9 +42,9 @@ public class GetCAInfoCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
-            logger.error("Useage : " + getUseage());
-            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_ARGS_INVALID, "getcainfo command args is invalid =>" + getUseage());
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
+            logger.error("Useage : " + getUsage());
+            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_ARGS_INVALID, "getcainfo command args is invalid =>" + getUsage());
         }
     }
 
@@ -58,7 +58,7 @@ public class GetCAInfoCommand extends BaseClientCommand {
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         /**
          * "ca-client cainfo -u http://serverAddr:serverPort -M <MSP-directory>"
          */

@@ -16,7 +16,7 @@ import java.security.Signature;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description 每一个用户实体,标识每一个用户,使用用户的名称,签名私钥和公钥证书 以及内部客户端来标识
+ * @Description 每一个用户实体, 标识每一个用户, 使用用户的名称, 签名私钥和公钥证书 以及内部客户端来标识
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -86,6 +86,17 @@ class Identity {
      */
     private String createToken(byte[] cert, PrivateKey privateKey) throws CommandException {
         try {
+
+            byte[] newCert = new byte[cert.length];
+            System.arraycopy(cert, 0, newCert, 0, cert.length);
+
+            final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(newCert);
+            final Certificate certificate = Certificate.getInstance(asn1Primitive);
+            final SubjectPublicKeyInfo subjectPublicKeyInfo = certificate.getSubjectPublicKeyInfo();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            PublicKey publicKey = converter.getPublicKey(subjectPublicKeyInfo);
+            logger.info("createToken<<<<<<publicKey : " + publicKey);
+
             String b64Cert = Base64.toBase64String(cert);
             Signature signature = Signature.getInstance("SM3withSM2", "BC");
             signature.initSign(privateKey);
@@ -95,19 +106,10 @@ class Identity {
             final String s = b64Cert + "." + b64Sig;
             logger.info("createToken<<<<<<token : " + s);
 
-            final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(cert);
-//            logger.info("createToken>>>>>>cert : " + ASN1Dump.dumpAsString(asn1Primitive, true));
-            final Certificate certificate = Certificate.getInstance(asn1Primitive);
-
-            final SubjectPublicKeyInfo subjectPublicKeyInfo = certificate.getSubjectPublicKeyInfo();
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-            PublicKey publicKey = converter.getPublicKey(subjectPublicKeyInfo);
-//            logger.info("createToken>>>>>>publicKey : " + publicKey);
-//            logger.info("createToken>>>>>>privateKey : " + privateKey);
-
-            signature.initVerify(publicKey);
-            signature.update(cert);
-            final boolean verify = signature.verify(sign);
+            Signature signature1 = Signature.getInstance("SM3withSM2", "BC");
+            signature1.initVerify(publicKey);
+            signature1.update(cert);
+            final boolean verify = signature1.verify(sign);
             if (!verify) {
                 throw new CommandException(CommandException.REASON_CODE_IDENTITY_CREATE_TOKEN, "verify failed");
             }
@@ -122,7 +124,7 @@ class Identity {
         return client.register(registrationRequest, token);
     }
 
-    public RevokeResponse revoke(RevokeRequest registrationRequest) throws CommandException{
+    public RevokeResponse revoke(RevokeRequest registrationRequest) throws CommandException {
         final String token = addTokenAuthHdr();
         return client.revoke(registrationRequest, token);
     }

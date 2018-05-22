@@ -41,7 +41,14 @@ public class UserAttrs {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(name, value);
+    }
+
+    @Override
+    public String toString() {
+        return "UserAttrs{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

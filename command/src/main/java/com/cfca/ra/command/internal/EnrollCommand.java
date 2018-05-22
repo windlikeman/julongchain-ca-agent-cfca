@@ -5,6 +5,7 @@ import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +41,17 @@ public final class EnrollCommand extends BaseClientCommand {
         super.prepare(args);
 
         ConfigBean configBean = loadConfigFile();
-        prepareClientConfig(configBean);
+
+        final EnrollmentRequest enrollmentRequest = buildEnrollmentRequestfromConfig(configBean);
+        clientCfg.setEnrollmentRequest(enrollmentRequest);
+
+//        final EnrollmentRequest enrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
+
     }
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
             logger.error("ca-client enroll -h serverAddr -p serverPort -a <json string>");
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
@@ -77,7 +83,7 @@ public final class EnrollCommand extends BaseClientCommand {
         storeCAChain(clientCfg, serverInfo);
     }
 
-    private void prepareClientConfig(ConfigBean configBean) throws CommandException {
+    private EnrollmentRequest buildEnrollmentRequestfromConfig(ConfigBean configBean) throws CommandException {
         clientCfg.setCaName(configBean.getCaname());
         clientCfg.setAdmin(configBean.getAdmin());
         clientCfg.setAdminpwd(configBean.getAdminpwd());
@@ -89,8 +95,7 @@ public final class EnrollCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_ENROLLMENT);
         }
         final String profile = configBean.getEnrollment().getProfile();
-        clientCfg.setEnrollmentRequest(new EnrollmentRequest.Builder(configBean.getAdmin(), configBean.getAdminpwd(), profile, csr, caName).build());
-
+        return new EnrollmentRequest.Builder(configBean.getAdmin(), configBean.getAdminpwd(), profile, csr, caName).build();
     }
 
     /**
@@ -133,7 +138,7 @@ public final class EnrollCommand extends BaseClientCommand {
         }
         final EnrollmentRequest enrollmentRequest = new EnrollmentRequest.Builder(username, password, profile, csrConfig, caName).build();
 
-        return client.enroll(username, enrollmentRequest);
+        return client.enroll(enrollmentRequest);
 
     }
 
@@ -165,7 +170,7 @@ public final class EnrollCommand extends BaseClientCommand {
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         return "ca-client enroll -h serverAddr -p serverPort -a <json string>";
 
     }

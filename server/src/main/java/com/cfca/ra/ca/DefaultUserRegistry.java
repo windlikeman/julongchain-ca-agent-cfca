@@ -18,9 +18,18 @@ import java.util.Map;
 public class DefaultUserRegistry implements IUserRegistry {
     private RegistryStore registerStore;
 
-
     public DefaultUserRegistry() throws RAServerException {
         this.registerStore = RegistryStore.CFCA;
+    }
+
+    @Override
+    public RegistryStore getRegistryStore() {
+        return registerStore;
+    }
+
+    @Override
+    public boolean containsUser(String id, String[] attrs) throws RAServerException {
+        return registerStore.containsUser(id,attrs);
     }
 
     @Override

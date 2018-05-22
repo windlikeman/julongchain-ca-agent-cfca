@@ -12,16 +12,21 @@ import java.util.List;
  * @CodeReviewer
  * @since v3.0.0
  */
-public class DefaultUser implements IUser{
+public class DefaultUser implements IUser {
     private final UserInfo userInfo;
 
-    public DefaultUser(UserInfo userInfo){
+    public DefaultUser(UserInfo userInfo) {
         this.userInfo = userInfo;
     }
 
     @Override
     public String getName() {
         return userInfo.getName();
+    }
+
+    @Override
+    public String getPassWord() {
+        return userInfo.getPass();
     }
 
     @Override
@@ -35,11 +40,6 @@ public class DefaultUser implements IUser{
     }
 
     @Override
-    public void login(String password, int caMaxEnrollment) throws RAServerException {
-
-    }
-
-    @Override
     public List<String> getAffiliationPath() {
         return new ArrayList<String>();
     }
@@ -48,9 +48,9 @@ public class DefaultUser implements IUser{
     public UserAttrs getAttribute(String name) throws RAServerException {
         final List<UserAttrs> attributes = userInfo.getAttributes();
         UserAttrs result = null;
-        for (UserAttrs attr: attributes) {
-            if (name.equals(attr.getName())){
-                result =  attr;
+        for (UserAttrs attr : attributes) {
+            if (name.equals(attr.getName())) {
+                result = attr;
                 break;
             }
         }
@@ -61,9 +61,9 @@ public class DefaultUser implements IUser{
     public List<UserAttrs> getAttributes(String[] attrNames) throws RAServerException {
         final List<UserAttrs> attributes = userInfo.getAttributes();
         List<UserAttrs> result = new ArrayList<>();
-        for (UserAttrs attr: attributes) {
-            for (String attrName: attrNames) {
-                if (attrName.equals(attr.getName())){
+        for (UserAttrs attr : attributes) {
+            for (String attrName : attrNames) {
+                if (attrName.equals(attr.getName())) {
                     result.add(attr);
                 }
             }
@@ -74,9 +74,9 @@ public class DefaultUser implements IUser{
     @Override
     public void modifyAttributes(List<UserAttrs> attrs) throws RAServerException {
         final List<UserAttrs> attributes = userInfo.getAttributes();
-        for (UserAttrs attr: attributes) {
-            for (UserAttrs modified: attrs) {
-                if (attr.getName().equals(modified.getName())){
+        for (UserAttrs attr : attributes) {
+            for (UserAttrs modified : attrs) {
+                if (attr.getName().equals(modified.getName())) {
                     attributes.remove(attr);
                     attributes.add(modified);
                 }

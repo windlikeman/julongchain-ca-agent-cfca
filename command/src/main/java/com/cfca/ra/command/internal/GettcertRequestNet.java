@@ -10,7 +10,7 @@ import java.util.List;
  * @CodeReviewer
  * @since v3.0.0
  */
-public class GettCertRequestNet {
+class GettCertRequestNet {
     /**
      * 查询证书数目
      */
@@ -37,14 +37,14 @@ public class GettCertRequestNet {
     /**
      * ca名称
      */
-    private final String caName;
+    private final String caname;
 
-    public GettCertRequestNet(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caName) {
+    GettCertRequestNet(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caname) {
         this.count = count;
         this.attrNames = attrNames;
         this.encryptAttrs = encryptAttrs;
         this.validityPeriod = validityPeriod;
-        this.caName = caName;
+        this.caname = caname;
     }
 
     public int getCount() {
@@ -63,7 +63,7 @@ public class GettCertRequestNet {
         return validityPeriod;
     }
 
-    public String getCaName() {
-        return caName;
+    public String getCaname() {
+        return caname;
     }
 }

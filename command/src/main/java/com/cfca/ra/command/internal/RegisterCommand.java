@@ -3,6 +3,7 @@ package com.cfca.ra.command.internal;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +51,8 @@ public final class RegisterCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
-            logger.error("Useage : " + getUseage());
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
+            logger.error("Useage : " + getUsage());
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_ARGS_INVALID, "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
@@ -77,12 +78,12 @@ public final class RegisterCommand extends BaseClientCommand {
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         return "ca-client register -h host -p port -a <json string>";
     }
 
     private ConcurrentHashMap<String, String> loadRegisterFile() throws CommandException {
-        ConcurrentHashMap<String, String> enrollIdStore = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, String> enrollIdStore = new ConcurrentHashMap<>(30);
         final String homeDir = clientCfg.getMspDir();
         File file = new File(String.join(File.separator, homeDir, registerFile));
         if (!file.exists()) {
@@ -108,7 +109,8 @@ public final class RegisterCommand extends BaseClientCommand {
         try {
             final String homeDir = clientCfg.getMspDir();
             File file = new File(String.join(File.separator, homeDir, registerFile));
-            final String s = new Gson().toJson(registered);
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            final String s = gson.toJson(registered);
             logger.info("updateRegisterFile<<<<<<s:\n" + s);
             FileUtils.writeStringToFile(file, s);
         } catch (IOException e) {

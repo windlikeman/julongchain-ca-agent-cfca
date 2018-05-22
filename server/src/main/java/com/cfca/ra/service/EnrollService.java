@@ -4,7 +4,6 @@ import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ServerRequestContext;
 import com.cfca.ra.beans.AuthInfo;
 import com.cfca.ra.beans.EnrollmentRequestNet;
 import com.cfca.ra.beans.EnrollmentResponseNet;
@@ -46,8 +45,11 @@ public class EnrollService {
     public EnrollmentResponseNet enroll(EnrollmentRequestNet data, String auth) {
         try {
             final String caName = data.getCaname();
-            final ServerRequestContext serverRequestContext = buildServerRequestContext(caName, auth);
-            final CertServiceResponseVO enrollResponseFromRA = raClient.enroll(data, serverRequestContext);
+            AuthInfo authInfo = getUserNameFromAuth(auth);
+            checkAuth(caName, authInfo);
+
+            final String enrollmentID = authInfo.getUser();
+            final CertServiceResponseVO enrollResponseFromRA = raClient.enroll(data, enrollmentID);
 
             final String resultCode = enrollResponseFromRA.getResultCode();
             final String resultMessage = enrollResponseFromRA.getResultMessage();
@@ -57,13 +59,12 @@ public class EnrollService {
             switch (resultCode) {
                 case RAClient.SUCCESS:
                     logger.info(enrollResponseFromRA.toString());
-                    final CA ca = getCA(caName, serverRequestContext);
+                    final CA ca = getCA(caName);
                     String b64cert = enrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
                     ca.fillCAInfo(response);
-                    String name = serverRequestContext.getEnrollmentID();
-                    server.storeCert(caName, name, b64cert);
-                    ca.updateEnrollIdStore(name, name);
+                    server.storeCert(caName, enrollmentID, b64cert);
+                    ca.updateEnrollIdStore(enrollmentID, enrollmentID);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();
@@ -80,11 +81,11 @@ public class EnrollService {
         }
     }
 
-    private CA getCA(String caName, ServerRequestContext serverRequestContext) throws RAServerException {
+    private CA getCA(String caName) throws RAServerException {
         if (StringUtils.isEmpty(caName)) {
             throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_GET_CA_NAME_EMPTY, "ca name is empty");
         }
-        return serverRequestContext.getServer().getCA(caName);
+        return server.getCA(caName);
     }
 
     private EnrollmentResponseNet buildErrorServerResponse(RAServerException e) {
@@ -92,16 +93,6 @@ public class EnrollService {
         ServerResponseError elem = new ServerResponseError(e.getReasonCode(), e.getMessage());
         errors.add(elem);
         return new EnrollmentResponseNet(false, null, errors, null);
-    }
-
-    private ServerRequestContext buildServerRequestContext(String caName, String auth) throws RAServerException {
-        AuthInfo authInfo = getUserNameFromAuth(auth);
-        checkAuth(caName, authInfo);
-
-        ServerRequestContext.Builder builder = new ServerRequestContext.Builder();
-        builder.enrollmentID(authInfo.getUser());
-        builder.server(server);
-        return builder.build();
     }
 
     private void checkAuth(String caName, AuthInfo authInfo) throws RAServerException {
@@ -139,7 +130,7 @@ public class EnrollService {
         }
 
         final byte[] decode = Base64.decode(remaining);
-        String userInfo = "";
+        String userInfo ;
         try {
             userInfo = new String(decode, "UTF-8");
             logger.info("checkAuth<<<<<<decoded auth is: " + userInfo);

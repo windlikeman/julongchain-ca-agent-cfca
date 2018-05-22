@@ -19,7 +19,6 @@ import java.util.Arrays;
 public class ReenrollCommand extends BaseClientCommand {
     private static final Logger logger = LoggerFactory.getLogger(ReenrollCommand.class);
 
-
     public ReenrollCommand() {
         this.name = COMMAND_NAME_REENROLL;
     }
@@ -40,7 +39,7 @@ public class ReenrollCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
             logger.error("ca-client reenroll -h serverAddr -p serverPort -a <json string>");
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "fail to build reenroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
@@ -97,7 +96,7 @@ public class ReenrollCommand extends BaseClientCommand {
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         return "ca-client reenroll -h serverAddr -p serverPort -a <json string>";
 
     }

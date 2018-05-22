@@ -31,14 +31,24 @@ public class UserInfo {
         this.state = state;
     }
 
-    public UserInfo(RegistrationRequest req, int state) {
+    public UserInfo(UserInfo userInfo, String pass) {
+        this.name = userInfo.getName();
+        this.pass = pass;
+        this.type = userInfo.getType();
+        this.affiliation = userInfo.getAffiliation();
+        this.attributes = userInfo.getAttributes();
+        this.maxEnrollments = userInfo.getMaxEnrollments();
+        this.state = userInfo.getState();
+    }
+
+    public UserInfo(RegistrationRequest req, String secret, int state) {
         this.name = req.getName();
-        this.pass = req.getSecret();
         this.type = req.getType();
         this.affiliation = req.getAffiliation();
         this.attributes = req.getAttribute();
         this.maxEnrollments = req.getMaxEnrollments();
         this.state = state;
+        this.pass = secret;
     }
 
     public int getState() {
@@ -71,8 +81,12 @@ public class UserInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         UserInfo userInfo = (UserInfo) o;
         return maxEnrollments == userInfo.maxEnrollments &&
                 state == userInfo.state &&
@@ -85,7 +99,6 @@ public class UserInfo {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(name, pass, type, affiliation, attributes, maxEnrollments, state);
     }
 

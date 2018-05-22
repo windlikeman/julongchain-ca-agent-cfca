@@ -6,7 +6,6 @@ import com.cfca.ra.beans.*;
 import com.cfca.ra.register.IUser;
 import com.cfca.ra.repository.CertCertStore;
 import com.cfca.ra.repository.EnrollIdStore;
-import com.cfca.ra.repository.UserStore;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -21,7 +20,7 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description  CA 对象,用于支持多CA配置管理
+ * @Description CA 对象,用于支持多CA配置管理
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -53,8 +52,13 @@ public class CA {
      */
     private final IUserRegistry registry;
 
-    private final UserStore userStore;
+//    private final UserStore userStore;
     private final EnrollIdStore enrollIdStore;
+
+    /**
+     *  用户注册信息
+     */
+//    private final RegistryStore registryStore;
 
     private CA(Builder builder) {
         this.config = builder.config;
@@ -62,7 +66,6 @@ public class CA {
         this.certStore = builder.certStore;
         this.server = builder.server;
         this.registry = builder.registry;
-        this.userStore = builder.userStore;
         this.enrollIdStore = builder.enrollIdStore;
     }
 
@@ -88,7 +91,7 @@ public class CA {
 
     public String getHomeDir() {
         String homeDir = "";
-        if (config == null){
+        if (config == null) {
             return homeDir;
         }
         final CAInfo ca = config.getCA();
@@ -100,7 +103,7 @@ public class CA {
 
     private String getName() {
         String name = "";
-        if (config == null){
+        if (config == null) {
             return name;
         }
         final CAInfo ca = config.getCA();
@@ -112,7 +115,7 @@ public class CA {
 
     private String getCaChain() {
         String chainfile = "";
-        if (config == null){
+        if (config == null) {
             return chainfile;
         }
         final CAInfo ca = config.getCA();
@@ -123,33 +126,39 @@ public class CA {
     }
 
     public void checkIdRegistered(String id) throws RAServerException {
-        if (userStore == null) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_CHECK_ID_REGISTERED, "this userStore is null");
+        if (registry == null) {
+            throw new RAServerException(RAServerException.REASON_CODE_CA_CHECK_ID_REGISTERED, "this registryStore is null");
         }
 
         if (StringUtils.isEmpty(id)) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_CHECK_ID_REGISTERED, "this user id is null");
         }
 
-        if (userStore.containsUser(id)) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_USER_ALREADY_REGISTERED, "this user[" + id + "] not exist already registered in CA[" + getName() + "]");
+        if (registry.containsUser(id, null)) {
+            throw new RAServerException(RAServerException.REASON_CODE_CA_USER_ALREADY_REGISTERED, "this user[" + id + "] already registered in CA[" + getName() + "]");
         }
     }
 
     public String getUserSecret(String user) throws RAServerException {
-        if (userStore == null) {
+        if (registry == null) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_NOT_READY, "CA[" + getName() + "] user store is null");
         }
-        if (!userStore.containsUser(user)) {
+        if (!registry.containsUser(user, null)) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_USER_NOT_EXIST, "this user[" + user + "] not exist in CA[" + getName() + "]");
         }
-        return userStore.getUser(user);
+        final IUser iu = registry.getUser(user, null);
+        return iu.getPassWord();
     }
 
     public void attributeIsTrue(String id, String s) throws RAServerException {
     }
 
     public void fillGettcertInfo(GettCertResponseNet resp) {
+        int id = 100;
+        int ts = 1000;
+        String key = "key";
+        List<TCert> tcerts = new ArrayList<>();
+        resp.setResult(new GettCertResponseResult(id, ts, key, tcerts));
     }
 
 
@@ -157,8 +166,8 @@ public class CA {
         return enrollIdStore.getEnrollmentId(id);
     }
 
-    public void storeCert(String username, String b64cert) throws RAServerException {
-        certStore.storeCert(username, b64cert);
+    public void storeCert(String enrollmentID, String b64cert) throws RAServerException {
+        certStore.storeCert(enrollmentID, b64cert);
     }
 
     public Certificate loadCert(String enrollmentId) throws RAServerException {
@@ -167,10 +176,6 @@ public class CA {
 
     public void updateEnrollIdStore(String enrollmentId, String id) throws RAServerException {
         enrollIdStore.updateEnrollIdStore(enrollmentId, id);
-    }
-
-    public void updateUserStore(IUser user, String secret) throws RAServerException {
-        userStore.updateUserStore(user, secret);
     }
 
     public String getCertFile(String serial) throws RAServerException {
@@ -184,7 +189,6 @@ public class CA {
 
         private String configFilePath = "";
         private CertCertStore certStore = CertCertStore.CFCA;
-        private UserStore userStore = UserStore.CFCA;
         private EnrollIdStore enrollIdStore = EnrollIdStore.CFCA;
 
         public Builder(RAServer server, CAConfig config, IUserRegistry registry) {
@@ -195,11 +199,6 @@ public class CA {
 
         public Builder enrollIdStore(EnrollIdStore v) {
             this.enrollIdStore = v;
-            return this;
-        }
-
-        public Builder userStore(UserStore v) {
-            this.userStore = v;
             return this;
         }
 
@@ -232,13 +231,12 @@ public class CA {
                 Objects.equals(certStore, ca.certStore) &&
                 Objects.equals(server, ca.server) &&
                 Objects.equals(registry, ca.registry) &&
-                userStore == ca.userStore &&
                 enrollIdStore == ca.enrollIdStore;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(config, configFilePath, certStore, server, registry, userStore, enrollIdStore);
+        return Objects.hash(config, configFilePath, certStore, server, registry, enrollIdStore);
     }
 
     public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet) throws RAServerException {
@@ -257,18 +255,18 @@ public class CA {
         enrollmentResponseNet.setMessages(messages);
     }
 
-    private byte[] getCAChain() throws RAServerException{
+    private byte[] getCAChain() throws RAServerException {
         final String homeDir = getHomeDir();
         final String caChain = getCaChain();
         final String caChainFilePath = String.join(File.separator, homeDir, caChain);
         File caChainFile = new File(caChainFilePath);
-        if (!caChainFile.exists()){
+        if (!caChainFile.exists()) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE);
         }
         try {
             return FileUtils.readFileToByteArray(caChainFile);
         } catch (IOException e) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_READ_CACHAIN_FILE,e);
+            throw new RAServerException(RAServerException.REASON_CODE_CA_READ_CACHAIN_FILE, e);
         }
     }
 

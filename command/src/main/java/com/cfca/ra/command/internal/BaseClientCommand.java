@@ -3,7 +3,10 @@ package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.IClientCommand;
-import com.cfca.ra.command.utils.*;
+import com.cfca.ra.command.utils.ConfigUtils;
+import com.cfca.ra.command.utils.MyFileUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
+import com.cfca.ra.command.utils.PemUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,8 @@ import java.util.Arrays;
  */
 public abstract class BaseClientCommand implements IClientCommand {
     private static final Logger logger = LoggerFactory.getLogger(BaseClientCommand.class);
+
+    static final int COMMAND_LINE_ARGS_NUM = 7;
 
     public static final String COMMAND_NAME_ENROLL = "enroll";
     public static final String COMMAND_NAME_REENROLL = "reenroll";
@@ -43,12 +48,12 @@ public abstract class BaseClientCommand implements IClientCommand {
     /**
      * 命令的配置文件路径
      */
-    protected String cfgFileName;
+    String cfgFileName;
 
     /**
      * 命令的主目录
      */
-    protected String homeDirectory;
+    private String homeDirectory;
 
     /**
      * 命令的真正实现客户端
@@ -56,7 +61,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     protected Client client;
 
     protected String host;
-    protected String port;
+    private String port;
     protected String content;
 
     /**
@@ -64,11 +69,17 @@ public abstract class BaseClientCommand implements IClientCommand {
      *
      * @return 用法描述
      */
-    public abstract String getUseage();
+    public abstract String getUsage();
 
+    /**
+     * 检查命令行参数有效性
+     *
+     * @param args 命令行参数
+     * @throws CommandException 遇到错误返回异常
+     */
     public abstract void checkArgs(String[] args) throws CommandException;
 
-    public void parseArgs(String[] args) throws CommandException {
+    private void parseArgs(String[] args) throws CommandException {
         for (int i = 0, size = args.length; i < size; i++) {
             switch (args[i]) {
                 case "-h":
@@ -211,11 +222,10 @@ public abstract class BaseClientCommand implements IClientCommand {
                 .append(fname).toString();
     }
 
-
     /**
-     * @param clientCfg
-     * @param serverInfo
-     * @throws CommandException
+     * @param clientCfg  客户端配置
+     * @param serverInfo 返回的 CA 服务器信息
+     * @throws CommandException 遇到错误返回异常
      */
     void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
         final String mspDir = clientCfg.getMspDir();

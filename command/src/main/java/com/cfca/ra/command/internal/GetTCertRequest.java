@@ -26,7 +26,7 @@ public class GettCertRequest {
     private final boolean encryptAttrs;
 
     /**
-     * 有效期	不可空
+     * 有效期
      */
     private final int validityPeriod;
 

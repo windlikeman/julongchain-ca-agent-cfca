@@ -1,9 +1,11 @@
 package com.cfca.ra;
 
-import com.cfca.ra.ca.*;
+import com.cfca.ra.ca.CA;
+import com.cfca.ra.ca.CAConfig;
+import com.cfca.ra.ca.CAInfo;
+import com.cfca.ra.ca.DefaultUserRegistry;
 import com.cfca.ra.repository.CertCertStore;
 import com.cfca.ra.repository.EnrollIdStore;
-import com.cfca.ra.repository.UserStore;
 import com.cfca.ra.utils.MyFileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -58,8 +60,6 @@ public class RAServer {
      */
     private Map<String, CA> caMap = new HashMap<>();
 
-    private ServerRequestContext serverRequestContext;
-
     public void initialize() throws RAServerException {
         if (StringUtils.isEmpty(serverHomeDir)) {
             this.serverHomeDir = System.getProperty("user.dir");
@@ -73,14 +73,6 @@ public class RAServer {
 
         defaultCA = initCA(null);
         addCA(defaultCA);
-    }
-
-    public ServerRequestContext getServerRequestContext() {
-        return serverRequestContext;
-    }
-
-    public void setServerRequestContext(final ServerRequestContext serverRequestContext) {
-        this.serverRequestContext = serverRequestContext;
     }
 
     public String getUserSecret(final String caName, final String user) throws RAServerException {
@@ -140,7 +132,6 @@ public class RAServer {
         DefaultUserRegistry registry = new DefaultUserRegistry();
         CA.Builder defaultCABuilder = new CA.Builder(this, local, registry)
                 .enrollIdStore(EnrollIdStore.CFCA)
-                .userStore(UserStore.CFCA)
                 .certStore(CertCertStore.CFCA);
         CA defaultCA = defaultCABuilder.build();
 
@@ -161,9 +152,9 @@ public class RAServer {
         return ca;
     }
 
-    public void storeCert(final String caName, final String username, final String b64cert) throws RAServerException {
+    public void storeCert(final String caName, final String enrollmentID, final String b64cert) throws RAServerException {
         final CA ca = getCA(caName);
-        ca.storeCert(username, b64cert);
+        ca.storeCert(enrollmentID, b64cert);
     }
 
     public PublicKey getKey(final String caName, final String enrollmentId) throws RAServerException {

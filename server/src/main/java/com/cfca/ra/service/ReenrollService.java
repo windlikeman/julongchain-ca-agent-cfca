@@ -4,7 +4,6 @@ import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ServerRequestContext;
 import com.cfca.ra.beans.EnrollmentResponseNet;
 import com.cfca.ra.beans.ReenrollmentRequestNet;
 import com.cfca.ra.beans.ServerResponseError;
@@ -88,8 +87,7 @@ public class ReenrollService {
             final String enrollmentId = "admin";
             verifyTokenByEnrollmentId(caname, enrollmentId, auth);
 
-            final ServerRequestContext serverRequestContext = buildServerRequestContext(caname, enrollmentId);
-            final CertServiceResponseVO reenrollResponseFromRA = raClient.reenroll(data, serverRequestContext);
+            final CertServiceResponseVO reenrollResponseFromRA = raClient.reenroll(data, enrollmentId);
 
             final String resultCode = reenrollResponseFromRA.getResultCode();
             final String resultMessage = reenrollResponseFromRA.getResultMessage();
@@ -99,12 +97,11 @@ public class ReenrollService {
             switch (resultCode) {
                 case RAClient.SUCCESS:
                     logger.info(reenrollResponseFromRA.toString());
-                    final CA ca = getCA(caname, serverRequestContext);
+                    final CA ca = getCA(caname);
                     String b64cert = reenrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
                     ca.fillCAInfo(response);
-                    String name = serverRequestContext.getEnrollmentID();
-                    server.storeCert(caname, name, b64cert);
+                    server.storeCert(caname, enrollmentId, b64cert);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();
@@ -121,11 +118,11 @@ public class ReenrollService {
         }
     }
 
-    private CA getCA(String caName, ServerRequestContext serverRequestContext) throws RAServerException {
+    private CA getCA(String caName) throws RAServerException {
         if (StringUtils.isEmpty(caName)) {
             throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY, "ca name is empty");
         }
-        return serverRequestContext.getServer().getCA(caName);
+        return server.getCA(caName);
     }
 
     private EnrollmentResponseNet buildErrorServerResponse(RAServerException e) {
@@ -133,14 +130,5 @@ public class ReenrollService {
         ServerResponseError elem = new ServerResponseError(e.getReasonCode(), e.getMessage());
         errors.add(elem);
         return new EnrollmentResponseNet(false, null, errors, null);
-    }
-
-    private ServerRequestContext buildServerRequestContext(String caName, String enrollmentId) throws RAServerException {
-        final CA ca = server.getCA(caName);
-        ServerRequestContext.Builder builder = new ServerRequestContext.Builder();
-        builder.enrollmentID(enrollmentId);
-        builder.server(server);
-        builder.CA(ca);
-        return builder.build();
     }
 }

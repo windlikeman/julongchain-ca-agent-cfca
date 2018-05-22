@@ -8,6 +8,7 @@ import com.cfca.ra.command.utils.MyStringUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -83,14 +85,14 @@ public class Client {
         this.reenrollmentComms = new ReenrollmentComms(clientCfg);
         this.registerComms = new RegisterComms(clientCfg);
         this.revokeComms = new RevokeComms(clientCfg);
-        this.gettCertComms= new GettCertComms(clientCfg);
+        this.gettCertComms = new GettCertComms(clientCfg);
     }
 
     public ClientConfig getClientCfg() {
         return clientCfg;
     }
 
-    public EnrollmentResponse enroll(String username, EnrollmentRequest enrollmentRequest) throws CommandException {
+    public EnrollmentResponse enroll(EnrollmentRequest enrollmentRequest) throws CommandException {
         initializeIfNeeded();
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null || csrConfig.getKey() == null) {
@@ -98,7 +100,9 @@ public class Client {
         }
         final String algo = csrConfig.getKey().getAlgo();
         final String password = enrollmentRequest.getPassword();
+        final String username = enrollmentRequest.getUsername();
         String basicAuth = buildBasicAuth(username, password);
+        logger.info("basicAuth=" + basicAuth);
         final CsrResult result = genCSR(algo, csrConfig.getNames());
         storeMyPrivateKey(result);
         EnrollmentRequestNet enrollmentRequestNet = buildReenrollmentRequestNet(enrollmentRequest, result.getCsr());
@@ -195,8 +199,8 @@ public class Client {
             }
 
             //这里certB64Encoded只是证书公钥
-            final byte[] decode = Base64.decode(certB64Encoded);
-            return buildIdentity(username, decode, key);
+            final byte[] certDecode = Base64.decode(certB64Encoded);
+            return buildIdentity(username, certDecode, key);
         } catch (Exception e) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED, e);
         }
@@ -354,7 +358,7 @@ public class Client {
             try {
                 logger.info("Initializing client with config: {}", clientCfg);
                 String mspDir = clientCfg.getMspDir();
-                if (MyStringUtils.isEmpty(mspDir) || "<<<MSPDIR>>>".equalsIgnoreCase(mspDir)) {
+                if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
                     clientCfg.setMspDir("msp");
                 }
                 mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homedir);
@@ -399,14 +403,14 @@ public class Client {
 
     public Identity loadMyIdentity() throws CommandException {
         try {
-            final PrivateKey key = PemUtils.loadPrivateKey(keyFile);
+            final PrivateKey privateKey = PemUtils.loadPrivateKey(keyFile);
             final byte[] certDecoded = PemUtils.loadFileContent(certFile);
 
-            logger.info("loadMyIdentity<<<<<<cert:\n"+ ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(certDecoded)));
-            logger.info("loadMyIdentity<<<<<<key:\n"+key);
+            logger.info("loadMyIdentity<<<<<<cert:\n" + ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(certDecoded)));
+            logger.info("loadMyIdentity<<<<<<privateKey:\n" + privateKey);
 
             String name = clientCfg.getAdmin();
-            return buildIdentity(name, certDecoded, key);
+            return buildIdentity(name, certDecoded, privateKey);
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION, e);
         }
@@ -414,8 +418,8 @@ public class Client {
 
     private Identity buildIdentity(String name, byte[] cert, PrivateKey key) {
         try {
-            logger.info("buildIdentity<<<<<<cert:\n"+ ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(cert)));
-            logger.info("buildIdentity<<<<<<key:\n"+key);
+            logger.info("buildIdentity<<<<<<cert:\n" + ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(cert)));
+            logger.info("buildIdentity<<<<<<key:\n" + key);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -451,6 +455,7 @@ public class Client {
         }
 
     }
+
     private RegistrationResponse buildRegistrationResponse(RegistrationResponseNet responseNet) throws CommandException {
         final String redentials = responseNet.getResult().getRedentials();
         if (MyStringUtils.isEmpty(redentials)) {
@@ -480,25 +485,30 @@ public class Client {
     }
 
     private GettCertResponse buildGettCertResponse(GettcertResponseNet responseNet) {
-        return null;
+        List<Certificate> certs = new ArrayList<>();
+        return new GettCertResponse(certs);
     }
 
     private GettCertRequestNet buildGettCertRequestNet(GettCertRequest request) {
-        return null;
+        int count = 0;
+        List<String> attrNames = new ArrayList<>();
+        boolean encryptAttrs = false;
+        int validityPeriod = 10;
+        String caName = "CFCA";
+        return new GettCertRequestNet(count, attrNames, encryptAttrs, validityPeriod, caName);
     }
 
     private RevokeRequestNet buildRevokeRequestNet(RevokeRequest registrationRequest) {
         return new RevokeRequestNet(registrationRequest);
     }
 
-    private RevokeResponse buildRevokeResponse(RevokeResponseNet responseNet) throws CommandException{
+    private RevokeResponse buildRevokeResponse(RevokeResponseNet responseNet) throws CommandException {
         return new RevokeResponse(responseNet.getResult());
     }
 
     private RegistrationRequestNet buildRegistrationRequestNet(RegistrationRequest registrationRequest) {
         return new RegistrationRequestNet(registrationRequest);
     }
-
 
 
     @Override

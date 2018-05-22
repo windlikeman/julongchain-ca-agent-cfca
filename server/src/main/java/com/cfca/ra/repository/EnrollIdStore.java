@@ -3,6 +3,8 @@ package com.cfca.ra.repository;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,7 +26,6 @@ import java.util.Map;
  */
 public enum EnrollIdStore implements IEnrollIdStore {
     CFCA("CFCA") {
-
         private Map<String, String> enrollIdStore;
 
         private String getHomeDir() {
@@ -49,21 +51,25 @@ public enum EnrollIdStore implements IEnrollIdStore {
         }
 
         private Map<String, String> loadEnrollIdFile() throws RAServerException {
-            final Map<String, String> enrollIdStore = new HashMap<String, String>() {{
-                put("admin", "admin");
-            }};
             try {
+                Map<String, String> enrollIdStore = new HashMap<>();
+                enrollIdStore.put("admin", "admin");
                 final String homeDir = getHomeDir();
                 File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
                 if (file.exists()) {
                     final String s = FileUtils.readFileToString(file);
-                    if(StringUtils.isBlank(s)||s.trim().equalsIgnoreCase("null")){
+                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        file.delete();
                         return enrollIdStore;
                     }
                     if (logger.isInfoEnabled()) {
                         logger.info("loadEnrollIdFile<<<<<< s:" + s);
                     }
-                    final Map map = new Gson().fromJson(s, Map.class);
+
+                    Gson gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
+                    Type type = new TypeToken<Map<String, String>>() {
+                    }.getType();
+                    Map<String, String> map = gson.fromJson(s, type);
                     Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
                     Map.Entry<String, String> entry;
                     while (it.hasNext()) {
@@ -85,10 +91,12 @@ public enum EnrollIdStore implements IEnrollIdStore {
                 final String homeDir = getHomeDir();
                 File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
 
-                final String s = new Gson().toJson(enrollIdStore);
+                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
+                final String s = gson.toJson(enrollIdStore);
                 if (logger.isInfoEnabled()) {
                     logger.info("updateEnrollIdFile<<<<<<" + s);
                 }
+
                 FileUtils.writeStringToFile(file, s);
             } catch (IOException e) {
                 throw new RAServerException(RAServerException.REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE, e);
@@ -97,7 +105,6 @@ public enum EnrollIdStore implements IEnrollIdStore {
     };
     protected static final Logger logger = LoggerFactory.getLogger(EnrollIdStore.class);
     protected final String caName;
-
 
     EnrollIdStore(String caName) {
         this.caName = caName;

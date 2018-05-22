@@ -2,6 +2,8 @@ package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.config.CsrConfig;
 
+import java.util.Objects;
+
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -10,6 +12,7 @@ import com.cfca.ra.command.config.CsrConfig;
  * @since v3.0.0
  */
 class EnrollmentRequest {
+
     /**
      * The label used in HSM operations
      */
@@ -78,6 +81,35 @@ class EnrollmentRequest {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EnrollmentRequest that = (EnrollmentRequest) o;
+        return Objects.equals(label, that.label) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(profile, that.profile) &&
+                Objects.equals(csrConfig, that.csrConfig) &&
+                Objects.equals(caName, that.caName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(label, username, password, profile, csrConfig, caName);
+    }
+
+    private final static EnrollmentRequest NULL = new Builder(null,null,null,null,null).label(null).build();
+
+    public boolean isNull() {
+        return this.equals(NULL);
+    }
+
     static class Builder {
         private final String password;
         private final String username;
@@ -96,6 +128,11 @@ class EnrollmentRequest {
             this.profile = profile;
             this.csrConfig = csrConfig;
             this.caName = caName;
+        }
+
+        public Builder label(String v){
+            this.label = v;
+            return this;
         }
 
         public EnrollmentRequest build() {

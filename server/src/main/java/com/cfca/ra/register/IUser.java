@@ -14,30 +14,29 @@ import java.util.List;
 public interface IUser {
 
     /**
-     * Returns the enrollment ID of the user
+     * 返回用户的身份ID
+     *
+     * @return 用户的身份ID
      */
     String getName();
+    /**
+     * 返回用户的密码
+     * @return 用户的密码
+     */
+    String getPassWord();
 
     /**
-     * Returns the enrollment ID of the user
+     * 返回用户的类型
      *
-     * @return
+     * @return 用户的类型
      */
     String getType();
 
     /**
-     * Return the max enrollments of the user
-     * @return
+     * 返回用户的最大注册次数
+     * @return 用户的最大注册次数
      */
     int getMaxEnrollments();
-
-    /**
-     * Return the max enrollments of the user
-     * @param password
-     * @param caMaxEnrollment
-     * @throws RAServerException
-     */
-    void login(String password, int caMaxEnrollment) throws RAServerException;
 
     /**
      * Get the complete path for the user's affiliation.
@@ -73,4 +72,5 @@ public interface IUser {
      * @throws RAServerException
      */
     void revoke() throws RAServerException;
+
 }

@@ -42,14 +42,14 @@ public class GettCertCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != 7) {
-            logger.error("Usage: " + getUseage());
-            throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_ARGS_INVALID, "args is invalid =>" + getUseage());
+        if (args.length != COMMAND_LINE_ARGS_NUM) {
+            logger.error("Usage: " + getUsage());
+            throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_ARGS_INVALID, "args is invalid =>" + getUsage());
         }
     }
 
     @Override
-    public String getUseage() {
+    public String getUsage() {
         return "ca-client tcert -h host -p port -a <json>";
     }
 

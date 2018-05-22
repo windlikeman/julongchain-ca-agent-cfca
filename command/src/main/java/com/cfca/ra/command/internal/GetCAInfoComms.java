@@ -31,6 +31,11 @@ class GetCAInfoComms {
     }
 
     private interface GetCAInfoService {
+        /**
+         * 发送GetCaInfo 的post请求给服务器
+         * @param requestNet
+         * @return 服务器xiangying
+         */
         @POST("cainfo")
         Call<GetCAInfoResponseNet> postWithCaName(@Body GetCAInfoRequestNet requestNet);
     }

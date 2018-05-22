@@ -41,6 +41,7 @@ public class GettCertService {
             ca.fillGettcertInfo(resp);
             return resp;
         }catch (RAServerException e){
+            logger.error("gettcert >>>>>>Failure : " + e.getMessage());
             return buildGettcertErrorServerResponse(e);
         }
     }
