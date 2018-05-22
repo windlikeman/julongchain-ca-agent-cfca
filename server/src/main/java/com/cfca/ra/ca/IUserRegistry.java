@@ -43,6 +43,6 @@ public interface IUserRegistry {
 
     void deleteAffiliation(String name, boolean force, boolean identityRemoval, boolean isRegistrar) throws RAServerException;
 
-    void ModifyAffiliation(String oldAffiliation, String newAffiliation , boolean force, boolean isRegistrar) throws RAServerException;
+    void modifyAffiliation(String oldAffiliation, String newAffiliation , boolean force, boolean isRegistrar) throws RAServerException;
 
 }

@@ -1,12 +1,9 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @author zhangchong

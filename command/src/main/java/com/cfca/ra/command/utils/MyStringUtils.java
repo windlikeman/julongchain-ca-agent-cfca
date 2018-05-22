@@ -1,7 +1,5 @@
 package com.cfca.ra.command.utils;
 
-import java.io.File;
-
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -9,9 +7,9 @@ import java.io.File;
  * @CodeReviewer
  * @since v3.0.0
  */
-public class StringUtils {
+public class MyStringUtils {
 
-    private StringUtils() {
+    private MyStringUtils() {
     }
 
     /**
@@ -40,7 +38,7 @@ public class StringUtils {
      * @return {@code true} 如果 cs 不会空 也不为null 也不为空格
      */
     public static boolean isNotBlank(CharSequence cs) {
-        return !StringUtils.isBlank(cs);
+        return !MyStringUtils.isBlank(cs);
     }
 
     /**

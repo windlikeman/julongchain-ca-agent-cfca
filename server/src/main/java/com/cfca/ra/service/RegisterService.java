@@ -5,6 +5,7 @@ import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.ca.IUserRegistry;
+import com.cfca.ra.ca.register.DefaultUser;
 import com.cfca.ra.ca.register.IUser;
 import com.cfca.ra.ca.register.UserAttrs;
 import com.cfca.ra.ca.register.UserInfo;
@@ -86,17 +87,35 @@ public class RegisterService {
             logger.info("registerUser >>>>>> enrollmentId : " + enrollmentId);
 
             final CA ca = server.getCA(caname);
-            IUser user = ca.getRegistry().getUser(enrollmentId, null);
-            //FIXME: 将待注册权限磨平或者继承到注册者一致的权限 :normalizeRegistrationRequest(data, user);
-            //FIXME: 是否允许注册 canRegister(user, data);
-            final String secret = registerUserID(data, ca);
+//            IUser user = ca.getRegistry().getUser(enrollmentId, null);
+            //FIXME: 将待注册权限磨平或者继承到注册者一致的权限 :
+//            normalizeRegistrationRequest(data, user);
+            //FIXME: 是否允许注册
+//            canRegister(user, data);
+            RegistrationRequest req = new RegistrationRequest(data);
+            final UserInfo insert = new UserInfo(req, 1);
+            final String secret = registerUserID(req, ca, insert);
             final RegistrationResponseNet registrationResponseNet = buildRegistrationResponseNet(secret);
             updateCallerStore(caname, enrollmentId, id);
+            updateUserStore(caname, new DefaultUser(insert), secret);
             return registrationResponseNet;
         } catch (RAServerException e) {
             logger.error("registerUser >>>>>> Failure : " + e.getMessage(), e);
             return buildRegisterErrorResponse(e);
         }
+    }
+
+    private void canRegister(IUser user, RegistrationRequestNet data) throws RAServerException {
+
+    }
+
+    /**
+     * 将调整待注册权限与注册者一致的权限
+     *
+     * @param data
+     * @param user
+     */
+    private void normalizeRegistrationRequest(RegistrationRequestNet data, IUser user) {
     }
 
     private void checkIdRegistered(String caname, String id) throws RAServerException {
@@ -115,16 +134,12 @@ public class RegisterService {
         return new RegistrationResponseNet(true, new RegistrationResponseResult(secret), null, null);
     }
 
-    private String registerUserID(RegistrationRequestNet registrationRequestNet, CA ca) throws RAServerException {
-        RegistrationRequest req = new RegistrationRequest(registrationRequestNet);
-
-        final int maxEnrollments = getMaxEnrollments(registrationRequestNet.getMaxEnrollments(), ca.getConfig().getRegistry().getMaxEnrollments());
+    private String registerUserID(RegistrationRequest req, CA ca, UserInfo insert) throws RAServerException {
+        final int maxEnrollments = getMaxEnrollments(req.getMaxEnrollments(), ca.getConfig().getRegistry().getMaxEnrollments());
         req.setMaxEnrollments(maxEnrollments);
         addAttributeToRequest(AttributeNames.EnrollmentID, req.getName(), req.getAttribute());
         addAttributeToRequest(AttributeNames.Type, req.getType(), req.getAttribute());
         addAttributeToRequest(AttributeNames.Affiliation, req.getAffiliation(), req.getAttribute());
-
-        final UserInfo insert = new UserInfo(req, 1);
 
         IUserRegistry registry = ca.getRegistry();
 
@@ -187,6 +202,12 @@ public class RegisterService {
     }
 
     private void updateCallerStore(String caname, String callerID, String id) throws RAServerException {
-        server.updateEnrollIdStore(caname, callerID, id);
+        final CA ca = server.getCA(caname);
+        ca.updateEnrollIdStore(callerID, id);
+    }
+
+    private void updateUserStore(String caname, IUser user, String secret) throws RAServerException {
+        final CA ca = server.getCA(caname);
+        ca.updateUserStore(user, secret);
     }
 }

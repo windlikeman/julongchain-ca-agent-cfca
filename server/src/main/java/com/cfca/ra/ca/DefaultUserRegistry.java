@@ -1,21 +1,13 @@
 package com.cfca.ra.ca;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ca.register.DefaultUser;
 import com.cfca.ra.ca.register.IUser;
 import com.cfca.ra.ca.register.UserInfo;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.apache.commons.io.FileUtils;
+import com.cfca.ra.ca.repository.RegistryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangchong
@@ -25,28 +17,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since v3.0.0
  */
 public class DefaultUserRegistry implements IUserRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultUserRegistry.class);
-    private final ConcurrentHashMap<String, IUser> registerStore;
-    private final String dir;
+    private RegistryStore registerStore;
 
-    public DefaultUserRegistry(String dir) throws RAServerException {
-        this.dir = dir;
-        this.registerStore = loadRegisterStoreFile();
+
+    public DefaultUserRegistry() throws RAServerException {
+        this.registerStore = RegistryStore.CFCA;
     }
 
     @Override
     public IUser getUser(String id, String[] attrs) throws RAServerException {
-        if (attrs == null) {
-            return registerStore.getOrDefault(id, null);
-        }
-
-        return null;
+        return registerStore.getUser(id, null);
     }
 
     @Override
     public void insertUser(UserInfo user) throws RAServerException {
-        registerStore.put(user.getName(), new DefaultUser(user));
-        updateRegistrationFile();
+        registerStore.insertUser(user);
 
     }
 
@@ -96,49 +81,7 @@ public class DefaultUserRegistry implements IUserRegistry {
     }
 
     @Override
-    public void ModifyAffiliation(String oldAffiliation, String newAffiliation, boolean force, boolean isRegistrar) throws RAServerException {
+    public void modifyAffiliation(String oldAffiliation, String newAffiliation, boolean force, boolean isRegistrar) throws RAServerException {
 
     }
-
-    private void updateRegistrationFile() throws RAServerException {
-
-        try {
-            final String json = new Gson().toJson(registerStore);
-            logger.info("updateRegistrationFile<<<<<< json : \n" + json);
-            final String registerFilePath = String.join(File.separator, dir, "register.dat");
-            final File registerFile = new File(registerFilePath);
-            FileUtils.writeStringToFile(registerFile, json);
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_UPDATE_REGISTER_STORE, e);
-        }
-    }
-
-    private ConcurrentHashMap<String, IUser> loadRegisterStoreFile() throws RAServerException {
-
-        try {
-            ConcurrentHashMap<String, IUser> registerStore = new ConcurrentHashMap<String, IUser>();
-            final String s;
-            final String registerFilePath = String.join(File.separator, dir, "register.dat");
-            final File registerFile = new File(registerFilePath);
-            if (registerFile.exists()) {
-                s = FileUtils.readFileToString(registerFile);
-                Type elemType = new TypeToken<Map<String, DefaultUser>>() {}.getType();
-                final Map<String, DefaultUser> map = new Gson().fromJson(s, elemType);
-                Iterator<Map.Entry<String, DefaultUser>> it = map.entrySet().iterator();
-                String key;
-                DefaultUser value;
-                while (it.hasNext()) {
-                    Map.Entry<String, DefaultUser> entry = it.next();
-                    key = entry.getKey();
-                    value = entry.getValue();
-                    registerStore.put(key, value);
-                }
-            }
-            return registerStore;
-        } catch (IOException e) {
-            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_LOAD_REGISTER_STORE, e);
-        }
-    }
-
-
 }

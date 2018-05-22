@@ -1,11 +1,10 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.PemUtils;
-import com.cfca.ra.command.utils.StringUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -120,7 +119,7 @@ public class Client {
         ServerInfo.Builder builder = new ServerInfo.Builder();
         final GetCAInfoResponseResult result = responseNet.getResult();
         final String cachain = result.getCachain();
-        if (!StringUtils.isEmpty(cachain)) {
+        if (!MyStringUtils.isEmpty(cachain)) {
             builder.caChain(Base64.decode(cachain));
         }
         builder.caName(result.getCaname());
@@ -191,7 +190,7 @@ public class Client {
      */
     private Identity buildIdentity(String username, String certB64Encoded, PrivateKey key) throws CommandException {
         try {
-            if (StringUtils.isEmpty(certB64Encoded)) {
+            if (MyStringUtils.isEmpty(certB64Encoded)) {
                 throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED, "failed to build identity by empty certB64Encoded");
             }
 
@@ -211,16 +210,16 @@ public class Client {
         }
 
         final String username = enrollmentRequest.getUsername();
-        if (StringUtils.isEmpty(username)) {
+        if (MyStringUtils.isEmpty(username)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing username");
         }
 
         final String profile = enrollmentRequest.getProfile();
-        if (StringUtils.isEmpty(profile)) {
+        if (MyStringUtils.isEmpty(profile)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing profile");
         }
         final String caName = enrollmentRequest.getCaName();
-        if (StringUtils.isEmpty(caName)) {
+        if (MyStringUtils.isEmpty(caName)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing CA Name");
         }
         return new EnrollmentRequestNet.Builder(p10, profile, caName, csrConfig).build();
@@ -234,23 +233,23 @@ public class Client {
         }
 
         final String username = enrollmentRequest.getUsername();
-        if (StringUtils.isEmpty(username)) {
+        if (MyStringUtils.isEmpty(username)) {
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing username");
         }
 
         final String profile = enrollmentRequest.getProfile();
-        if (StringUtils.isEmpty(profile)) {
+        if (MyStringUtils.isEmpty(profile)) {
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing profile");
         }
         final String caName = enrollmentRequest.getCaName();
-        if (StringUtils.isEmpty(caName)) {
+        if (MyStringUtils.isEmpty(caName)) {
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing CA Name");
         }
         return new ReenrollmentRequestNet.Builder(p10, profile, caName, csrConfig).build();
     }
 
     private String buildBasicAuth(String username, String password) throws CommandException {
-        if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+        if (!MyStringUtils.isEmpty(username) && !MyStringUtils.isEmpty(password)) {
             try {
                 String userInfo = username + ":" + password;
                 return "Basic " + Base64.toBase64String(userInfo.getBytes("UTF-8"));
@@ -268,7 +267,7 @@ public class Client {
      * @throws CommandException 失败时报错
      */
     public CsrResult genCSR(String keyAlg, String distictName) throws CommandException {
-        if (StringUtils.isEmpty(keyAlg) || StringUtils.isEmpty(distictName)) {
+        if (MyStringUtils.isEmpty(keyAlg) || MyStringUtils.isEmpty(distictName)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "keyAlg or distictName is empty");
         }
 
@@ -302,7 +301,7 @@ public class Client {
     private String genSM2CSR(String distictName, KeyPair keypair) throws CommandException {
 
         try {
-            if (StringUtils.isEmpty(distictName)) {
+            if (MyStringUtils.isEmpty(distictName)) {
                 throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "distictName is empty");
             }
 
@@ -355,7 +354,7 @@ public class Client {
             try {
                 logger.info("Initializing client with config: {}", clientCfg);
                 String mspDir = clientCfg.getMspDir();
-                if (StringUtils.isEmpty(mspDir) || "<<<MSPDIR>>>".equalsIgnoreCase(mspDir)) {
+                if (MyStringUtils.isEmpty(mspDir) || "<<<MSPDIR>>>".equalsIgnoreCase(mspDir)) {
                     clientCfg.setMspDir("msp");
                 }
                 mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homedir);
@@ -454,7 +453,7 @@ public class Client {
     }
     private RegistrationResponse buildRegistrationResponse(RegistrationResponseNet responseNet) throws CommandException {
         final String redentials = responseNet.getResult().getRedentials();
-        if (StringUtils.isEmpty(redentials)) {
+        if (MyStringUtils.isEmpty(redentials)) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD);
         }
         return new RegistrationResponse(redentials);
@@ -464,7 +463,6 @@ public class Client {
         RevokeRequestNet registrationRequestNet = buildRevokeRequestNet(registrationRequest);
         final RevokeResponseNet responseNet = revokeComms.request(registrationRequestNet, token);
         if (responseNet.isSuccess()) {
-//            removeCert
             return buildRevokeResponse(responseNet);
         } else {
             throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_RESPONSE_NOT_SUCCESS);

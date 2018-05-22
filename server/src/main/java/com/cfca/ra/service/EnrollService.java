@@ -63,7 +63,7 @@ public class EnrollService {
                     ca.fillCAInfo(response);
                     String name = serverRequestContext.getEnrollmentID();
                     server.storeCert(caName, name, b64cert);
-                    server.updateEnrollIdStore(caName, name, name);
+                    ca.updateEnrollIdStore(name, name);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();

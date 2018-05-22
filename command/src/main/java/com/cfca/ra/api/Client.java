@@ -16,7 +16,6 @@ import java.util.HashMap;
  */
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-    private static final String CA_CLIENT_CONFIG_FILENAME = "ca-client-config.properties";
 
     public static void main(String[] args) throws Exception {
         final Client client = new Client();

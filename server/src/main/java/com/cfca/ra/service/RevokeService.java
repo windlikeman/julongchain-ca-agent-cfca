@@ -57,7 +57,9 @@ public class RevokeService {
 
             if (!StringUtils.isEmpty(data.getId())) {
                 final IUser user = ca.getRegistry().getUser(data.getId(), null);
-                user.revoke();
+                if (user != null) {
+                    user.revoke();
+                }
             }
 
             final String result = raClient.revoke(data);

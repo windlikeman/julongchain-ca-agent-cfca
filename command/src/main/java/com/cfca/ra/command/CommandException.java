@@ -1,6 +1,6 @@
 package com.cfca.ra.command;
 
-import com.cfca.ra.command.utils.StringUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
 
 import java.util.HashMap;
 
@@ -127,33 +127,29 @@ public class CommandException extends Exception {
     public static final int REASON_CODE_REENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT = 0x7005;
 
     /**
-     * REGISTER 命令加载配置文件失败
-     */
-    public static final int REASON_CODE_REGISTER_COMMAND_LOAD_CONFIG_FAILED = 0x8001;
-    /**
      * REGISTER 命令解析命令行参数失败
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_ARGS_INVALID = 0x8002;
+    public static final int REASON_CODE_REGISTER_COMMAND_ARGS_INVALID = 0x8001;
     /**
      * REGISTER 命令网络通信失败
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_COMMS_FAILED = 0x8003;
+    public static final int REASON_CODE_REGISTER_COMMAND_COMMS_FAILED = 0x8002;
     /**
      * REGISTER 命令服务器返回失败的回复
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS = 0x8004;
+    public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS = 0x8003;
     /**
      * REGISTER 命令服务器返回失败的回复
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD = 0x8005;
+    public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD = 0x8004;
     /**
      * REGISTER 命令加载注册数据库文件失败
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_LOAD_REGISTER_FILE = 0x8006;
+    public static final int REASON_CODE_REGISTER_COMMAND_LOAD_REGISTER_FILE = 0x8005;
     /**
      * REGISTER 命令更新注册数据库文件失败
      */
-    public static final int REASON_CODE_REGISTER_COMMAND_UPDATE_REGISTER_FILE = 0x8007;
+    public static final int REASON_CODE_REGISTER_COMMAND_UPDATE_REGISTER_FILE = 0x8006;
 
     /**
      * REVOKE 命令解析命令行参数失败
@@ -242,7 +238,6 @@ public class CommandException extends Exception {
             put(REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "the reenroll command fail to parse CLI parameters");
             put(REASON_CODE_REENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT, "the reenroll command fail to initiallize with config file missing enrollment");
 
-            put(REASON_CODE_REGISTER_COMMAND_LOAD_CONFIG_FAILED, "the register command fail to initiallize with config file");
             put(REASON_CODE_REGISTER_COMMAND_ARGS_INVALID, "the register command fail to parse CLI parameters");
             put(REASON_CODE_REGISTER_COMMAND_COMMS_FAILED, "the register command fail to communicate with server");
             put(REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS, "the register command fail to get successful response from server");
@@ -313,7 +308,7 @@ public class CommandException extends Exception {
 
     @Override
     public String getMessage() {
-        if (!StringUtils.isBlank(message)) {
+        if (!MyStringUtils.isBlank(message)) {
             return message;
         }
         return messageCatalog.getOrDefault(reasonCode, "Unknown error message");

@@ -1,8 +1,7 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
-import com.cfca.ra.command.utils.StringUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -55,7 +54,7 @@ class RegisterComms {
      */
     RegistrationResponseNet request(RegistrationRequestNet registrationRequestNet, String auth) throws CommandException {
         final String baseurl = clientConfig.getUrl();
-        if (StringUtils.isBlank(baseurl)) {
+        if (MyStringUtils.isBlank(baseurl)) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_COMMS_FAILED, "baseurl is empty");
         }
         Retrofit retrofit = new Retrofit.Builder()
@@ -76,10 +75,6 @@ class RegisterComms {
         try {
             Response<RegistrationResponseNet> response = call.execute();
             RegistrationResponseNet decodedResponse = response.body();
-            if (!response.isSuccessful()) {
-                logger.error("response is not successful : " + response.message());
-                return null;
-            }
 
             if (decodedResponse == null) {
                 logger.error("response body is null");

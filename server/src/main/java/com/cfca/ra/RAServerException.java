@@ -176,18 +176,30 @@ public class RAServerException extends Exception {
      * CA:加载公钥文件失败
      */
     public static final int REASON_CODE_CA_LOAD_CERT = 0xc005;
-    /**
-     * CA:更新ENROLLID失败
-     */
-    public static final int REASON_CODE_CA_UPDATE_ENROLLID_FILE = 0xc006;
-    /**
-     * CA:加载ENROLLID失败
-     */
-    public static final int REASON_CODE_CA_LOAD_ENROLLID_FILE = 0xc007;
+
     /**
      * CA:检查 ID 是否被注册时失败
      */
     public static final int REASON_CODE_CA_CHECK_ID_REGISTERED = 0xc008;
+
+    /**
+     * USER_STORE:读取用户信息数据库异常
+     */
+    public static final int REASON_CODE_USER_STORE_LOAD_EXCEPTION = 0xd001;
+    /**
+     * USER_STORE:更新用户信息数据库异常
+     */
+    public static final int REASON_CODE_USER_STORE_UPDATE_EXCEPTION = 0xd002;
+
+    /**
+     * ENROLLIDSTORE:更新ENROLLID失败
+     */
+    public static final int REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE = 0xe001;
+    /**
+     * ENROLLIDSTORE:加载ENROLLID失败
+     */
+    public static final int REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE = 0xe002;
+
 
     private String message;
 
@@ -239,9 +251,13 @@ public class RAServerException extends Exception {
             put(REASON_CODE_CA_STORE_CERT_WITH_PEM, "ca fail to store cert due to pem file format");
             put(REASON_CODE_CA_STORE_CERT_INVALID_ARGS, "ca fail to store cert due to invalid args");
             put(REASON_CODE_CA_LOAD_CERT, "ca fail to load cert due to pem operation");
-            put(REASON_CODE_CA_UPDATE_ENROLLID_FILE, "ca fail to update enroll id dat file");
-            put(REASON_CODE_CA_LOAD_ENROLLID_FILE, "ca fail to load update enroll id dat file");
             put(REASON_CODE_CA_CHECK_ID_REGISTERED, "ca fail to check id registered");
+
+            put(REASON_CODE_USER_STORE_LOAD_EXCEPTION, "user store fail to load");
+            put(REASON_CODE_USER_STORE_UPDATE_EXCEPTION, "user store fail to update");
+
+            put(REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE, "enrollid store fail to update enroll id dat file");
+            put(REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE, "enrollid store fail to load update enroll id dat file");
 
         }
     };

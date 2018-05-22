@@ -9,7 +9,7 @@ import com.cfca.ra.command.config.CsrConfig;
  * @CodeReviewer
  * @since v3.0.0
  */
-public class EnrollmentRequest {
+class EnrollmentRequest {
     /**
      * The label used in HSM operations
      */
@@ -78,7 +78,7 @@ public class EnrollmentRequest {
                 '}';
     }
 
-    public static class Builder {
+    static class Builder {
         private final String password;
         private final String username;
         private final String profile;

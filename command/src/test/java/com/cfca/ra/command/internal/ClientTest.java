@@ -1,12 +1,8 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ClientTest {
 

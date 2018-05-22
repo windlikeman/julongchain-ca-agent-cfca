@@ -1,11 +1,9 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.utils.ConfigUtils;
-import com.cfca.ra.command.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

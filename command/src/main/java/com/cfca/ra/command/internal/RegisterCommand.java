@@ -1,7 +1,7 @@
 package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.CommandException;
-import com.cfca.ra.command.utils.StringUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +67,7 @@ public final class RegisterCommand extends BaseClientCommand {
 
         final String secret = resp.getSecret();
         logger.info("Password: {}", secret);
-        if (StringUtils.isEmpty(secret)) {
+        if (MyStringUtils.isEmpty(secret)) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS);
         }
 

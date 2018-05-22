@@ -42,7 +42,7 @@ public class PemUtils {
     }
 
     public static Certificate loadCert(String fileName) throws IOException {
-        if (StringUtils.isBlank(fileName)) {
+        if (MyStringUtils.isBlank(fileName)) {
             throw new IOException();
         }
         final PemObject certObject = loadFile(fileName);
@@ -62,7 +62,7 @@ public class PemUtils {
     }
 
     public static PrivateKey loadPrivateKey(String fileName) throws IOException {
-        if (StringUtils.isBlank(fileName)) {
+        if (MyStringUtils.isBlank(fileName)) {
             throw new IOException("loadPrivateKey fileName is blank");
         }
         final PemObject certObject = loadFile(fileName);
@@ -74,7 +74,7 @@ public class PemUtils {
     }
 
     private static PemObject loadFile(String fileName) throws IOException {
-        if (StringUtils.isBlank(fileName)) {
+        if (MyStringUtils.isBlank(fileName)) {
             throw new IOException("loadFile fileName is blank");
         }
         File file = new File(fileName);
@@ -88,7 +88,7 @@ public class PemUtils {
     }
 
     public static byte[] loadFileContent(String fileName) throws IOException {
-        if (StringUtils.isBlank(fileName)) {
+        if (MyStringUtils.isBlank(fileName)) {
             throw new IOException("loadFileContent fileName is blank");
         }
         final PemObject certObject = loadFile(fileName);

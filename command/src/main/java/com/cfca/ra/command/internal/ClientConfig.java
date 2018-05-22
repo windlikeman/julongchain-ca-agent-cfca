@@ -1,4 +1,4 @@
-package com.cfca.ra.command;
+package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.internal.*;

@@ -1,11 +1,10 @@
 package com.cfca.ra.command.internal;
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.utils.ConfigUtils;
-import com.cfca.ra.command.utils.StringUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +99,7 @@ public final class EnrollCommand extends BaseClientCommand {
      * @throws CommandException 失败则返回
      */
     private EnrollmentResponse enrollWithConfig(String rawurl) throws CommandException {
-        if (StringUtils.isEmpty(rawurl)) {
+        if (MyStringUtils.isEmpty(rawurl)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "rawurl is empty");
         }
 
@@ -109,7 +108,7 @@ public final class EnrollCommand extends BaseClientCommand {
         final String host = purl.getHost();
 
         final String scheme = purl.getScheme();
-        if (StringUtils.isEmpty(host)) {
+        if (MyStringUtils.isEmpty(host)) {
             String expecting = String.format(
                     "%s://<host>", scheme);
             String message = String.format("The URL of the server is missing the host; found '%s' but expecting '%s'", rawurl, expecting);
@@ -119,17 +118,17 @@ public final class EnrollCommand extends BaseClientCommand {
         final String username = purl.getUsername();
         final String password = purl.getPassword();
 
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+        if (MyStringUtils.isEmpty(username) || MyStringUtils.isEmpty(password)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "missing the enrollment ID and secret");
         }
 
         final CsrConfig csrConfig = clientCfg.getCsrConfig();
         final String caName = clientCfg.getCaName();
-        if (StringUtils.isEmpty(caName)) {
+        if (MyStringUtils.isEmpty(caName)) {
             throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_CA_NAME, "clientCfg missing caName");
         }
         String profile = clientCfg.getEnrollmentRequest().getProfile();
-        if (StringUtils.isEmpty(profile)) {
+        if (MyStringUtils.isEmpty(profile)) {
             throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_PROFILE, "enrollmentRequest missing profile");
         }
         final EnrollmentRequest enrollmentRequest = new EnrollmentRequest.Builder(username, password, profile, csrConfig, caName).build();

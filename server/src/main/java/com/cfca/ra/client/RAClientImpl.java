@@ -67,7 +67,7 @@ public class RAClientImpl implements IRAClient {
                 logger.info("revoke<<<<<<"+certServiceResponseVO.getResultMessage());
                 return "revoke success";
             }else {
-                throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, "not found dn in server ");
+                throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, "the dn of cert want to be revoked not found in server ");
             }
         } catch (RATKException e) {
             throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, e);
@@ -76,9 +76,6 @@ public class RAClientImpl implements IRAClient {
 
     private String getDistictName(RevokeRequestNet data) throws RAServerException {
         try {
-            /**
-             * "2000631224"
-             */
             String serialNo = data.getSerial();
             QueryRequestVO queryRequestVO = new QueryRequestVO();
             queryRequestVO.setTxCode("7102");

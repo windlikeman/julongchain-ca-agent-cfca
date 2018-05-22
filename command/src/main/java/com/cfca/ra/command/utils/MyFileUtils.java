@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.Charset;
 
 /**
  * @author zhangchong
@@ -28,7 +27,7 @@ public class MyFileUtils {
      * @throws Exception
      */
     public static void createNewFile(String filePath) throws CommandException {
-        if (StringUtils.isEmpty(filePath)) {
+        if (MyStringUtils.isEmpty(filePath)) {
             throw new CommandException(CommandException.REASON_CODE_FILE_CREATE_NEW_FILE, "failed to create file because filePath is empty");
         }
         try {
@@ -53,7 +52,7 @@ public class MyFileUtils {
     }
 
     public static String getDir(String filePath) throws CommandException {
-        if (StringUtils.isEmpty(filePath)) {
+        if (MyStringUtils.isEmpty(filePath)) {
             throw new CommandException(CommandException.REASON_CODE_FILE_GET_DIR_PATH, "failed to get file dir because filePath is empty");
         }
         try {
@@ -72,7 +71,7 @@ public class MyFileUtils {
      * @throws CommandException
      */
     public static boolean fileExists(String filename) throws CommandException {
-        if (StringUtils.isEmpty(filename)) {
+        if (MyStringUtils.isEmpty(filename)) {
             throw new CommandException(CommandException.REASON_CODE_FILE_EXISTS, "failed to check file exists because filename is empty");
         }
         try {
@@ -84,7 +83,7 @@ public class MyFileUtils {
     }
 
     public static String makeFileAbs(String filename, String dir) {
-        if (StringUtils.isEmpty(filename)) {
+        if (MyStringUtils.isEmpty(filename)) {
             return "";
         }
 
@@ -97,7 +96,7 @@ public class MyFileUtils {
     }
 
     public static String makeFileAbs(String dir) {
-        if (StringUtils.isEmpty(dir)) {
+        if (MyStringUtils.isEmpty(dir)) {
             return "";
         }
 

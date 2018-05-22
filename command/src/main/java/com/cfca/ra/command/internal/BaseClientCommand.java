@@ -1,7 +1,6 @@
 package com.cfca.ra.command.internal;
 
 
-import com.cfca.ra.command.ClientConfig;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.IClientCommand;
 import com.cfca.ra.command.utils.*;
@@ -9,10 +8,8 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.cert.X509Certificate;
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author zhangchong
@@ -92,17 +89,17 @@ public abstract class BaseClientCommand implements IClientCommand {
                     break;
             }
         }
-        if(StringUtils.isEmpty(host)){
+        if(MyStringUtils.isEmpty(host)){
             String expecting = "-h host -p port";
             String message = String.format("The args of the command["+name+"] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_HOST, message);
         }
-        if(StringUtils.isEmpty(port)){
+        if(MyStringUtils.isEmpty(port)){
             String expecting = "-h host -p port -a<json string>";
             String message = String.format("The args of the command["+name+"] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, message);
         }
-        if(StringUtils.isEmpty(content)){
+        if(MyStringUtils.isEmpty(content)){
             String expecting = "-h host -p port -a<json string>";
             String message = String.format("The args of the command["+name+"] is missing the content; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, message);
@@ -142,7 +139,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     }
 
     private boolean shouldCreateDefaultConfig(String cmdName) throws CommandException {
-        if (StringUtils.isEmpty(cmdName)) {
+        if (MyStringUtils.isEmpty(cmdName)) {
             throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "fail to create defaultConfig in 'shouldCreateDefaultConfig',because cmdName is empty");
         }
         return COMMAND_NAME_ENROLL.equals(cmdName);
@@ -174,13 +171,13 @@ public abstract class BaseClientCommand implements IClientCommand {
 
         String defaultConfig = getDefaultConfigFile(CA_CLIENT_CONFIG_FILENAME);
 
-        if (StringUtils.isEmpty(this.cfgFileName)) {
+        if (MyStringUtils.isEmpty(this.cfgFileName)) {
             this.cfgFileName = defaultConfig;
         } else {
             configFileSet = true;
         }
 
-        if (StringUtils.isEmpty(this.homeDirectory)) {
+        if (MyStringUtils.isEmpty(this.homeDirectory)) {
             this.homeDirectory = MyFileUtils.getDir(defaultConfig);
         } else {
             homeDirSet = true;
@@ -188,7 +185,7 @@ public abstract class BaseClientCommand implements IClientCommand {
 
         this.homeDirectory = MyFileUtils.makeFileAbs(this.homeDirectory).trim();
         //如果末尾是'/' 去掉它
-        this.homeDirectory = StringUtils.trimRight(this.homeDirectory, File.separator);
+        this.homeDirectory = MyStringUtils.trimRight(this.homeDirectory, File.separator);
 
         if (configFileSet && homeDirSet) {
             logger.info("Using both --config and --home CLI flags; --config will take precedence");
@@ -223,7 +220,7 @@ public abstract class BaseClientCommand implements IClientCommand {
 //        final String mspDir = clientCfg.getMspDir();
 //        final String url = clientCfg.getUrl();
 //        String fname = requireCAChainFileName(url);
-//        if (StringUtils.isEmpty(clientCfg.getCaName())) {
+//        if (MyStringUtils.isEmpty(clientCfg.getCaName())) {
 //            fname = String.format("%s-%s", fname, clientCfg.getCaName());
 //        }
 //        fname = fname.replace(":", "-");

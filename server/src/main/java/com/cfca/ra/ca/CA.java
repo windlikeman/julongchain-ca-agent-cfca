@@ -3,24 +3,19 @@ package com.cfca.ra.ca;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
-import com.cfca.ra.utils.PemUtils;
-import com.google.gson.Gson;
-import org.apache.commons.io.FileUtils;
+import com.cfca.ra.ca.register.IUser;
+import com.cfca.ra.ca.repository.CertStore;
+import com.cfca.ra.ca.repository.EnrollIdStore;
+import com.cfca.ra.ca.repository.UserStore;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.DecoderException;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zhangchong
@@ -43,11 +38,11 @@ public class CA {
     private final String configFilePath;
 
     /**
-     * The database handle used to store certificates and optionally
+     * The database handle used to certStore certificates and optionally
      * the user registry information, unless LDAP it enabled for the
      * user registry function.
      */
-    private final CAStore store;
+    private final CertStore certStore;
 
     /**
      * The server hosting this CA
@@ -59,19 +54,17 @@ public class CA {
      */
     private final IUserRegistry registry;
 
-    private ConcurrentMap<String, String> userStore;
-    private ConcurrentMap<String, String> enrollIdStore;
+    private final UserStore userStore;
+    private final EnrollIdStore enrollIdStore;
 
-    private CA(Builder builder) throws RAServerException {
+    private CA(Builder builder){
         this.config = builder.config;
         this.configFilePath = builder.configFilePath;
-        this.store = builder.store;
+        this.certStore = builder.certStore;
         this.server = builder.server;
         this.registry = builder.registry;
-        this.userStore = new ConcurrentHashMap<>();
-        this.userStore.put("admin", "YWRtaW46MTIzNA==");
-        this.enrollIdStore = loadEnrollIdFile();
-        updateEnrollIdFile();
+        this.userStore = builder.userStore;
+        this.enrollIdStore =builder.enrollIdStore;
     }
 
     public String getHomeDir() {
@@ -100,8 +93,8 @@ public class CA {
         return configFilePath;
     }
 
-    public CAStore getStore() {
-        return store;
+    public CertStore getCertStore() {
+        return certStore;
     }
 
     public RAServer getServer() {
@@ -110,100 +103,6 @@ public class CA {
 
     public IUserRegistry getRegistry() {
         return registry;
-    }
-
-    public void storeCert(String username, String b64cert) throws RAServerException {
-        if (StringUtils.isBlank(username)) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_STORE_CERT_INVALID_ARGS, "ca[" + getName() + "] fail to store cert to file, username is empty");
-        }
-
-        if (StringUtils.isBlank(b64cert)) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_STORE_CERT_INVALID_ARGS, "ca[" + getName() + "] fail to store cert to file, b64cert is empty");
-        }
-
-        byte[] decode = null;
-        try {
-            decode = Base64.decode(b64cert);
-            final String homeDir = getHomeDir();
-            final String certFile = buildCertFile(homeDir, username);
-            if (logger.isInfoEnabled()) {
-                logger.info("storeCert<<<<<< store cert to :" + certFile);
-            }
-            PemUtils.storeCert(certFile, decode);
-        } catch (DecoderException e) {
-            final String msg = "storeCert>>>>>> Failure cert:\n" + Hex.toHexString(decode) + "\nfail to decode b64";
-            throw new RAServerException(RAServerException.REASON_CODE_CA_STORE_CERT_B64_DECODE, "fail to store cert to file due to b64 decode :" + msg, e);
-        } catch (IOException e) {
-            final String cert = dumpCertASN1(decode);
-            throw new RAServerException(RAServerException.REASON_CODE_CA_STORE_CERT_WITH_PEM, "fail to store cert to file due to process pem file , cert:\n" + cert, e);
-        }
-    }
-
-    private String dumpCertASN1(byte[] decode) {
-        String result = "none";
-        if (decode == null) {
-            return result;
-        }
-        try {
-            final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(decode);
-            result = ASN1Dump.dumpAsString(asn1Primitive, true);
-        } catch (IOException e) {
-            result = Hex.toHexString(decode) + "\nfail to decode asn1 due to:" + e.getMessage();
-        }
-        return result;
-    }
-
-    public void updateEnrollIdStore(String enrollmentID, String id) throws RAServerException {
-        enrollIdStore.put(id, enrollmentID);
-        updateEnrollIdFile();
-    }
-
-    private ConcurrentHashMap<String, String> loadEnrollIdFile() throws RAServerException {
-        final ConcurrentHashMap<String, String> enrollIdStore = new ConcurrentHashMap<>();
-        final String homeDir = getHomeDir();
-        File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
-        if (!file.exists()) {
-            enrollIdStore.put("admin", "admin");
-            return enrollIdStore;
-        }
-        try {
-            final String s = FileUtils.readFileToString(file);
-            if (logger.isInfoEnabled()) {
-                logger.info("loadEnrollIdFile<<<<<< s:" + s);
-            }
-            final Map map = new Gson().fromJson(s, Map.class);
-            Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
-            Map.Entry<String, String> entry;
-            while (it.hasNext()) {
-                entry = it.next();
-                enrollIdStore.put(entry.getKey(), entry.getValue());
-            }
-            return enrollIdStore;
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_LOAD_ENROLLID_FILE, e);
-        }
-    }
-
-    private void updateEnrollIdFile() throws RAServerException {
-        try {
-            final String homeDir = getHomeDir();
-            File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
-            final String s = new Gson().toJson(enrollIdStore);
-            if (logger.isInfoEnabled()) {
-                logger.info("updateEnrollIdFile<<<<<<" + s);
-            }
-            FileUtils.writeStringToFile(file, s);
-        } catch (IOException e) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_UPDATE_ENROLLID_FILE, e);
-        }
-    }
-
-    public String getEnrollmentId(String id) {
-        String enrollmentId = "admin";
-        if (enrollIdStore.containsKey(id)) {
-            enrollmentId = enrollIdStore.get(id);
-        }
-        return enrollmentId;
     }
 
     public void checkIdRegistered(String id) throws RAServerException {
@@ -215,7 +114,7 @@ public class CA {
             throw new RAServerException(RAServerException.REASON_CODE_CA_CHECK_ID_REGISTERED, "this user id is null");
         }
 
-        if (userStore.containsKey(id)) {
+        if (userStore.containsUser(id)) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_USER_ALREADY_REGISTERED, "this user[" + id + "] not exist already registered in CA[" + getName() + "]");
         }
     }
@@ -224,24 +123,10 @@ public class CA {
         if (userStore == null) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_NOT_READY, "CA[" + getName() + "] user store is null");
         }
-        if (!userStore.containsKey(user)) {
+        if (!userStore.containsUser(user)) {
             throw new RAServerException(RAServerException.REASON_CODE_CA_USER_NOT_EXIST, "this user[" + user + "] not exist in CA[" + getName() + "]");
         }
-        return userStore.get(user);
-    }
-
-    private String buildCertFile(String homeDir, String enrollmentId) {
-        final String certDir = String.join(File.separator, homeDir, "certs");
-        final String certFile = String.format("%s-cert.pem", enrollmentId);
-        return String.join(File.separator, certDir, certFile);
-    }
-
-    public Certificate loadCert(String homeDir, String enrollmentId) throws RAServerException {
-        try {
-            return PemUtils.loadCert(buildCertFile(homeDir, enrollmentId));
-        } catch (IOException e) {
-            throw new RAServerException(RAServerException.REASON_CODE_CA_LOAD_CERT, e);
-        }
+        return userStore.getUser(user);
     }
 
     public void attributeIsTrue(String id, String s) throws RAServerException {
@@ -250,13 +135,36 @@ public class CA {
     public void fillGettcertInfo(GettcertResponseNet resp) {
     }
 
+
+    public String getEnrollmentId(String id) throws RAServerException {
+        return enrollIdStore.getEnrollmentId(id);
+    }
+
+    public void storeCert(String username, String b64cert) throws RAServerException {
+        certStore.storeCert(username, b64cert);
+    }
+
+    public Certificate loadCert(String enrollmentId) throws RAServerException {
+        return certStore.loadCert(enrollmentId);
+    }
+
+    public void updateEnrollIdStore(String enrollmentId, String id) throws RAServerException {
+        enrollIdStore.updateEnrollIdStore(enrollmentId, id);
+    }
+
+    public void updateUserStore(IUser user, String secret) throws RAServerException {
+        userStore.updateUserStore(user, secret);
+    }
+
     public static class Builder {
         private final CAConfig config;
         private final RAServer server;
         private final IUserRegistry registry;
 
         private String configFilePath = "";
-        private CAStore store = new CAStore();
+        private CertStore certStore = CertStore.CFCA;
+        private UserStore userStore = UserStore.CFCA;
+        private EnrollIdStore enrollIdStore = EnrollIdStore.CFCA;
 
         public Builder(RAServer server, CAConfig config, IUserRegistry registry) {
             this.server = server;
@@ -264,17 +172,27 @@ public class CA {
             this.registry = registry;
         }
 
+        public Builder enrollIdStore(EnrollIdStore v) {
+            this.enrollIdStore = v;
+            return this;
+        }
+
+        public Builder userStore(UserStore v) {
+            this.userStore = v;
+            return this;
+        }
+
+        public Builder certStore(CertStore v) {
+            this.certStore = v;
+            return this;
+        }
+
         public Builder configFilePath(String v) {
             this.configFilePath = v;
             return this;
         }
 
-        public Builder store(CAStore v) {
-            this.store = v;
-            return this;
-        }
-
-        public CA build() throws RAServerException {
+        public CA build()  {
             return new CA(this);
         }
     }
@@ -287,17 +205,19 @@ public class CA {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final CA ca = (CA) o;
+        CA ca = (CA) o;
         return Objects.equals(config, ca.config) &&
                 Objects.equals(configFilePath, ca.configFilePath) &&
-                Objects.equals(store, ca.store) &&
+                Objects.equals(certStore, ca.certStore) &&
                 Objects.equals(server, ca.server) &&
-                Objects.equals(registry, ca.registry);
+                Objects.equals(registry, ca.registry) &&
+                userStore == ca.userStore &&
+                enrollIdStore == ca.enrollIdStore;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(config, configFilePath, store, server, registry);
+        return Objects.hash(config, configFilePath, certStore, server, registry, userStore, enrollIdStore);
     }
 
     public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet) {

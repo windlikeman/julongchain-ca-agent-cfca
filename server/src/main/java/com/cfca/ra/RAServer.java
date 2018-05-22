@@ -1,9 +1,9 @@
 package com.cfca.ra;
 
-import com.cfca.ra.ca.CA;
-import com.cfca.ra.ca.CAConfig;
-import com.cfca.ra.ca.CAInfo;
-import com.cfca.ra.ca.DefaultUserRegistry;
+import com.cfca.ra.ca.*;
+import com.cfca.ra.ca.repository.CertStore;
+import com.cfca.ra.ca.repository.EnrollIdStore;
+import com.cfca.ra.ca.repository.UserStore;
 import com.cfca.ra.utils.MyFileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -103,7 +103,7 @@ public class RAServer {
         CAInfo existedOne;
         String message;
         while (iter.hasNext()) {
-            entry = (Map.Entry<String, CA>) iter.next();
+            entry = iter.next();
             value = entry.getValue();
             existedOne = value.getConfig().getCA();
             if (existedOne != null && caName.equals(existedOne.getName())) {
@@ -111,7 +111,6 @@ public class RAServer {
                         caName, adding.getConfigFilePath(), value.getConfigFilePath());
                 throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_ADD_CA_EXCEPTION, message);
             }
-            //FIXME: compareDN(existedOne.getCertfile(), addingOne.getCertfile())
         }
         caMap.put(caName, adding);
 
@@ -126,8 +125,11 @@ public class RAServer {
             final CAInfo caInfo = new CAInfo.Builder(name, homeDir).build();
             local = new CAConfig.Builder(caInfo).build();
         }
-        DefaultUserRegistry registry = new DefaultUserRegistry(local.getCA().getHomeDir());
-        CA.Builder defaultCABuilder = new CA.Builder(this, local, registry);
+        DefaultUserRegistry registry = new DefaultUserRegistry();
+        CA.Builder defaultCABuilder = new CA.Builder(this, local, registry)
+                .enrollIdStore(EnrollIdStore.CFCA)
+                .userStore(UserStore.CFCA)
+                .certStore(CertStore.CFCA);
         CA defaultCA = defaultCABuilder.build();
 
         logger.info("Init default CA with home {} and config {}", defaultCA.getHomeDir(), defaultCA.getConfig());
@@ -155,18 +157,13 @@ public class RAServer {
     public PublicKey getKey(final String caName, final String enrollmentId) throws RAServerException {
         try {
             final CA ca = getCA(caName);
-            final Certificate certificate = ca.loadCert(ca.getHomeDir(), enrollmentId);
+            final Certificate certificate = ca.loadCert(enrollmentId);
             final SubjectPublicKeyInfo subjectPublicKeyInfo = certificate.getSubjectPublicKeyInfo();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             return converter.getPublicKey(subjectPublicKeyInfo);
         } catch (Exception e) {
             throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_GET_KEY_EXCEPTION, e);
         }
-    }
-
-    public void updateEnrollIdStore(final String caName, final String enrollmentID, final String id) throws RAServerException {
-        final CA ca = getCA(caName);
-        ca.updateEnrollIdStore(enrollmentID, id);
     }
 
     public String getEnrollmentId(final String caName, final String id) throws RAServerException {
