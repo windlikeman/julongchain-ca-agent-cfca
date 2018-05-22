@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Bootstrap Admin Theme v3</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- jQuery UI -->
+    <link href="https://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" rel="stylesheet" media="screen">
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- styles -->
+    <link href="css/styles.css" rel="stylesheet">
+
+    <link href="css/stats.css" rel="stylesheet">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery-3.2.0.js"></script>
+    <script src="js/vue.js"></script>
+    <script type="text/javascript" src="js/iframeResizer.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('iframe').iFrameResize({
+                //log                     : true,                  // Enable console logging
+                minHeight: 1,
+                inPageLinks: true,
+                resizedCallback: function (messageData) { // Callback fn when resize is received
+
+                },
+                messageCallback: function (messageData) { // Callback fn when message is received;
+                    swal(messageData.message);
+                    //document.getElementsByTagName('iframe')[0].iFrameResizer.sendMessage('Hello back from parent page');
+                },
+                closedCallback: function (id) { // Callback fn when iFrame is closed
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div style="margin-bottom: 8%;padding-bottom: 5%">
+
+    <div class="header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-1">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <h1 style="color:white">MFV用户体验提升系统</h1>
+                    </div>
+                </div>
+                <!--<<div class="col-md-5">
+                   <div class="row">
+                     <div class="col-lg-12">
+                       <div class="input-group form">
+                            <input type="text" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                              <button class="btn btn-primary" type="button">Search</button>
+                            </span>
+                       </div>
+                     </div>
+                   </div>
+                </div>-->
+                <div class="row">
+                    <div class="col-xs-1 ">
+                        <div style="text-align:center;">
+                            <a href="#"
+                               style="color: white"><h1></h1>修改密码</h1></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-1 ">
+                        <div style="text-align:center">
+                            <a href="#"
+                               style="color: white"><h1></h1>退出登录</h1></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

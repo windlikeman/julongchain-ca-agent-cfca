@@ -1,0 +1,84 @@
+package com.cfca.ra.command.internal;
+
+import java.util.Arrays;
+
+/**
+ * @author zhangchong
+ * @create 2018/5/11
+ * @Description 其中包含了证书信息
+ * @CodeReviewer
+ * @since v3.0.0
+ */
+public class ServerInfo {
+    private final String caName;
+    /**
+     * CAChain 就是 CA 证书链.
+     * 链表中的第一个元素就是CA根证书
+     */
+    private final byte[] caChain;
+
+    /**
+     * 服务器版本号
+     */
+    private final String version;
+
+    private ServerInfo(Builder builder){
+        this.caName = builder.caName;
+        this.caChain = builder.caChain;
+        this.version = builder.version;
+    }
+
+    public static class Builder{
+        private String caName;
+        /**
+         * CAChain 就是 CA 证书链.
+         * 链表中的第一个元素就是CA根证书
+         */
+        private byte[] caChain;
+
+        /**
+         * 服务器版本号
+         */
+        private String version = "v3.0.0";
+
+        public Builder caName(String caName){
+            this.caName = caName;
+            return this;
+        }
+
+        public Builder caChain(byte[] caChain){
+            this.caChain = caChain;
+            return this;
+        }
+
+        public Builder version(String version){
+            this.version = version;
+            return this;
+        }
+
+        public ServerInfo build(){
+            return new ServerInfo(this);
+        }
+    }
+
+    public String getCaName() {
+        return caName;
+    }
+
+    public byte[] getCaChain() {
+        return caChain;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "caName='" + caName + '\'' +
+                ", caChain=" + Arrays.toString(caChain) +
+                ", version='" + version + '\'' +
+                '}';
+    }
+}
