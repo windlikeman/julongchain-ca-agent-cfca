@@ -17,12 +17,6 @@ public interface Affiliation {
 
     /**
      *
-     * @return preKey
-     */
-    String getPrekey();
-
-    /**
-     *
      * @return 返回用户权限级别
      */
     int getLevel();

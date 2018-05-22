@@ -1,4 +1,4 @@
-package com.cfca.ra.ca.register;
+package com.cfca.ra.register;
 
 import com.cfca.ra.beans.RegistrationRequest;
 
@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description 用户信息
  * @CodeReviewer
  * @since v3.0.0
  */

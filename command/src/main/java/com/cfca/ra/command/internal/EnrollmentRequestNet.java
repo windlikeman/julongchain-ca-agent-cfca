@@ -5,7 +5,7 @@ import com.cfca.ra.command.config.CsrConfig;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description 用于调用服务器Restful接口用的参数
+ * @Description enroll接口网络请求参数,用于调用服务器Restful接口
  * @CodeReviewer
  * @since v3.0.0
  */

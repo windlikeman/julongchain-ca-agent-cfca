@@ -1,12 +1,12 @@
-package com.cfca.ra.ca.repository;
+package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ca.register.IUser;
+import com.cfca.ra.register.IUser;
 
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description 用户信息数据库接口, 用于检索用户, 更新用户信息
  * @CodeReviewer
  * @since
  */

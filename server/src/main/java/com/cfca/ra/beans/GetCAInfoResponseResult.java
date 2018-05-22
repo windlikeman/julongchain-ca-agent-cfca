@@ -3,7 +3,7 @@ package com.cfca.ra.beans;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * @Description
+ * @Description  GetCAInfo命令的返回的CA信息
  * @CodeReviewer
  * @since v3.0.0
  */

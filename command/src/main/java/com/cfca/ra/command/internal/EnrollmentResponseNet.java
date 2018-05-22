@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description 网络请求返回的结果
+ * @Description enroll接口网络响应请求参数,用于调用服务器Restful接口
  * @CodeReviewer
  * @since v3.0.0
  */

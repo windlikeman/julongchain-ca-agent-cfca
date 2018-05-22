@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description ClientIdentity 用于标识客户端
  * @CodeReviewer
  * @since v3.0.0
  */

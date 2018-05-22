@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description 签发证书命令
+ * @Description 注册用户命令
  * @CodeReviewer
  * @since v3.0.0
  */

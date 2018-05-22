@@ -3,7 +3,7 @@ package com.cfca.ra.command.internal;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description GettCert命令服务器返回给客户端交易证书所用的对称加密密钥,用以解密
  * @CodeReviewer
  * @since v3.0.0
  */

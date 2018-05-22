@@ -3,7 +3,7 @@ package com.cfca.ra.beans;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description enroll接口网络请求参数,用于调用服务器Restful接口
  * @CodeReviewer
  * @since v3.0.0
  */

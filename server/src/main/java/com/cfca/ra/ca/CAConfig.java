@@ -6,7 +6,8 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description ca的配置
+ * @Description CA 配置信息,包含与证书颁发机构相关的信息, 包括CA的名称, 对于区块链网络的所有成员而言, 该名称应该是唯一的.
+ * 它还包括发放登记证书(ECerts)和交易证书(TCerts)时使用的密钥和证书文件.
  * @CodeReviewer
  * @since v3.0.0
  */

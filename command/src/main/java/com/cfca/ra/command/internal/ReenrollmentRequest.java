@@ -5,7 +5,7 @@ import com.cfca.ra.command.config.CsrConfig;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * @Description
+ * @Description 重新签发证书命令的内部使用的请求,用于适配网络Restful接口请求
  * @CodeReviewer
  * @since v3.0.0
  */

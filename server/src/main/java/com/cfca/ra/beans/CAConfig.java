@@ -3,13 +3,22 @@ package com.cfca.ra.beans;
 /**
  * @author zhangchong
  * @create 2018/5/15
- * @Description
+ * @Description CA 配置信息
  * @CodeReviewer
  * @since v3.0.0
  */
 public class CAConfig {
+    /**
+     *
+     */
     private int pathlen;
+    /**
+     *
+     */
     private int pathlenzero;
+    /**
+     *
+     */
     private int expiry;
 
     public int getPathlen() {

@@ -5,11 +5,11 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 命令行内部使用的GettCert 命令请求,用于适配网络Restful接口请求
  * @CodeReviewer
  * @since v3.0.0
  */
-public class GetTCertRequest {
+public class GettCertRequest {
     /**
      * 查询证书数目
      */
@@ -35,7 +35,7 @@ public class GetTCertRequest {
      */
     private final String caname;
 
-    public GetTCertRequest(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caname) {
+    public GettCertRequest(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caname) {
         this.count = count;
         this.attrNames = attrNames;
         this.encryptAttrs = encryptAttrs;
@@ -65,7 +65,7 @@ public class GetTCertRequest {
 
     @Override
     public String toString() {
-        return "GetTCertRequest{" +
+        return "GettCertRequest{" +
                 "count=" + count +
                 ", attrNames=" + attrNames +
                 ", encryptAttrs=" + encryptAttrs +

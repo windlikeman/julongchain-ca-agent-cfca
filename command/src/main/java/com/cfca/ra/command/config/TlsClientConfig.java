@@ -3,7 +3,7 @@ package com.cfca.ra.command.config;
 /**
  * @author zhangchong
  * @create 2018/5/15
- * @Description
+ * @Description 配置了 Tls 的客户端配置信息
  * @CodeReviewer
  * @since v3.0.0
  */

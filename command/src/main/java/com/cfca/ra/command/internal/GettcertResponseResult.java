@@ -5,9 +5,9 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description GettCert命令服务器返回给客户端的tcert 对象
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class GettcertResponseResult {
     /**

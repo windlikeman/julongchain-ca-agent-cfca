@@ -8,15 +8,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author zhangchong
  * @create 2018/5/13
- * @Description
+ * @Description 获取交易证书命令
  * @CodeReviewer
  * @since v3.0.0
  */
-public class GetTCertCommand extends BaseClientCommand {
+public class GettCertCommand extends BaseClientCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(GetTCertCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(GettCertCommand.class);
 
-    public GetTCertCommand() {
+    public GettCertCommand() {
         this.name = COMMAND_NAME_GETTCERT;
     }
 
@@ -25,8 +25,8 @@ public class GetTCertCommand extends BaseClientCommand {
         logger.info("Entered getTCert");
         Identity id = client.loadMyIdentity();
 
-        GetTCertRequest request = clientCfg.getGetTCertRequest();
-        final GetTCertResponse resp = id.gettcert(request);
+        GettCertRequest request = clientCfg.getGettCertRequest();
+        final GettCertResponse resp = id.gettcert(request);
         if (resp == null) {
             throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_COMMS_FAILED, "gettcert command failed to execute, but I do not know why");
         }
@@ -36,8 +36,8 @@ public class GetTCertCommand extends BaseClientCommand {
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
 
-        final GetTCertRequest getTCertRequest = new Gson().fromJson(content, GetTCertRequest.class);
-        clientCfg.setGetTCertRequest(getTCertRequest);
+        final GettCertRequest gettCertRequest = new Gson().fromJson(content, GettCertRequest.class);
+        clientCfg.setGettCertRequest(gettCertRequest);
     }
 
     @Override
@@ -50,9 +50,6 @@ public class GetTCertCommand extends BaseClientCommand {
 
     @Override
     public String getUseage() {
-        /**
-         * "ca-client cainfo -u http://serverAddr:serverPort -M <MSP-directory>"
-         */
         return "ca-client tcert -h host -p port -a <json>";
     }
 

@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description 用于标识 CA 中注册信息
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -19,6 +19,9 @@ public class CAConfigIdentity {
      * password
      */
     private final  String pass;
+    /**
+     *
+     */
     private final String type;
     private final String affiliation;
     private final int maxEnrollments;

@@ -5,11 +5,11 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description GettCert命令服务器返回给客户端的 tcert 对象
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
-public class GettcertResponseResult {
+public class GettCertResponseResult {
     /**
      * Transaction batch identifier
      */
@@ -29,7 +29,7 @@ public class GettcertResponseResult {
      */
     private final List<TCert> tcerts;
 
-    public GettcertResponseResult(int id, int ts, String key, List<TCert> tcerts) {
+    public GettCertResponseResult(int id, int ts, String key, List<TCert> tcerts) {
         this.id = id;
         this.ts = ts;
         this.key = key;

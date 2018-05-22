@@ -47,6 +47,10 @@ public class CommandException extends Exception {
      * 命令行参数缺少 content
      */
     public static final int REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT = 0x2003;
+    /**
+     * 存储CA CHAIN 文件失败
+     */
+    public static final int REASON_CODE_BASE_COMMAND_STORE_CA_CHAIN = 0x2004;
 
     /**
      * ENROLL 命令的参数无效
@@ -200,8 +204,6 @@ public class CommandException extends Exception {
      */
     public static final int REASON_CODE_IDENTITY_CREATE_TOKEN = 0xd001;
 
-
-
     private String message;
 
     private int reasonCode;
@@ -213,6 +215,7 @@ public class CommandException extends Exception {
             put(REASON_CODE_BASE_COMMAND_ARGS_MISSING_HOST, "the base command fail to parse CLI parameters due to missing host");
             put(REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, "the base command fail to parse CLI parameters due to missing port");
             put(REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, "the base command fail to parse CLI parameters due to missing content");
+            put(REASON_CODE_BASE_COMMAND_STORE_CA_CHAIN, "the base command fail to store ca chain file");
 
             put(REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "the enrollment command fail to parse CLI parameters");
             put(REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "the enrollment command failed to communicate with server");

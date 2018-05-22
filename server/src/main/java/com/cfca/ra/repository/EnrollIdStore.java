@@ -1,4 +1,4 @@
-package com.cfca.ra.ca.repository;
+package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.utils.MyFileUtils;

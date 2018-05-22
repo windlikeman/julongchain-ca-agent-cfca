@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author zhangchong
  * @create 2018/5/13
- * @Description
+ * @Description GetCAInfo 命令对象,处理 GetCAInfo 操作
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -32,6 +32,7 @@ public class GetCAInfoCommand extends BaseClientCommand {
         final GetCAInfoRequest getCAInfoRequest = new Gson().fromJson(content, GetCAInfoRequest.class);
         logger.error("prepare<<<<<<" + getCAInfoRequest.toString());
         clientCfg.setGetCAInfoRequest(getCAInfoRequest);
+        clientCfg.setCaName(getCAInfoRequest.getCaName());
 
         mspDir = clientCfg.getMspDir();
         if (mspDir.isEmpty()) {

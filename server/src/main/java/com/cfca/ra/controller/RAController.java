@@ -14,7 +14,7 @@ import java.security.Security;
 /**
  * @author zhangchong
  * @create 2018/5/14
- * @Description 实现类
+ * @Description Restful 接口控制类,目前定义了 enroll reenroll register gettcert getcainfo revoke等接口的处理
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -82,9 +82,9 @@ public class RAController {
     }
 
     @RequestMapping(value = "/tcert", method = RequestMethod.POST)
-    public GettcertResponseNet tcert(@RequestBody(required = false) GettcertRequestNet data, @RequestHeader("Authorization") String auth) {
-        logger.info("/tcert >>>>>> Runnning : GettcertRequestNet=" + data);
-        GettcertResponseNet response = raService.gettcert(data, auth);
+    public GettCertResponseNet tcert(@RequestBody(required = false) GettCertRequestNet data, @RequestHeader("Authorization") String auth) {
+        logger.info("/tcert >>>>>> Runnning : GettCertRequestNet=" + data);
+        GettCertResponseNet response = raService.gettcert(data, auth);
         logger.info("/tcert <<<<<< Finished");
         return response;
     }

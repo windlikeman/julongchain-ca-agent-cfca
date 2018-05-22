@@ -1,7 +1,6 @@
 package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.config.CsrConfig;
-import com.cfca.ra.command.internal.*;
 
 
 /**
@@ -59,14 +58,14 @@ public enum ClientConfig {
      */
     private RevokeRequest revokeRequest;
 
-    private GetTCertRequest getTCertRequest;
+    private GettCertRequest gettCertRequest;
 
-    public GetTCertRequest getGetTCertRequest() {
-        return getTCertRequest;
+    public GettCertRequest getGettCertRequest() {
+        return gettCertRequest;
     }
 
-    public void setGetTCertRequest(GetTCertRequest getTCertRequest) {
-        this.getTCertRequest = getTCertRequest;
+    public void setGettCertRequest(GettCertRequest gettCertRequest) {
+        this.gettCertRequest = gettCertRequest;
     }
 
     public String getAdmin() {

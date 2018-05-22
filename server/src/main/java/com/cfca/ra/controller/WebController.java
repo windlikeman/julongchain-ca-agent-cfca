@@ -8,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- *
- * @author 10046663
- * @date 2017/3/10
+ * @author zhangchong
+ * @create 2018/5/21
+ * @Description 前端测试页面
+ * @CodeReviewer
+ * @since v3.0.0
  */
 @Controller
 public class WebController {

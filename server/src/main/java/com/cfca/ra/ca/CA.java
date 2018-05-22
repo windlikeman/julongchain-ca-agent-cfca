@@ -3,16 +3,17 @@ package com.cfca.ra.ca;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
-import com.cfca.ra.ca.register.IUser;
-import com.cfca.ra.ca.repository.CertStore;
-import com.cfca.ra.ca.repository.EnrollIdStore;
-import com.cfca.ra.ca.repository.UserStore;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.repository.CertCertStore;
+import com.cfca.ra.repository.EnrollIdStore;
+import com.cfca.ra.repository.UserStore;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,13 +21,11 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description  CA 对象,用于支持多CA配置管理
  * @CodeReviewer
  * @since v3.0.0
  */
 public class CA {
-    private static final Logger logger = LoggerFactory.getLogger(CA.class);
-
     /**
      * The CA's configuration
      */
@@ -42,7 +41,7 @@ public class CA {
      * the user registry information, unless LDAP it enabled for the
      * user registry function.
      */
-    private final CertStore certStore;
+    private final CertCertStore certStore;
 
     /**
      * The server hosting this CA
@@ -57,32 +56,14 @@ public class CA {
     private final UserStore userStore;
     private final EnrollIdStore enrollIdStore;
 
-    private CA(Builder builder){
+    private CA(Builder builder) {
         this.config = builder.config;
         this.configFilePath = builder.configFilePath;
         this.certStore = builder.certStore;
         this.server = builder.server;
         this.registry = builder.registry;
         this.userStore = builder.userStore;
-        this.enrollIdStore =builder.enrollIdStore;
-    }
-
-    public String getHomeDir() {
-        final CAInfo ca = config.getCA();
-        String homeDir = "";
-        if (ca != null) {
-            homeDir = ca.getHomeDir();
-        }
-        return homeDir;
-    }
-
-    private String getName() {
-        final CAInfo ca = config.getCA();
-        if (ca != null) {
-            return ca.getName();
-        } else {
-            return "";
-        }
+        this.enrollIdStore = builder.enrollIdStore;
     }
 
     public CAConfig getConfig() {
@@ -93,7 +74,7 @@ public class CA {
         return configFilePath;
     }
 
-    public CertStore getCertStore() {
+    public CertCertStore getCertStore() {
         return certStore;
     }
 
@@ -103,6 +84,42 @@ public class CA {
 
     public IUserRegistry getRegistry() {
         return registry;
+    }
+
+    public String getHomeDir() {
+        String homeDir = "";
+        if (config == null){
+            return homeDir;
+        }
+        final CAInfo ca = config.getCA();
+        if (ca != null) {
+            homeDir = ca.getHomeDir();
+        }
+        return homeDir;
+    }
+
+    private String getName() {
+        String name = "";
+        if (config == null){
+            return name;
+        }
+        final CAInfo ca = config.getCA();
+        if (ca != null) {
+            name = ca.getName();
+        }
+        return name;
+    }
+
+    private String getCaChain() {
+        String chainfile = "";
+        if (config == null){
+            return chainfile;
+        }
+        final CAInfo ca = config.getCA();
+        if (ca != null) {
+            chainfile = ca.getChainfile();
+        }
+        return chainfile;
     }
 
     public void checkIdRegistered(String id) throws RAServerException {
@@ -132,7 +149,7 @@ public class CA {
     public void attributeIsTrue(String id, String s) throws RAServerException {
     }
 
-    public void fillGettcertInfo(GettcertResponseNet resp) {
+    public void fillGettcertInfo(GettCertResponseNet resp) {
     }
 
 
@@ -156,13 +173,17 @@ public class CA {
         userStore.updateUserStore(user, secret);
     }
 
+    public String getCertFile(String serial) throws RAServerException {
+        return certStore.getCertFilePath(serial);
+    }
+
     public static class Builder {
         private final CAConfig config;
         private final RAServer server;
         private final IUserRegistry registry;
 
         private String configFilePath = "";
-        private CertStore certStore = CertStore.CFCA;
+        private CertCertStore certStore = CertCertStore.CFCA;
         private UserStore userStore = UserStore.CFCA;
         private EnrollIdStore enrollIdStore = EnrollIdStore.CFCA;
 
@@ -182,7 +203,7 @@ public class CA {
             return this;
         }
 
-        public Builder certStore(CertStore v) {
+        public Builder certStore(CertCertStore v) {
             this.certStore = v;
             return this;
         }
@@ -192,7 +213,7 @@ public class CA {
             return this;
         }
 
-        public CA build()  {
+        public CA build() {
             return new CA(this);
         }
     }
@@ -220,7 +241,7 @@ public class CA {
         return Objects.hash(config, configFilePath, certStore, server, registry, userStore, enrollIdStore);
     }
 
-    public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet) {
+    public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet) throws RAServerException {
         final List<ServerResponseMessage> messages = new ArrayList<>();
         ServerResponseMessage e1 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_CANAME, getName());
         ServerResponseMessage e2 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_VERSION, config.getVersion());
@@ -236,12 +257,22 @@ public class CA {
         enrollmentResponseNet.setMessages(messages);
     }
 
-    //FIXME
-    private byte[] getCAChain() {
-        return null;
+    private byte[] getCAChain() throws RAServerException{
+        final String homeDir = getHomeDir();
+        final String caChain = getCaChain();
+        final String caChainFilePath = String.join(File.separator, homeDir, caChain);
+        File caChainFile = new File(caChainFilePath);
+        if (!caChainFile.exists()){
+            throw new RAServerException(RAServerException.REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE);
+        }
+        try {
+            return FileUtils.readFileToByteArray(caChainFile);
+        } catch (IOException e) {
+            throw new RAServerException(RAServerException.REASON_CODE_CA_READ_CACHAIN_FILE,e);
+        }
     }
 
-    public void fillCAInfo(GetCAInfoResponseNet resp) {
+    public void fillCAInfo(GetCAInfoResponseNet resp) throws RAServerException {
         final String caName = getName();
         byte[] caChain = getCAChain();
         String chain = "";

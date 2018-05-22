@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -89,22 +90,22 @@ public abstract class BaseClientCommand implements IClientCommand {
                     break;
             }
         }
-        if(MyStringUtils.isEmpty(host)){
+        if (MyStringUtils.isEmpty(host)) {
             String expecting = "-h host -p port";
-            String message = String.format("The args of the command["+name+"] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_HOST, message);
         }
-        if(MyStringUtils.isEmpty(port)){
+        if (MyStringUtils.isEmpty(port)) {
             String expecting = "-h host -p port -a<json string>";
-            String message = String.format("The args of the command["+name+"] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, message);
         }
-        if(MyStringUtils.isEmpty(content)){
+        if (MyStringUtils.isEmpty(content)) {
             String expecting = "-h host -p port -a<json string>";
-            String message = String.format("The args of the command["+name+"] is missing the content; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the content; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, message);
         }
-        clientCfg.setUrl("http://"+host+":"+port);
+        clientCfg.setUrl("http://" + host + ":" + port);
     }
 
     @Override
@@ -217,38 +218,24 @@ public abstract class BaseClientCommand implements IClientCommand {
      * @throws CommandException
      */
     void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
-//        final String mspDir = clientCfg.getMspDir();
-//        final String url = clientCfg.getUrl();
-//        String fname = requireCAChainFileName(url);
-//        if (MyStringUtils.isEmpty(clientCfg.getCaName())) {
-//            fname = String.format("%s-%s", fname, clientCfg.getCaName());
-//        }
-//        fname = fname.replace(":", "-");
-//        fname = fname.replace(".", "-");
-//        fname = fname + ".pem";
-//        String tlsfname = String.format("tls-%s", fname);
-//
-//        String rootCACertsDir = String.join(File.separator, mspDir, "cacerts");
-//        String intCACertsDir = String.join(File.separator, mspDir, "intermediatecerts");
-//        String tlsRootCACertsDir = String.join(File.separator, mspDir, "tlscacerts");
-//        String tlsIntCACertsDir = String.join(File.separator, mspDir, "tlsintermediatecerts");
-//
-//        byte[] chain = serverInfo.getCaChain();
-//        // 解析根证书链将字节解析成 X509证书数组
-//        List<X509Certificate> certs = CertUtils.buildCertsFromP7b(chain);
-//        // 将根证书存入 "cacerts" msp 文件夹,约定第一个位置的证书就是根证书
-//        if (certs != null && !certs.isEmpty()) {
-//            X509Certificate cert = certs.get(0);
-//            if (!CertUtils.isCA(cert)) {
-//                throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "A certificate in the CA chain is not a CA certificate");
-//            }
-//        }
-//        PemUtils.storeCert(rootCACertsDir, fname, cert);
+        final String mspDir = clientCfg.getMspDir();
+        String fname = requireCAChainFileName(clientCfg.getCaName());
+        fname = fname.replace(":", "-");
+        fname = fname.replace(".", "-");
+        fname = fname + ".pem";
+        String rootCACertsDir = String.join(File.separator, mspDir, "cacerts");
+        final String chainFile = String.join(File.separator, rootCACertsDir, fname);
+        byte[] chain = serverInfo.getCaChain();
+        try {
+            PemUtils.storeCert(chainFile, chain);
+        } catch (IOException e) {
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_STORE_CA_CHAIN, e);
+        }
     }
 
-    private String requireCAChainFileName(String url) {
-        logger.info("requireCAChainFileName>>>>>>Running: url=" + url);
-        return "";
+    private String requireCAChainFileName(String caName) {
+        logger.info("requireCAChainFileName>>>>>>Running: caName=" + caName);
+        return caName;
     }
 
 }

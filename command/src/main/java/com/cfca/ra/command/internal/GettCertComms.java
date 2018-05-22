@@ -42,7 +42,7 @@ class GettCertComms {
          */
         @POST("tcert")
         Call<GettcertResponseNet> postWithGettCertRequestNet(
-                @Body GettcertRequestNet request,
+                @Body GettCertRequestNet request,
                 @Header("Authorization") String auth
         );
     }
@@ -52,7 +52,7 @@ class GettCertComms {
      * @return EnrollmentResponseNet
      * @throws IOException 网络请求失败
      */
-    GettcertResponseNet request(GettcertRequestNet registrationRequestNet, String auth) throws CommandException {
+    GettcertResponseNet request(GettCertRequestNet registrationRequestNet, String auth) throws CommandException {
         final String baseurl = clientConfig.getUrl();
         if (MyStringUtils.isBlank(baseurl)) {
             throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_COMMS_FAILED, "baseurl is empty");

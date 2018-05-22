@@ -6,11 +6,11 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description GettCert命令的网络请求对象,用于调用服务器Restful接口
  * @CodeReviewer
  * @since v3.0.0
  */
-public class GettcertRequestNet {
+public class GettCertRequestNet {
     /**
      * 查询证书数目
      */
@@ -37,14 +37,14 @@ public class GettcertRequestNet {
     /**
      * ca名称
      */
-    private final String caname;
+    private final String caName;
 
-    public GettcertRequestNet(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caname) {
+    public GettCertRequestNet(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caName) {
         this.count = count;
         this.attrNames = attrNames;
         this.encryptAttrs = encryptAttrs;
         this.validityPeriod = validityPeriod;
-        this.caname = caname;
+        this.caName = caName;
     }
 
     public int getCount() {
@@ -63,7 +63,7 @@ public class GettcertRequestNet {
         return validityPeriod;
     }
 
-    public String getCaname() {
-        return caname;
+    public String getCaName() {
+        return caName;
     }
 }

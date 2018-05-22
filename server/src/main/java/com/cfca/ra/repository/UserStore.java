@@ -1,7 +1,7 @@
-package com.cfca.ra.ca.repository;
+package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ca.register.IUser;
+import com.cfca.ra.register.IUser;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;

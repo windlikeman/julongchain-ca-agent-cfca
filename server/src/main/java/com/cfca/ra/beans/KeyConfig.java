@@ -3,7 +3,7 @@ package com.cfca.ra.beans;
 /**
  * @author zhangchong
  * @create 2018/5/15
- * @Description
+ * @Description 生成 CSR 带的签名算法和密钥长度
  * @CodeReviewer
  * @since v3.0.0
  */

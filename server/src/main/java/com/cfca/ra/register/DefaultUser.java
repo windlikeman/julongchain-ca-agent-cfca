@@ -1,4 +1,4 @@
-package com.cfca.ra.ca.register;
+package com.cfca.ra.register;
 
 import com.cfca.ra.RAServerException;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @create 2018/5/21
  * @Description 默认的IUser接口实现
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class DefaultUser implements IUser{
     private final UserInfo userInfo;

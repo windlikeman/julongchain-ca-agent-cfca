@@ -35,14 +35,14 @@ public class Client {
         final GetCAInfoCommand getCAInfoCommand = new GetCAInfoCommand();
         final RegisterCommand registerCommand = new RegisterCommand();
         final RevokeCommand revokeCommand = new RevokeCommand();
-        final GetTCertCommand getTCertCommand = new GetTCertCommand();
+        final GettCertCommand gettCertCommand = new GettCertCommand();
 
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_ENROLL, enrollCommand);
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_REENROLL, reenrollCommand);
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_GETCAINFO, getCAInfoCommand);
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_REGISTER, registerCommand);
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_REVOKE, revokeCommand);
-        commandHashMap.put(BaseClientCommand.COMMAND_NAME_GETTCERT, getTCertCommand);
+        commandHashMap.put(BaseClientCommand.COMMAND_NAME_GETTCERT, gettCertCommand);
     }
 
 

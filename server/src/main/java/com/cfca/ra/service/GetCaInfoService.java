@@ -2,11 +2,9 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.beans.GetCAInfoResponseNet;
+import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +14,12 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 获取 CA 相关信息的服务
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 @Service
 public class GetCaInfoService {
-    private static final Logger logger = LoggerFactory.getLogger(GetCaInfoService.class);
     private final RAServer server;
 
     @Autowired

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 重新签发证书的服务
  * @CodeReviewer
  * @since v3.0.0
  */

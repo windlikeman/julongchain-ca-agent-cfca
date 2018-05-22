@@ -16,7 +16,7 @@ import java.security.Signature;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 每一个用户实体,标识每一个用户,使用用户的名称,签名私钥和公钥证书 以及内部客户端来标识
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -127,7 +127,7 @@ class Identity {
         return client.revoke(registrationRequest, token);
     }
 
-    public GetTCertResponse gettcert(GetTCertRequest request) throws CommandException {
+    public GettCertResponse gettcert(GettCertRequest request) throws CommandException {
         final String token = addTokenAuthHdr();
         return client.gettcert(request, token);
     }

@@ -1,8 +1,6 @@
-package com.cfca.ra.ca.repository;
+package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
-
-import java.util.Map;
 
 /**
  * @author zhangchong

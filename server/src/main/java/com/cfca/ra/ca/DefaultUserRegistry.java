@@ -1,18 +1,17 @@
 package com.cfca.ra.ca;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ca.register.IUser;
-import com.cfca.ra.ca.register.UserInfo;
-import com.cfca.ra.ca.repository.RegistryStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.register.UserInfo;
+import com.cfca.ra.repository.RegistryStore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description DefaultUserRegistry 是用于检索用户和组的接口的默认实现
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -47,41 +46,21 @@ public class DefaultUserRegistry implements IUserRegistry {
 
     @Override
     public Affiliation getAffiliation(String name) throws RAServerException {
-        return null;
+        return new DefaultAffiliation(0, name);
     }
 
     @Override
     public Affiliation[] getAllAffiliations(String name) throws RAServerException {
-        return new Affiliation[0];
+        return new Affiliation[]{new DefaultAffiliation(0, name)};
     }
 
     @Override
-    public void insertAffiliation(String name, String prekey, int level) throws RAServerException {
-
+    public void insertAffiliation(String name, int level) throws RAServerException {
+        final DefaultAffiliation defaultAffiliation = new DefaultAffiliation(level, name);
     }
 
     @Override
     public Map<String, String> getProperties(String... names) throws RAServerException {
-        return null;
-    }
-
-    @Override
-    public UserInfo[] getUserLessThanLevel(int version) throws RAServerException {
-        return new UserInfo[0];
-    }
-
-    @Override
-    public UserInfo[] getFilteredUsers(String affiliation, String types) throws RAServerException {
-        return new UserInfo[0];
-    }
-
-    @Override
-    public void deleteAffiliation(String name, boolean force, boolean identityRemoval, boolean isRegistrar) throws RAServerException {
-
-    }
-
-    @Override
-    public void modifyAffiliation(String oldAffiliation, String newAffiliation, boolean force, boolean isRegistrar) throws RAServerException {
-
+        return new HashMap<>();
     }
 }

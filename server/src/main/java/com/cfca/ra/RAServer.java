@@ -1,9 +1,9 @@
 package com.cfca.ra;
 
 import com.cfca.ra.ca.*;
-import com.cfca.ra.ca.repository.CertStore;
-import com.cfca.ra.ca.repository.EnrollIdStore;
-import com.cfca.ra.ca.repository.UserStore;
+import com.cfca.ra.repository.CertCertStore;
+import com.cfca.ra.repository.EnrollIdStore;
+import com.cfca.ra.repository.UserStore;
 import com.cfca.ra.utils.MyFileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -73,7 +73,6 @@ public class RAServer {
 
         defaultCA = initCA(null);
         addCA(defaultCA);
-        logger.info("Home directory for default CA: {}", defaultCA.getHomeDir());
     }
 
     public ServerRequestContext getServerRequestContext() {
@@ -122,6 +121,19 @@ public class RAServer {
             final String name = "CFCA";
             String homeDir = String.join(File.separator, System.getProperty("user.dir"), name);
             homeDir = MyFileUtils.getAbsFilePath(homeDir);
+            final File file = new File(homeDir);
+            if (file.isDirectory()) {
+                if (!file.exists()) {
+                    final boolean mkdirs = file.mkdirs();
+                    if (!mkdirs) {
+                        logger.warn("failed to init CA with create CA home directory :{}", homeDir);
+                        throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_CREATE_CA_HOME_DIR);
+                    }
+                }
+            } else {
+                logger.warn("failed to init CA with create CA home directory due to homeDir not dir type:{}", homeDir);
+            }
+
             final CAInfo caInfo = new CAInfo.Builder(name, homeDir).build();
             local = new CAConfig.Builder(caInfo).build();
         }
@@ -129,7 +141,7 @@ public class RAServer {
         CA.Builder defaultCABuilder = new CA.Builder(this, local, registry)
                 .enrollIdStore(EnrollIdStore.CFCA)
                 .userStore(UserStore.CFCA)
-                .certStore(CertStore.CFCA);
+                .certStore(CertCertStore.CFCA);
         CA defaultCA = defaultCABuilder.build();
 
         logger.info("Init default CA with home {} and config {}", defaultCA.getHomeDir(), defaultCA.getConfig());
@@ -174,5 +186,10 @@ public class RAServer {
     public void checkIdRegistered(final String caname, final String id) throws RAServerException {
         final CA ca = getCA(caname);
         ca.checkIdRegistered(id);
+    }
+
+    public String findCertFile(String caName, String serial) throws RAServerException{
+        final CA ca = getCA(caName);
+        return ca.getCertFile(serial);
     }
 }

@@ -5,49 +5,40 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/15
- * @Description Certificate Signing Request section for generating the CSR for an enrollment certificate (ECert)
+ * @Description 证书签名申请部分，用于生成注册证书的CSR(ECert)
  * @CodeReviewer
  * @since v3.0.0
  */
 public class CsrConfig {
     /**
-     * Used by CAs to determine which domain the certificate is to be generated for
+     * 由CA用来确定要生成证书的common name
      */
     private String cn;
 
     /**
-     * The serialnumber field, if specified, becomes part of the issued
-     * certificate's DN (Distinguished Name).  For example, one use case for this is
-     * a company with its own CA (Certificate Authority) which issues certificates
-     * to its employees and wants to include the employee's serial number in the DN
-     * of its issued certificates.
-     * WARNING: The serialnumber field should not be confused with the certificate's
-     * serial number which is set by the CA but is not a component of the
-     * certificate's DN.
+     * 序列号
      */
     private String serialnumber;
 
     /**
-     *  A list of name objects. Each name object should contain at least one
-     *    "C", "L", "O", or "ST" value (or any combination of these) where these
-     *    are abbreviations for the following:
-     *        "C": country
-     *        "L": locality or municipality (such as city or town name)
-     *        "O": organization
-     *        "OU": organizational unit, such as the department responsible for owning the key;
-     *         it can also be used for a "Doing Business As" (DBS) name
-     *        "ST": the state or province
+     * 证书的一组name. 至少包含下列一个的值:
+     *   "C", "L", "O", or "ST" 他们代表:
+     *       "C": country
+     *       "L": locality or municipality (such as city or town name)
+     *       "O": organization
+     *       "OU": organizational unit, such as the department responsible for owning the key;
+     *       it can also be used for a "Doing Business As" (DBS) name
+     *       "ST": the state or province
      *
-     *    Note that the "OU" or organizational units of an ECert are always set according
-     *    to the values of the identities type and affiliation. OUs are calculated for an enroll
-     *    as OU=<type>, OU=<affiliationRoot>, ..., OU=<affiliationLeaf>. For example, an identity
-     *    of type "client" with an affiliation of "org1.dept2.team3" would have the following
-     *    organizational units: OU=client, OU=org1, OU=dept2, OU=team3
+     *  请注意,ECert的"OU"或组织单位总是根据身份类型和隶属关系的值进行设置
+     *  OU的计算方式为 OU = <type>, OU = <affiliationRoot>,...,OU = <affiliationLeaf>
+     *  例如,具有"org1.dept2.team3"属性的"client"类型的标识将具有以下组织单位:
+     *  OU = client,OU = org1,OU = dept2,OU = team3
      */
     private String names;
 
     /**
-     * A list of host names for which the certificate should be valid
+     * 证书应该有效的主机名列表
      */
     private List<String> hosts;
 

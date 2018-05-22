@@ -1,10 +1,9 @@
-package com.cfca.ra.ca.repository;
+package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.ca.DefaultUserRegistry;
-import com.cfca.ra.ca.register.DefaultUser;
-import com.cfca.ra.ca.register.IUser;
-import com.cfca.ra.ca.register.UserInfo;
+import com.cfca.ra.register.DefaultUser;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.register.UserInfo;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,6 +19,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author zhangchong
+ * @create 2018/5/16
+ * @Description CA 对应注册命令的注册信息库
+ * @CodeReviewer
+ * @since v3.0.0
+ */
 public enum RegistryStore implements IRegistryStore {
     CFCA("CFCA") {
 

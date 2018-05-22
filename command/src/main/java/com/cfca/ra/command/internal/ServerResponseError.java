@@ -2,7 +2,7 @@ package com.cfca.ra.command.internal;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 服务器Restful接口返回给客户端的错误信息
  * @CodeReviewer
  * @since v3.0.0
  */

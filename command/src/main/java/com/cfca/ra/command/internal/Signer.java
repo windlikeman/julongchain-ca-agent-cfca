@@ -7,7 +7,7 @@ import java.security.PrivateKey;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 由签名私钥和对应公钥证书,以及内部的客户端实现组成
  * @CodeReviewer
  * @since v3.0.0
  */

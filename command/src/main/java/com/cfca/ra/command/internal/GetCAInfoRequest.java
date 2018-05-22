@@ -3,7 +3,7 @@ package com.cfca.ra.command.internal;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * @Description
+ * @Description 获取ca信息的命令内部使用的请求参数,用于适配服务器Restful接口用的参数
  * @CodeReviewer
  * @since v3.0.0
  */

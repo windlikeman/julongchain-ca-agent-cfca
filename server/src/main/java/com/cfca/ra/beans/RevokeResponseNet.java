@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/14
- * @Description
+ * @Description 吊销接口服务器返回给客户端的响应对象
  * @CodeReviewer
  * @since v3.0.0
  */

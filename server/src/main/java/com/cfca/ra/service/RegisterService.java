@@ -5,10 +5,10 @@ import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.ca.IUserRegistry;
-import com.cfca.ra.ca.register.DefaultUser;
-import com.cfca.ra.ca.register.IUser;
-import com.cfca.ra.ca.register.UserAttrs;
-import com.cfca.ra.ca.register.UserInfo;
+import com.cfca.ra.register.DefaultUser;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.register.UserAttrs;
+import com.cfca.ra.register.UserInfo;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,9 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 注册服务
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 @Service
 public class RegisterService {

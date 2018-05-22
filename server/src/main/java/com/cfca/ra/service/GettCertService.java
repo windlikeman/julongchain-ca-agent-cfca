@@ -2,9 +2,8 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.GetCAInfoResponseNet;
-import com.cfca.ra.beans.GettcertRequestNet;
-import com.cfca.ra.beans.GettcertResponseNet;
+import com.cfca.ra.beans.GettCertRequestNet;
+import com.cfca.ra.beans.GettCertResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
 import org.bouncycastle.util.encoders.Base64;
@@ -19,9 +18,9 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description 获取交易证书的服务
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class GettCertService {
     private static final Logger logger = LoggerFactory.getLogger(GettCertService.class);
@@ -32,12 +31,12 @@ public class GettCertService {
         server = raServer;
     }
 
-    public GettcertResponseNet gettcert(GettcertRequestNet data, String token) {
+    public GettCertResponseNet gettcert(GettCertRequestNet data, String token) {
         try {
             logger.info("gettcert Entered");
             String id = "admin";
             verifyToken(data.getCaname(), id, token);
-            GettcertResponseNet resp = new GettcertResponseNet(true, null);
+            GettCertResponseNet resp = new GettCertResponseNet(true, null);
             final CA ca = server.getCA(data.getCaname());
             ca.fillGettcertInfo(resp);
             return resp;
@@ -83,10 +82,10 @@ public class GettCertService {
         }
     }
 
-    private GettcertResponseNet buildGettcertErrorServerResponse(RAServerException e) {
+    private GettCertResponseNet buildGettcertErrorServerResponse(RAServerException e) {
         List<ServerResponseError> errors = new ArrayList<>();
         ServerResponseError elem = new ServerResponseError(e.getReasonCode(), e.getMessage());
         errors.add(elem);
-        return new GettcertResponseNet(false, errors);
+        return new GettCertResponseNet(false, errors);
     }
 }

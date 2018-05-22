@@ -32,9 +32,16 @@ public class PemUtils {
         }
     }
 
+    public static Certificate loadCert(File file) throws IOException {
+        if (!file.exists()) {
+            throw new IOException("file [" + file.getAbsolutePath() + "] is not exist");
+        }
+        return loadCert(file.getAbsolutePath());
+    }
+
     public static Certificate loadCert(String fileName) throws IOException {
         if (StringUtils.isBlank(fileName)) {
-            throw new IOException();
+            throw new IOException("file name is blank");
         }
         final PemObject certObject = loadFile(fileName);
         final byte[] certDecoded = certObject.getContent();

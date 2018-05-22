@@ -3,7 +3,7 @@ package com.cfca.ra.beans;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description 鉴权信息
  * @CodeReviewer
  * @since v3.0.0
  */

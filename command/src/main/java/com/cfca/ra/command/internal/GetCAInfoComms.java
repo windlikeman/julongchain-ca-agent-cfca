@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * @Description
+ * @Description 获取证书命令客户端与服务器之间的网络交互, 发送和接受网络消息
  * @CodeReviewer
  * @since v3.0.0
  */

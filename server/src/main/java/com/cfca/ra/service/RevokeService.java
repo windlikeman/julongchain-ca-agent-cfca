@@ -6,7 +6,7 @@ import com.cfca.ra.beans.RevokeRequestNet;
 import com.cfca.ra.beans.RevokeResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
-import com.cfca.ra.ca.register.IUser;
+import com.cfca.ra.register.IUser;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
 import org.apache.commons.lang3.StringUtils;
@@ -25,9 +25,9 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 吊销服务
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 @Service
 public class RevokeService {
@@ -44,12 +44,12 @@ public class RevokeService {
     public RevokeResponseNet revoke(RevokeRequestNet data, String auth) {
         try {
             logger.info("revoke >>>>>> data : " + data + ", auth=" + auth);
-            final String caname = data.getCaname();
+            final String caName = data.getCaname();
             final String id = data.getId();
-            String enrollmentId = getEnrollmentIdFromToken(caname, id, auth);
+            String enrollmentId = getEnrollmentIdFromToken(caName, id, auth);
             logger.info("revoke >>>>>> enrollmentId : " + enrollmentId);
 
-            final CA ca = server.getCA(caname);
+            final CA ca = server.getCA(caName);
             ca.attributeIsTrue(id, "hf.Revoker");
             if (StringUtils.isEmpty(data.getSerial()) && StringUtils.isEmpty(data.getAki()) && StringUtils.isEmpty(data.getId())) {
                 throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_INVALID_REQUEST, "Either Name or Serial and AKI are required for a revoke request");
@@ -63,7 +63,7 @@ public class RevokeService {
             }
 
             final String result = raClient.revoke(data);
-            removeCert(data.getSerial());
+            removeCert(caName, data.getSerial());
             return new RevokeResponseNet(true, result, null, null);
         } catch (RAServerException e) {
             logger.error("revoke >>>>>> Failure : " + e.getMessage(), e);
@@ -71,20 +71,30 @@ public class RevokeService {
         }
     }
 
-    private void removeCert(String serial) throws RAServerException {
-        File file = findCertFile(serial);
+    private void removeCert(String caName, String serial) throws RAServerException {
+        File file = findCertFile(caName, serial);
         if (file != null && file.exists()) {
             final boolean delete = file.delete();
             if (!delete) {
                 throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_REMOVE_CERT, "remove cert file[" + file.getAbsolutePath() + "] failed");
             }
         }
-
     }
 
-    //FIXME
-    private File findCertFile(String serial) {
-        return null;
+    /**
+     * 查找指定序列号的证书文件
+     * @param caName
+     * @param serial
+     * @return
+     * @throws RAServerException
+     */
+    private File findCertFile(String caName, String serial) throws RAServerException {
+        final String certFilePath = server.findCertFile(caName, serial);
+        if (StringUtils.isBlank(certFilePath)) {
+            logger.warn("findCertFile<<<<<<Failure : ca[{}] not found cert file with serial[{}]", caName, serial);
+            return null;
+        }
+        return new File(certFilePath);
     }
 
     private RevokeResponseNet buildErrorResponse(RAServerException e) {

@@ -469,8 +469,8 @@ public class Client {
         }
     }
 
-    public GetTCertResponse gettcert(GetTCertRequest request, String token) throws CommandException {
-        GettcertRequestNet gettCertRequestNet = buildGettCertRequestNet(request);
+    public GettCertResponse gettcert(GettCertRequest request, String token) throws CommandException {
+        GettCertRequestNet gettCertRequestNet = buildGettCertRequestNet(request);
         final GettcertResponseNet responseNet = gettCertComms.request(gettCertRequestNet, token);
         if (responseNet.isSuccess()) {
             return buildGettCertResponse(responseNet);
@@ -479,11 +479,11 @@ public class Client {
         }
     }
 
-    private GetTCertResponse buildGettCertResponse(GettcertResponseNet responseNet) {
+    private GettCertResponse buildGettCertResponse(GettcertResponseNet responseNet) {
         return null;
     }
 
-    private GettcertRequestNet buildGettCertRequestNet(GetTCertRequest request) {
+    private GettCertRequestNet buildGettCertRequestNet(GettCertRequest request) {
         return null;
     }
 

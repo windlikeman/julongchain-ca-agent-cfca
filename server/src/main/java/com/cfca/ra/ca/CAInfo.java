@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description
+ * @Description CA 信息,它包括发放登记证书(ECerts)和交易证书(TCerts)时使用的密钥和证书文件
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -30,7 +30,7 @@ public class CAInfo {
 
     private final String homeDir;
 
-    public CAInfo(Builder builder) {
+    private CAInfo(Builder builder) {
         this.name = builder.name;
         this.keyfile = builder.keyfile;
         this.certfile = builder.certfile;

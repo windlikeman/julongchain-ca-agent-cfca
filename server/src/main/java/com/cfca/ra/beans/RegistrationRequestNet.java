@@ -1,6 +1,6 @@
 package com.cfca.ra.beans;
 
-import com.cfca.ra.ca.register.UserAttrs;
+import com.cfca.ra.register.UserAttrs;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 注册接口网络请求参数,用于调用服务器Restful接口
  * @CodeReviewer
  * @since v3.0.0
  */

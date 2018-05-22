@@ -7,8 +7,8 @@ import com.cfca.ra.RAServerException;
 import com.cfca.ra.ServerRequestContext;
 import com.cfca.ra.beans.AuthInfo;
 import com.cfca.ra.beans.EnrollmentRequestNet;
-import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.beans.EnrollmentResponseNet;
+import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 签发证书的服务
  * @CodeReviewer
  * @since v3.0.0
  */

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description 用于接受吊销命令的服务器响应
  * @CodeReviewer
  * @since v3.0.0
  */

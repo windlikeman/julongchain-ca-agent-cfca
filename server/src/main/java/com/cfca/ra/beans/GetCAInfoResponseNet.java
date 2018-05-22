@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * @Description
+ * @Description GetCAInfo命令的网络响应对象
  * @CodeReviewer
  * @since v3.0.0
  */

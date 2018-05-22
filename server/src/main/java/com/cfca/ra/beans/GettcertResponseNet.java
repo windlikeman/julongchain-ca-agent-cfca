@@ -7,11 +7,11 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/11
- * @Description
+ * @Description GettCert命令服务器返回给客户端的对象
  * @CodeReviewer
  * @since v3.0.0
  */
-public class GettcertResponseNet {
+public class GettCertResponseNet {
 
 
     /**
@@ -24,7 +24,7 @@ public class GettcertResponseNet {
      * The name of the root CA associated with this server.
      */
     @SerializedName("Result")
-    private GettcertResponseResult result;
+    private GettCertResponseResult result;
 
     /**
      * A array of error messages (i.e. code and string messages).
@@ -38,7 +38,7 @@ public class GettcertResponseNet {
     @SerializedName("Messages")
     private List<ServerResponseMessage> messages;
 
-    public GettcertResponseNet(final boolean success, final List<ServerResponseError> errors) {
+    public GettCertResponseNet(final boolean success, final List<ServerResponseError> errors) {
         this.success = success;
         this.errors = errors;
     }
@@ -47,7 +47,7 @@ public class GettcertResponseNet {
         this.messages = messages;
     }
 
-    public void setResult(final GettcertResponseResult result) {
+    public void setResult(final GettCertResponseResult result) {
         this.result = result;
     }
 
@@ -55,7 +55,7 @@ public class GettcertResponseNet {
         return success;
     }
 
-    public GettcertResponseResult getResult() {
+    public GettCertResponseResult getResult() {
         return result;
     }
 

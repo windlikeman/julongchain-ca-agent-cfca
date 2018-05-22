@@ -1,4 +1,4 @@
-package com.cfca.ra.ca.register;
+package com.cfca.ra.register;
 
 import com.cfca.ra.RAServerException;
 

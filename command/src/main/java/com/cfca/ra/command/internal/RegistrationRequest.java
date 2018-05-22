@@ -6,9 +6,9 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 命令行内部使用注册接口参数
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class RegistrationRequest {
     /**

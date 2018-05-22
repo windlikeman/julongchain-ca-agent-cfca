@@ -5,18 +5,18 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description
+ * @Description GettCert命令服务器返回给客户端的 tcert 对象中的交易证书详细信息
  * @CodeReviewer
  * @since v3.0.0
  */
 class TCert {
     /**
-     * Based 64 encoded transaction certificate
+     * 基于 B64 编码的交易证书
      */
     private final String cert;
 
     /**
-     * An array of decryption keys, assuming encryption was enabled.
+     * 一组解密密钥,假设加密已启用
      */
     private final List<TKey> keys;
 

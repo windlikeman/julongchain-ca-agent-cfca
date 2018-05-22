@@ -54,9 +54,9 @@ public interface IRAService {
      *
      * @param data
      * @param auth
-     * @return GettcertResponseNet
+     * @return GettCertResponseNet
      */
-    GettcertResponseNet gettcert(GettcertRequestNet data, String auth);
+    GettCertResponseNet gettcert(GettCertRequestNet data, String auth);
 
     /**
      * 初始化:包括初始化 CA 配置列表等

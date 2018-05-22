@@ -38,10 +38,6 @@ public class RAServerException extends Exception {
      * ENROLL 服务检查鉴权信息失败
      */
     public static final int REASON_CODE_ENROLL_SERVICE_CHECK_AUTH = 0x5006;
-    /**
-     * ENROLL 服务执行失败
-     */
-    public static final int REASON_CODE_ENROLL_SERVICE_EXCEPTION = 0x5007;
 
     /**
      * REGISTER 命令失败:该用户已经注册过
@@ -84,14 +80,6 @@ public class RAServerException extends Exception {
      * REENROLL 命令失败:获取CA失败,ca 名称是空
      */
     public static final int REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY = 0x7004;
-    /**
-     * REENROLL 命令失败:校验token失败
-     */
-    public static final int REASON_CODE_REENROLL_SERVICE_CHECK_AUTH = 0x7005;
-    /**
-     * REENROLL 命令失败:读取token失败
-     */
-    public static final int REASON_CODE_REENROLL_SERVICE_READ_AUTH = 0x7006;
 
     /**
      * REVOKE 命令失败: REVOKE 之前必须ENROLL
@@ -155,19 +143,23 @@ public class RAServerException extends Exception {
      * RA Server:查找CA失败,CA名称为空
      */
     public static final int REASON_CODE_RA_SERVER_GET_CA_NAME_EMPTY = 0xb006;
+    /**
+     * RA Server:初始化CA失败,创建CA home dir 失败
+     */
+    public static final int REASON_CODE_RA_SERVER_CREATE_CA_HOME_DIR = 0xb007;
 
     /**
      * CA:因为B64解码失败导致存储证书失败
      */
-    public static final int REASON_CODE_CA_STORE_CERT_B64_DECODE = 0xc001;
+    public static final int REASON_CODE_CA_CERT_STORE_CERT_B64_DECODE = 0xc001;
     /**
      * CA:因为pem文件格式操作失败导致存储证书失败
      */
-    public static final int REASON_CODE_CA_STORE_CERT_WITH_PEM = 0xc002;
+    public static final int REASON_CODE_CA_CERT_STORE_CERT_WITH_PEM = 0xc002;
     /**
      * CA:无效的参数导致存储证书失败
      */
-    public static final int REASON_CODE_CA_STORE_CERT_INVALID_ARGS = 0xc003;
+    public static final int REASON_CODE_CA_CERT_STORE_CERT_INVALID_ARGS = 0xc003;
     /**
      * CA:该用户已经注册
      */
@@ -175,12 +167,23 @@ public class RAServerException extends Exception {
     /**
      * CA:加载公钥文件失败
      */
-    public static final int REASON_CODE_CA_LOAD_CERT = 0xc005;
-
+    public static final int REASON_CODE_CA_CERTSTORE_LOAD_CERT = 0xc005;
+    /**
+     * CA:公钥 Store 获取文件路径失败
+     */
+    public static final int REASON_CODE_CA_CERTSTORE_GET_CERT_FILE_PATH = 0xc006;
     /**
      * CA:检查 ID 是否被注册时失败
      */
-    public static final int REASON_CODE_CA_CHECK_ID_REGISTERED = 0xc008;
+    public static final int REASON_CODE_CA_CHECK_ID_REGISTERED = 0xc007;
+    /**
+     * CA:没有找到该CA的证书链文件
+     */
+    public static final int REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE = 0xc008;
+    /**
+     * CA:读取该CA的证书链文件失败
+     */
+    public static final int REASON_CODE_CA_READ_CACHAIN_FILE = 0xc009;
 
     /**
      * USER_STORE:读取用户信息数据库异常
@@ -200,7 +203,6 @@ public class RAServerException extends Exception {
      */
     public static final int REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE = 0xe002;
 
-
     private String message;
 
     private int reasonCode;
@@ -212,7 +214,6 @@ public class RAServerException extends Exception {
             put(REASON_CODE_ENROLL_SERVICE_BUILD_RATK_REQUEST, "enrollment service failed to build ratk request");
             put(REASON_CODE_ENROLL_SERVICE_RATK_PROCESS, "enrollment service failed to process ratk request");
             put(REASON_CODE_ENROLL_SERVICE_CHECK_AUTH, "enrollment service failed to check auth");
-            put(REASON_CODE_ENROLL_SERVICE_EXCEPTION, "enrollment service failed");
 
             put(REASON_CODE_REGISTER_SERVICE_ALREADY_REGISTERED, "register service failed to register by already registered");
             put(REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "register service failed with invalid token");
@@ -225,8 +226,6 @@ public class RAServerException extends Exception {
             put(REASON_CODE_REENROLL_SERVICE_NOT_ENROLL, "reenroll service failed with must enroll first");
             put(REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "reenroll service failed due to invalid token");
             put(REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY, "reenroll service failed due to ca name is empty");
-            put(REASON_CODE_REENROLL_SERVICE_CHECK_AUTH, "reenroll service failed due to check auth");
-            put(REASON_CODE_REENROLL_SERVICE_READ_AUTH, "reenroll service failed due to read invalid auth");
 
             put(REASON_CODE_REVOKE_SERVICE_NOT_ENROLL, "revoke service failed with must enroll first");
             put(REASON_CODE_REVOKE_SERVICE_INVALID_TOKEN, "revoke service failed due to invalid token");
@@ -243,15 +242,19 @@ public class RAServerException extends Exception {
             put(REASON_CODE_RA_SERVER_GET_CA_NOT_FOUND, "RA Server not found CA by ca name");
             put(REASON_CODE_RA_SERVER_ADD_CA_EXCEPTION, "RA Server failed to add CA");
             put(REASON_CODE_RA_SERVER_GET_CA_NAME_EMPTY, "RA Server failed to get CA with empty ca name");
+            put(REASON_CODE_RA_SERVER_CREATE_CA_HOME_DIR, "RA Server failed to create CA due to fail to create home dir");
 
             put(REASON_CODE_CA_NOT_READY, "CA is not ready");
             put(REASON_CODE_CA_USER_NOT_EXIST, " this user not exist in this ca store");
             put(REASON_CODE_CA_USER_ALREADY_REGISTERED, "this user already registered in this ca");
-            put(REASON_CODE_CA_STORE_CERT_B64_DECODE, "ca fail to store cert due to decode b64 string");
-            put(REASON_CODE_CA_STORE_CERT_WITH_PEM, "ca fail to store cert due to pem file format");
-            put(REASON_CODE_CA_STORE_CERT_INVALID_ARGS, "ca fail to store cert due to invalid args");
-            put(REASON_CODE_CA_LOAD_CERT, "ca fail to load cert due to pem operation");
+            put(REASON_CODE_CA_CERT_STORE_CERT_B64_DECODE, "ca fail to store cert due to decode b64 string");
+            put(REASON_CODE_CA_CERT_STORE_CERT_WITH_PEM, "ca fail to store cert due to pem file format");
+            put(REASON_CODE_CA_CERT_STORE_CERT_INVALID_ARGS, "ca fail to store cert due to invalid args");
+            put(REASON_CODE_CA_CERTSTORE_GET_CERT_FILE_PATH, "ca fail to get cert file path from cert store");
+            put(REASON_CODE_CA_CERTSTORE_LOAD_CERT, "ca fail to load cert due to pem operation");
             put(REASON_CODE_CA_CHECK_ID_REGISTERED, "ca fail to check id registered");
+            put(REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE, "ca fail to read chain file due to not found");
+            put(REASON_CODE_CA_READ_CACHAIN_FILE, "ca fail to read chain file");
 
             put(REASON_CODE_USER_STORE_LOAD_EXCEPTION, "user store fail to load");
             put(REASON_CODE_USER_STORE_UPDATE_EXCEPTION, "user store fail to update");
@@ -268,7 +271,7 @@ public class RAServerException extends Exception {
         this.reasonCode = reasonCode;
     }
 
-    RAServerException(final Throwable cause) {
+    public RAServerException(final Throwable cause) {
         super();
         this.reasonCode = REASON_CODE_SERVER_EXCEPTION;
         this.cause = cause;

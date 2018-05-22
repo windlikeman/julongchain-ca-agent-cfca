@@ -65,7 +65,7 @@ public class RAServiceImpl implements IRAService {
     }
 
     @Override
-    public GettcertResponseNet gettcert(GettcertRequestNet data, String auth) {
+    public GettCertResponseNet gettcert(GettCertRequestNet data, String auth) {
         return gettCertService.gettcert(data, auth);
     }
 

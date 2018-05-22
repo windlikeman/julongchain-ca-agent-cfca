@@ -1,15 +1,15 @@
 package com.cfca.ra.beans;
 
-import com.cfca.ra.ca.register.UserAttrs;
+import com.cfca.ra.register.UserAttrs;
 
 import java.util.List;
 
 /**
  * @author zhangchong
  * @create 2018/5/18
- * @Description
+ * @Description 服务器内部使用注册接口参数
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class RegistrationRequest {
     /**
