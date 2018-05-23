@@ -1,6 +1,11 @@
 package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.config.CsrConfig;
+import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoRequest;
+import com.cfca.ra.command.internal.gettcert.GettCertRequest;
+import com.cfca.ra.command.internal.register.RegistrationRequest;
+import com.cfca.ra.command.internal.revoke.RevokeRequest;
 
 
 /**

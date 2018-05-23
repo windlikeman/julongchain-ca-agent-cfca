@@ -6,7 +6,7 @@ package com.cfca.ra.command.internal;
  * @CodeReviewer
  * @since v3.0.0
  */
-class ServerResponseMessage {
+public class ServerResponseMessage {
     static final int RESPONSE_MESSAGE_CODE_CANAME = 0x101;
     static final int RESPONSE_MESSAGE_CODE_VERSION = 0x102;
     static final int RESPONSE_MESSAGE_CODE_CACHAIN = 0x103;

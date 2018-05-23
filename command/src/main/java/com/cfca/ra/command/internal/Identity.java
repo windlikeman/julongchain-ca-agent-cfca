@@ -1,6 +1,14 @@
 package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.CommandException;
+import com.cfca.ra.command.internal.enroll.EnrollmentResponse;
+import com.cfca.ra.command.internal.gettcert.GettCertRequest;
+import com.cfca.ra.command.internal.gettcert.GettCertResponse;
+import com.cfca.ra.command.internal.reenroll.ReenrollmentRequest;
+import com.cfca.ra.command.internal.register.RegistrationRequest;
+import com.cfca.ra.command.internal.register.RegistrationResponse;
+import com.cfca.ra.command.internal.revoke.RevokeRequest;
+import com.cfca.ra.command.internal.revoke.RevokeResponse;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -20,7 +28,7 @@ import java.security.Signature;
  * @CodeReviewer
  * @since v3.0.0
  */
-class Identity {
+public class Identity {
 
     private static final Logger logger = LoggerFactory.getLogger(Identity.class);
     private final String name;

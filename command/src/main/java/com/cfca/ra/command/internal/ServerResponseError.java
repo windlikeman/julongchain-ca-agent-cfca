@@ -6,7 +6,7 @@ package com.cfca.ra.command.internal;
  * @CodeReviewer
  * @since v3.0.0
  */
-class ServerResponseError {
+public class ServerResponseError {
     /**
      * Integer code denoting the type of error.
      */

@@ -22,7 +22,7 @@ import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIF
 /**
  * Created by 10128044 on 2017/8/18.
  */
-class OkHttpUtils {
+public class OkHttpUtils {
 
     private static Logger logger = LoggerFactory.getLogger(OkHttpUtils.class);
 

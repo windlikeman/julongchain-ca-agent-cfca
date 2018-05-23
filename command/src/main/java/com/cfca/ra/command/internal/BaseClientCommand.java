@@ -25,7 +25,7 @@ import java.util.Arrays;
 public abstract class BaseClientCommand implements IClientCommand {
     private static final Logger logger = LoggerFactory.getLogger(BaseClientCommand.class);
 
-    static final int COMMAND_LINE_ARGS_NUM = 7;
+    protected static final int COMMAND_LINE_ARGS_NUM = 7;
 
     public static final String COMMAND_NAME_ENROLL = "enroll";
     public static final String COMMAND_NAME_REENROLL = "reenroll";
@@ -48,7 +48,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     /**
      * 命令的配置文件路径
      */
-    String cfgFileName;
+    protected String cfgFileName;
 
     /**
      * 命令的主目录
@@ -227,7 +227,7 @@ public abstract class BaseClientCommand implements IClientCommand {
      * @param serverInfo 返回的 CA 服务器信息
      * @throws CommandException 遇到错误返回异常
      */
-    void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
+    protected void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
         final String mspDir = clientCfg.getMspDir();
         String fname = requireCAChainFileName(clientCfg.getCaName());
         fname = fname.replace(":", "-");

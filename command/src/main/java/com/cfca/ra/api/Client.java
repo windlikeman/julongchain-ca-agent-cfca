@@ -1,6 +1,12 @@
 package com.cfca.ra.api;
 
 import com.cfca.ra.command.internal.*;
+import com.cfca.ra.command.internal.enroll.EnrollCommand;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoCommand;
+import com.cfca.ra.command.internal.gettcert.GettCertCommand;
+import com.cfca.ra.command.internal.reenroll.ReenrollCommand;
+import com.cfca.ra.command.internal.register.RegisterCommand;
+import com.cfca.ra.command.internal.revoke.RevokeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

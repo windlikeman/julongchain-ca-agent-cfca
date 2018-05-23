@@ -7,32 +7,32 @@ package com.cfca.ra.command.internal;
  * @CodeReviewer
  * @since v3.0.0
  */
-class ParsedUrl {
+public class ParsedUrl {
     private final String scheme;
     private final String host;
     private final String username;
     private final String password;
 
-    ParsedUrl(String scheme, String host, String username, String password) {
+    public ParsedUrl(String scheme, String host, String username, String password) {
         this.scheme = scheme;
         this.host = host;
         this.username = username;
         this.password = password;
     }
 
-    String getScheme() {
+    public String getScheme() {
         return scheme;
     }
 
-    String getHost() {
+    public String getHost() {
         return host;
     }
 
-    String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    String getPassword() {
+    public String getPassword() {
         return password;
     }
 
