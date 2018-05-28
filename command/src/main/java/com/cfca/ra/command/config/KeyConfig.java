@@ -1,5 +1,7 @@
 package com.cfca.ra.command.config;
 
+import java.util.Objects;
+
 /**
  * @author zhangchong
  * @create 2018/5/15
@@ -33,5 +35,24 @@ public class KeyConfig {
                 "algo='" + algo + '\'' +
                 ", size=" + size +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        KeyConfig keyConfig = (KeyConfig) o;
+        return size == keyConfig.size &&
+                Objects.equals(algo, keyConfig.algo);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(algo, size);
     }
 }

@@ -5,6 +5,8 @@ import com.cfca.ra.command.internal.ClientConfig;
 import com.cfca.ra.command.internal.OkHttpUtils;
 import com.cfca.ra.command.internal.ServerResponseError;
 import com.cfca.ra.command.utils.MyStringUtils;
+import com.google.gson.Gson;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -67,9 +69,11 @@ public class EnrollmentComms {
      * @throws IOException 网络请求失败
      */
     public EnrollmentResponseNet request(EnrollmentRequestNet enrollmentRequest, String auth) throws CommandException {
+        final String s = new Gson().toJson(enrollmentRequest);
+        logger.info("request>>>>>>" + Base64.toBase64String(s.getBytes()));
         final String baseurl = clientConfig.getUrl();
-        if (MyStringUtils.isBlank(baseurl)){
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED,"baseurl is empty");
+        if (MyStringUtils.isBlank(baseurl)) {
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "baseurl is empty");
         }
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseurl)

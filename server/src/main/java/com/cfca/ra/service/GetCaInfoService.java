@@ -2,9 +2,8 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.GetCAInfoResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
-import com.cfca.ra.ca.CA;
+import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,7 @@ public class GetCaInfoService {
     public GetCAInfoResponseNet getCaInfo(String caname) {
         try {
             GetCAInfoResponseNet resp = new GetCAInfoResponseNet(true, null);
-            final CA ca = server.getCA(caname);
-            ca.fillCAInfo(resp);
+            server.fillCAInfo(caname, resp);
             return resp;
         }catch (RAServerException e){
             return buildGetCAInfoErrorServerResponse(e);

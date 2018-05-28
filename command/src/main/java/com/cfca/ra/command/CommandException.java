@@ -64,33 +64,6 @@ public class CommandException extends Exception {
      * ENROLL 命令加载配置文件失败
      */
     public static final int REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED = 0x5003;
-    /**
-     * ENROLL 命令生成CSR失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED = 0x5004;
-    /**
-     * ENROLL 命令构建网络请求失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED = 0x5005;
-
-    /**
-     * ENROLL 命令构建IDENTITY失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED = 0x5006;
-
-    /**
-     * ENROLL 命令存储证书失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_STORE_IDENTITY_FAILED = 0x5007;
-
-    /**
-     * ENROLL 命令存储密钥失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_STORE_PRIVATEKEY_FAILED = 0x5008;
-    /**
-     * ENROLL 命令初始化内部客户端失败
-     */
-    public static final int REASON_CODE_ENROLL_COMMAND_INITIALIZE_CLIENT_FAILED = 0x5009;
 
     /**
      * GETCAINFO 命令网络通信失败
@@ -109,10 +82,6 @@ public class CommandException extends Exception {
      */
     public static final int REASON_CODE_GETCAINFO_COMMAND_LOAD_CONFIG_FILE = 0x6004;
 
-    /**
-     * REENROLL 命令构建网络请求失败
-     */
-    public static final int REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED = 0x7001;
     /**
      * REENROLL 命令加载配置文件失败
      */
@@ -143,10 +112,6 @@ public class CommandException extends Exception {
      */
     public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS = 0x8003;
     /**
-     * REGISTER 命令服务器返回失败的回复
-     */
-    public static final int REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD = 0x8004;
-    /**
      * REGISTER 命令加载注册数据库文件失败
      */
     public static final int REASON_CODE_REGISTER_COMMAND_LOAD_REGISTER_FILE = 0x8005;
@@ -163,10 +128,6 @@ public class CommandException extends Exception {
      * REVOKE 命令网络通信失败
      */
     public static final int REASON_CODE_REVOKE_COMMAND_COMMS_FAILED = 0x9002;
-    /**
-     * REVOKE 命令网络返回失败
-     */
-    public static final int REASON_CODE_REVOKE_COMMAND_RESPONSE_NOT_SUCCESS = 0x9003;
 
     /**
      * GETTCERT 命令网络返回失败
@@ -178,14 +139,69 @@ public class CommandException extends Exception {
     public static final int REASON_CODE_GETTCERT_COMMAND_ARGS_INVALID = 0xa002;
 
     /**
-     * 内部客户端失败
-     */
-    public static final int REASON_CODE_INTERNAL_CLIENT_EXCEPTION = 0xb001;
-
-    /**
      * 内部客户端load identity失败
      */
     public static final int REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION = 0xb002;
+    /**
+     * 内部客户端创建 cert file 文件路径失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_BUILD_CERTFILE_PATH = 0xb003;
+    /**
+     * 内部客户端创建 private key file 文件路径失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_BUILD_PRIVATEKEY_FILE_PATH = 0xb004;
+    /**
+     * 内部客户端存储 private key file 文件失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED = 0xb005;
+    /**
+     * 内部客户端存储 identity 失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED = 0xb006;
+    /**
+     * 内部客户端生成 SM2 CSR 失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED = 0xb007;
+    /**
+     * 内部客户端执行 enroll 失败,csr配置问题
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION = 0xb008;
+    /**
+     * 内部客户端存储 serverinfo 失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_STORE_LOCAL_SERVERINFO_EXCEPTION = 0xb009;
+    /**
+     * 内部客户端创建 identity 失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED = 0xb00a;
+    /**
+     * 内部客户端创建 reenrollment 网络请求失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED = 0xb00b;
+    /**
+     * 内部客户端创建鉴权信息失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_BUILD_BASICAUTH_EXCEPTION = 0xb00c;
+    /**
+     * 内部客户端创建CSR失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED = 0xb00d;
+    /**
+     * 内部客户端创建失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_INIT_FAILED = 0xb00e;
+    /**
+     * 内部客户端检查是否签发过证书失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION = 0xb00f;
+    /**
+     * 内部客户端 reenroll 失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION = 0xb010;
+    /**
+     * 内部客户端 register 后服务器回复空的密码
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_REGISTER_RESPONSE_EMPTY_PASSWORD_FROM_SERVER = 0xb012;
 
     /**
      * 文件操作失败,检查文件是否存在失败
@@ -220,22 +236,27 @@ public class CommandException extends Exception {
             put(REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "the enrollment command fail to parse CLI parameters");
             put(REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "the enrollment command failed to communicate with server");
             put(REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED, "the enrollment command failed to initiallize with config file");
-            put(REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "the enrollment command failed to generate csr");
-            put(REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "the enrollment command fail to build net request");
-            put(REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED, "the enrollment command fail to build identity");
-            put(REASON_CODE_ENROLL_COMMAND_STORE_IDENTITY_FAILED, "the enrollment command fail to store identity");
-            put(REASON_CODE_ENROLL_COMMAND_STORE_PRIVATEKEY_FAILED, "the enrollment command fail to store private key");
-            put(REASON_CODE_ENROLL_COMMAND_INITIALIZE_CLIENT_FAILED, "the enrollment command fail to init client");
 
-            put(REASON_CODE_INTERNAL_CLIENT_EXCEPTION, "the internal client fail to execute");
             put(REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION, "the internal client fail to load identity");
+            put(REASON_CODE_INTERNAL_CLIENT_BUILD_CERTFILE_PATH, "the internal client fail to build cert file path");
+            put(REASON_CODE_INTERNAL_CLIENT_BUILD_PRIVATEKEY_FILE_PATH, "the internal client fail to build private key file path");
+            put(REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, "the internal client fail to store private key file");
+            put(REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED, "the internal client fail to store identity");
+            put(REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, "the internal client fail to generate sm2 csr");
+            put(REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION, "the internal client fail to enroll due to csr config");
+            put(REASON_CODE_INTERNAL_CLIENT_STORE_LOCAL_SERVERINFO_EXCEPTION, "the internal client fail to store local serverinfo");
+            put(REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED, "the internal client fail to build identity");
+            put(REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "the internal client fail to build reenrollment net request");
+            put(REASON_CODE_INTERNAL_CLIENT_BUILD_BASICAUTH_EXCEPTION, "the internal client fail to build basic auth message");
+            put(REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "the internal client fail to build generate csr");
+            put(REASON_CODE_INTERNAL_CLIENT_INIT_FAILED, "the internal client fail to initialize");
+            put(REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION, "the internal client fail to check enrollment");
 
             put(REASON_CODE_GETCAINFO_COMMAND_COMMS_FAILED, "the getcainfo command fail to communicate with server");
             put(REASON_CODE_GETCAINFO_COMMAND_INIT_MISSING_MSPDIR, "the getcainfo command fail to init by missing mspdir");
             put(REASON_CODE_GETCAINFO_COMMAND_ARGS_INVALID, "the getcainfo command fail to parse CLI parameters");
             put(REASON_CODE_GETCAINFO_COMMAND_LOAD_CONFIG_FILE, "the getcainfo command fail to load config file");
 
-            put(REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "the reenroll command fail to build net request");
             put(REASON_CODE_REENROLL_COMMAND_LOAD_CONFIG_FAILED, "the reenroll command fail to initiallize with config file");
             put(REASON_CODE_REENROLL_COMMAND_COMMS_FAILED, "the reenroll command fail to communicate with server");
             put(REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "the reenroll command fail to parse CLI parameters");
@@ -244,13 +265,11 @@ public class CommandException extends Exception {
             put(REASON_CODE_REGISTER_COMMAND_ARGS_INVALID, "the register command fail to parse CLI parameters");
             put(REASON_CODE_REGISTER_COMMAND_COMMS_FAILED, "the register command fail to communicate with server");
             put(REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS, "the register command fail to get successful response from server");
-            put(REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD, "the register command fail to get password from server");
             put(REASON_CODE_REGISTER_COMMAND_LOAD_REGISTER_FILE, "the register command fail to load register data file");
             put(REASON_CODE_REGISTER_COMMAND_UPDATE_REGISTER_FILE, "the register command fail to update register data file");
 
             put(REASON_CODE_REVOKE_COMMAND_ARGS_INVALID, "the revoke command fail to parse CLI parameters");
             put(REASON_CODE_REVOKE_COMMAND_COMMS_FAILED, "the revoke command fail to communicate with server");
-            put(REASON_CODE_REVOKE_COMMAND_RESPONSE_NOT_SUCCESS, "the revoke command receive the failed response from server");
 
             put(REASON_CODE_GETTCERT_COMMAND_COMMS_FAILED, "the gettcert command fail to communicate with server");
             put(REASON_CODE_GETTCERT_COMMAND_ARGS_INVALID, "the gettcert command fail to parse CLI parameters");
@@ -264,6 +283,7 @@ public class CommandException extends Exception {
             put(REASON_CODE_FILE_GET_DIR_PATH, "fail to get file dir");
 
             put(REASON_CODE_IDENTITY_CREATE_TOKEN, "fail to create token");
+
         }
     };
 

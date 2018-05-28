@@ -5,13 +5,18 @@ import cfca.ra.toolkit.RAClient;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.AuthInfo;
-import com.cfca.ra.beans.EnrollmentRequestNet;
-import com.cfca.ra.beans.EnrollmentResponseNet;
+import com.cfca.ra.enroll.EnrollmentRequest;
+import com.cfca.ra.enroll.EnrollmentRequestNet;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
-import org.apache.commons.lang3.StringUtils;
+import com.cfca.ra.repository.IMessageStore;
+import com.cfca.ra.repository.MessageStore;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +40,24 @@ public class EnrollService {
     private final RAServer server;
 
     private final IRAClient raClient;
+    private final IMessageStore messageStore;
 
     @Autowired
     public EnrollService(RAServer server) {
         this.server = server;
         this.raClient = new RAClientImpl();
+        this.messageStore = MessageStore.ENROLL_DEFAULT;
     }
 
-    public EnrollmentResponseNet enroll(EnrollmentRequestNet data, String auth) {
+    public EnrollmentResponseNet enroll(EnrollmentRequest request, String auth) {
         try {
+
+            EnrollmentRequestNet data = request.getEnrollmentRequestNet();
+            final int messageId = data.hashCode();
+            if (messageStore.containsMessage(messageId)) {
+                throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+            }
+
             final String caName = data.getCaname();
             AuthInfo authInfo = getUserNameFromAuth(auth);
             checkAuth(caName, authInfo);
@@ -73,12 +87,16 @@ public class EnrollService {
                     response = new EnrollmentResponseNet(false, null, errors, null);
                     break;
             }
-
+            updateMessageId(messageId, request);
             return response;
         } catch (RAServerException e) {
             logger.error("enroll >>>>>> Failure : " + e.getMessage(), e);
             return buildErrorServerResponse(e);
         }
+    }
+
+    private void updateMessageId(int messageId, EnrollmentRequest data) throws RAServerException {
+        messageStore.updateMessage(messageId, data);
     }
 
     private CA getCA(String caName) throws RAServerException {

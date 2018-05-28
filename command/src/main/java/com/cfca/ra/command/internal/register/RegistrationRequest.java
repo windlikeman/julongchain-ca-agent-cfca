@@ -1,7 +1,5 @@
 package com.cfca.ra.command.internal.register;
 
-import com.cfca.ra.command.internal.UserAttrs;
-
 import java.util.Arrays;
 import java.util.List;
 

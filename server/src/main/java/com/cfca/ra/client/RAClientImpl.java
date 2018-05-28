@@ -8,12 +8,20 @@ import cfca.ra.common.vo.response.TxResponseVO;
 import cfca.ra.toolkit.RAClient;
 import cfca.ra.toolkit.exception.RATKException;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.EnrollmentRequestNet;
-import com.cfca.ra.beans.ReenrollmentRequestNet;
-import com.cfca.ra.beans.RevokeRequestNet;
-import org.apache.commons.lang3.StringUtils;
+import com.cfca.ra.enroll.EnrollmentRequestNet;
+import com.cfca.ra.gettcert.GettCertRequest;
+import com.cfca.ra.gettcert.GettCertResponse;
+import com.cfca.ra.gettcert.TCert;
+import com.cfca.ra.gettcert.TCertReq;
+import com.cfca.ra.reenroll.ReenrollmentRequestNet;
+import com.cfca.ra.revoke.RevokeRequestNet;
+import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author zhangchong
@@ -71,6 +79,61 @@ public class RAClientImpl implements IRAClient {
         } catch (RATKException e) {
             throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, e);
         }
+    }
+
+    @Override
+    public GettCertResponse gettcert(GettCertRequest req, List<TCertReq> set, BouncyCastleProvider provider) throws RAServerException {
+        if (set == null || set.isEmpty()) {
+            throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_RATK_PROCESS, "invalid request,request is empty");
+        }
+        try {
+            for (TCertReq tCertReq : set) {
+                CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(req, tCertReq, provider);
+                final CertServiceResponseVO certServiceResponseVO = (CertServiceResponseVO) client.process(certServiceRequestVO);
+                buildTcertResponse(certServiceResponseVO);
+            }
+        } catch (RATKException e) {
+            throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_RATK_PROCESS, e);
+        }
+        return null;
+    }
+
+    private GettCertResponse buildTcertResponse(CertServiceResponseVO certServiceResponseVO) {
+        GettCertResponse tcertResponse = new GettCertResponse();
+        final String serialNo = certServiceResponseVO.getSerialNo();
+        long serial = Long.parseLong(serialNo, 16);
+        tcertResponse.setId(serial);
+        tcertResponse.setTs(System.currentTimeMillis());
+        byte[] kdfKey = new byte[]{};
+        tcertResponse.setKey(kdfKey);
+        List<TCert> set = new ArrayList<>();
+        tcertResponse.settCerts(set);
+        return tcertResponse;
+    }
+
+    private CertServiceRequestVO buildCertServiceRequestVO(GettCertRequest req, TCertReq tCertReq, BouncyCastleProvider provider) {
+        CertServiceRequestVO certServiceRequestVO = new CertServiceRequestVO();
+        certServiceRequestVO.setTxCode("1101");
+        // certServiceRequestVO.setLocale(locale);
+        certServiceRequestVO.setCaName(req.getCaname());
+        certServiceRequestVO.setCertType("1");
+        certServiceRequestVO.setCustomerType("1");
+        certServiceRequestVO.setUserName("admin");
+        certServiceRequestVO.setIdentType("Z");
+        certServiceRequestVO.setIdentNo("H09358028");
+        certServiceRequestVO.setKeyLength("256");
+        certServiceRequestVO.setKeyAlg("SM2");
+        certServiceRequestVO.setBranchCode("678");
+
+        //20180531235959
+        final long start = tCertReq.getNotBefore().getTime();
+//        certServiceRequestVO.setStartTime(start);
+//        certServiceRequestVO.setEndTime(endTime);
+//        certServiceRequestVO.setAddIdentNoExt(addIdentNoExt);
+//        certServiceRequestVO.setSelfExtValue(selfExtValue);
+//        certServiceRequestVO.setP10(p10);
+
+        return null;
     }
 
     private String getDistictName(RevokeRequestNet data) throws RAServerException {

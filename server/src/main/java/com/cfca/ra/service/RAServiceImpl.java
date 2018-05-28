@@ -2,9 +2,18 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.cfca.ra.enroll.EnrollmentRequest;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
+import com.cfca.ra.getcainfo.GetCAInfoRequestNet;
+import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
+import com.cfca.ra.gettcert.GettCertRequestNet;
+import com.cfca.ra.gettcert.GettCertResponseNet;
+import com.cfca.ra.reenroll.ReenrollmentRequest;
+import com.cfca.ra.register.RegistrationRequest;
+import com.cfca.ra.register.RegistrationResponseNet;
+import com.cfca.ra.revoke.RevokeRequest;
+import com.cfca.ra.revoke.RevokeResponseNet;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,28 +51,28 @@ public class RAServiceImpl implements IRAService {
     }
 
     @Override
-    public EnrollmentResponseNet enroll(EnrollmentRequestNet data, String auth) {
+    public EnrollmentResponseNet enroll(EnrollmentRequest data, String auth) {
         return enrollService.enroll(data, auth);
     }
 
     @Override
-    public EnrollmentResponseNet reenroll(ReenrollmentRequestNet data, String auth) {
+    public EnrollmentResponseNet reenroll(ReenrollmentRequest data, String auth) {
         return reenrollService.reenroll(data, auth);
     }
 
     @Override
-    public RegistrationResponseNet register(RegistrationRequestNet data, String auth) {
+    public RegistrationResponseNet register(RegistrationRequest data, String auth) {
         return registerService.registerUser(data, auth);
     }
 
     @Override
-    public RevokeResponseNet revoke(RevokeRequestNet data, String auth) {
+    public RevokeResponseNet revoke(RevokeRequest data, String auth) {
         return revokeService.revoke(data, auth);
     }
 
     @Override
-    public GettCertResponseNet gettcert(GettCertRequestNet data, String auth) {
-        return gettCertService.gettcert(data, auth);
+    public GettCertResponseNet gettcert(GettCertRequestNet data, String auth, BouncyCastleProvider provider) {
+        return gettCertService.gettcert(data, auth, provider);
     }
 
     @Override

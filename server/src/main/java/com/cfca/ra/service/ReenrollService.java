@@ -4,13 +4,16 @@ import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.EnrollmentResponseNet;
-import com.cfca.ra.beans.ReenrollmentRequestNet;
 import com.cfca.ra.beans.ServerResponseError;
-import com.cfca.ra.ca.CA;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
-import org.apache.commons.lang3.StringUtils;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
+import com.cfca.ra.reenroll.ReenrollmentRequest;
+import com.cfca.ra.reenroll.ReenrollmentRequestNet;
+import com.cfca.ra.repository.IMessageStore;
+import com.cfca.ra.repository.MessageStore;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +39,12 @@ public class ReenrollService {
 
     private final IRAClient raClient;
 
+    private final IMessageStore messageStore;
     @Autowired
     public ReenrollService(RAServer server) {
         this.server = server;
         this.raClient = new RAClientImpl();
+        this.messageStore = MessageStore.REENROLL_DEFAULT;
     }
 
     private void verifyTokenByEnrollmentId(String caName, String id, String auth) throws RAServerException {
@@ -81,8 +86,13 @@ public class ReenrollService {
         }
     }
 
-    public EnrollmentResponseNet reenroll(ReenrollmentRequestNet data, String auth) {
+    public EnrollmentResponseNet reenroll(ReenrollmentRequest request, String auth) {
         try {
+            final ReenrollmentRequestNet data = request.getReenrollmentRequestNet();
+            final int messageId = data.hashCode();
+            if(messageStore.containsMessage(messageId)){
+                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+            }
             final String caname = data.getCaname();
             final String enrollmentId = "admin";
             verifyTokenByEnrollmentId(caname, enrollmentId, auth);
@@ -97,10 +107,9 @@ public class ReenrollService {
             switch (resultCode) {
                 case RAClient.SUCCESS:
                     logger.info(reenrollResponseFromRA.toString());
-                    final CA ca = getCA(caname);
                     String b64cert = reenrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
-                    ca.fillCAInfo(response);
+                    server.fillCAInfo(caname, response);
                     server.storeCert(caname, enrollmentId, b64cert);
                     break;
                 default:
@@ -110,7 +119,7 @@ public class ReenrollService {
                     response = new EnrollmentResponseNet(false, null, errors, null);
                     break;
             }
-
+            updateMessage(messageId, request);
             return response;
         } catch (RAServerException e) {
             logger.error("reenroll >>>>>> Failure : " + e.getMessage(), e);
@@ -118,11 +127,8 @@ public class ReenrollService {
         }
     }
 
-    private CA getCA(String caName) throws RAServerException {
-        if (StringUtils.isEmpty(caName)) {
-            throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY, "ca name is empty");
-        }
-        return server.getCA(caName);
+    private void updateMessage(int messageId, ReenrollmentRequest request) throws RAServerException {
+        messageStore.updateMessage(messageId, request);
     }
 
     private EnrollmentResponseNet buildErrorServerResponse(RAServerException e) {

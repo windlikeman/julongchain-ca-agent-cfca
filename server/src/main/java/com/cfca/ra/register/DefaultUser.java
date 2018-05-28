@@ -1,6 +1,7 @@
 package com.cfca.ra.register;
 
 import com.cfca.ra.RAServerException;
+import com.cfca.ra.ca.Attribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +46,10 @@ public class DefaultUser implements IUser {
     }
 
     @Override
-    public UserAttrs getAttribute(String name) throws RAServerException {
-        final List<UserAttrs> attributes = userInfo.getAttributes();
-        UserAttrs result = null;
-        for (UserAttrs attr : attributes) {
+    public Attribute getAttribute(String name) throws RAServerException {
+        final List<Attribute> attributes = userInfo.getAttributes();
+        Attribute result = null;
+        for (Attribute attr : attributes) {
             if (name.equals(attr.getName())) {
                 result = attr;
                 break;
@@ -58,10 +59,10 @@ public class DefaultUser implements IUser {
     }
 
     @Override
-    public List<UserAttrs> getAttributes(String[] attrNames) throws RAServerException {
-        final List<UserAttrs> attributes = userInfo.getAttributes();
-        List<UserAttrs> result = new ArrayList<>();
-        for (UserAttrs attr : attributes) {
+    public List<Attribute> getAttributes(List<String> attrNames) throws RAServerException {
+        final List<Attribute> attributes = userInfo.getAttributes();
+        List<Attribute> result = new ArrayList<>();
+        for (Attribute attr : attributes) {
             for (String attrName : attrNames) {
                 if (attrName.equals(attr.getName())) {
                     result.add(attr);
@@ -72,10 +73,10 @@ public class DefaultUser implements IUser {
     }
 
     @Override
-    public void modifyAttributes(List<UserAttrs> attrs) throws RAServerException {
-        final List<UserAttrs> attributes = userInfo.getAttributes();
-        for (UserAttrs attr : attributes) {
-            for (UserAttrs modified : attrs) {
+    public void modifyAttributes(List<Attribute> attrs) throws RAServerException {
+        final List<Attribute> attributes = userInfo.getAttributes();
+        for (Attribute attr : attributes) {
+            for (Attribute modified : attrs) {
                 if (attr.getName().equals(modified.getName())) {
                     attributes.remove(attr);
                     attributes.add(modified);

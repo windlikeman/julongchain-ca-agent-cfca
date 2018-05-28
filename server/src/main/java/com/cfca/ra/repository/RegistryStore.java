@@ -3,14 +3,13 @@ package com.cfca.ra.repository;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.register.DefaultUser;
 import com.cfca.ra.register.IUser;
-import com.cfca.ra.register.UserAttrs;
 import com.cfca.ra.register.UserInfo;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,7 +77,11 @@ public enum RegistryStore implements IRegistryStore {
                 return;
             }
             try {
-                Gson gson = new GsonBuilder().disableHtmlEscaping().enableComplexMapKeySerialization().create();
+                Gson gson = new GsonBuilder()
+                        .disableHtmlEscaping()
+                        .enableComplexMapKeySerialization()
+                        .setPrettyPrinting()
+                        .create();
                 final String json = gson.toJson(registerStore);
                 logger.info("updateRegistrationFile<<<<<< json : \n" + json);
                 final String registerFilePath = String.join(File.separator, getHomeDir(), "register.dat");

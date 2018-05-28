@@ -21,4 +21,12 @@ class TKey {
         this.name = name;
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "TKey{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

@@ -229,10 +229,8 @@ public abstract class BaseClientCommand implements IClientCommand {
      */
     protected void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
         final String mspDir = clientCfg.getMspDir();
-        String fname = requireCAChainFileName(clientCfg.getCaName());
-        fname = fname.replace(":", "-");
-        fname = fname.replace(".", "-");
-        fname = fname + ".pem";
+        String fname = requireCAChainFileName(clientCfg);
+
         String rootCACertsDir = String.join(File.separator, mspDir, "cacerts");
         final String chainFile = String.join(File.separator, rootCACertsDir, fname);
         byte[] chain = serverInfo.getCaChain();
@@ -243,9 +241,18 @@ public abstract class BaseClientCommand implements IClientCommand {
         }
     }
 
-    private String requireCAChainFileName(String caName) {
-        logger.info("requireCAChainFileName>>>>>>Running: caName=" + caName);
-        return caName;
+    private String requireCAChainFileName(ClientConfig clientCfg) {
+        logger.info("requireCAChainFileName>>>>>>Running: clientCfg=" + clientCfg);
+        String fileName = host + "-" + port;
+        final String caName = clientCfg.getCaName();
+        if (!MyStringUtils.isEmpty(caName)) {
+            fileName = String.format("%s-%s", fileName, caName);
+        }
+
+        fileName = fileName.replace(":", "-");
+        fileName = fileName.replace(".", "-");
+        fileName = fileName + ".pem";
+        return fileName;
     }
 
 }

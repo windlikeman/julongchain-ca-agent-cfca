@@ -13,12 +13,12 @@ public class GettcertResponseResult {
     /**
      * Transaction batch identifier
      */
-    private final int id;
+    private final long id;
 
     /**
      * Time stamp
      */
-    private final int ts;
+    private final long ts;
     /**
      * Base 64 encoded key
      */
@@ -29,7 +29,7 @@ public class GettcertResponseResult {
      */
     private final List<TCert> tcerts;
 
-    public GettcertResponseResult(int id, int ts, String key, List<TCert> tcerts) {
+    public GettcertResponseResult(long id, long ts, String key, List<TCert> tcerts) {
         this.id = id;
         this.ts = ts;
         this.key = key;

@@ -101,10 +101,10 @@ public class Client {
     }
 
     public EnrollmentResponse enroll(EnrollmentRequest enrollmentRequest) throws CommandException {
-        initializeIfNeeded();
+        initializeIfNeeded(enrollmentRequest.getUsername());
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null || csrConfig.getKey() == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_EXCEPTION, "enrollmentRequest missing csrConfig or missing key info");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION, "enrollmentRequest missing csrConfig or missing key info");
         }
         final String algo = csrConfig.getKey().getAlgo();
         final String password = enrollmentRequest.getPassword();
@@ -121,7 +121,7 @@ public class Client {
     }
 
     public ServerInfo getCAInfo(GetCAInfoRequest getCAInfoRequest) throws CommandException {
-        initializeIfNeeded();
+        initializeIfNeeded(null);
         GetCAInfoRequestNet getCAInfoRequestNet = buildGetCAInfoRequestNet(getCAInfoRequest);
         final GetCAInfoResponseNet responseNet = getCAInfoComms.request(getCAInfoRequestNet);
         return buildServerInfo(responseNet);
@@ -187,7 +187,7 @@ public class Client {
             }
             return serverInfo.build();
         } catch (UnsupportedEncodingException e) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_EXCEPTION, "caChain getBytes unsupport encoding :UTF-8", e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_LOCAL_SERVERINFO_EXCEPTION, "caChain getBytes unsupport encoding :UTF-8", e);
         }
     }
 
@@ -203,14 +203,14 @@ public class Client {
     private Identity buildIdentity(String username, String certB64Encoded, PrivateKey key) throws CommandException {
         try {
             if (MyStringUtils.isEmpty(certB64Encoded)) {
-                throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED, "failed to build identity by empty certB64Encoded");
+                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED, "failed to build identity by empty certB64Encoded");
             }
 
             //这里certB64Encoded只是证书公钥
             final byte[] certDecode = Base64.decode(certB64Encoded);
             return buildIdentity(username, certDecode, key);
         } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_IDENTITY_FAILED, e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED, e);
         }
 
     }
@@ -218,21 +218,21 @@ public class Client {
     private EnrollmentRequestNet buildReenrollmentRequestNet(EnrollmentRequest enrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing csrConfig ");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing csrConfig ");
         }
 
         final String username = enrollmentRequest.getUsername();
         if (MyStringUtils.isEmpty(username)) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing username");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing username");
         }
 
         final String profile = enrollmentRequest.getProfile();
         if (MyStringUtils.isEmpty(profile)) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing profile");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing profile");
         }
         final String caName = enrollmentRequest.getCaName();
         if (MyStringUtils.isEmpty(caName)) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing CA Name");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing CA Name");
         }
         return new EnrollmentRequestNet.Builder(p10, profile, caName, csrConfig).build();
     }
@@ -241,35 +241,35 @@ public class Client {
     private ReenrollmentRequestNet buildReenrollmentRequestNet(ReenrollmentRequest enrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing csrConfig ");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing csrConfig ");
         }
 
         final String username = enrollmentRequest.getUsername();
         if (MyStringUtils.isEmpty(username)) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing username");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing username");
         }
 
         final String profile = enrollmentRequest.getProfile();
         if (MyStringUtils.isEmpty(profile)) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing profile");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing profile");
         }
         final String caName = enrollmentRequest.getCaName();
         if (MyStringUtils.isEmpty(caName)) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing CA Name");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing CA Name");
         }
         return new ReenrollmentRequestNet.Builder(p10, profile, caName, csrConfig).build();
     }
 
     private String buildBasicAuth(String username, String password) throws CommandException {
-        if (!MyStringUtils.isEmpty(username) && !MyStringUtils.isEmpty(password)) {
-            try {
-                String userInfo = username + ":" + password;
-                return "Basic " + Base64.toBase64String(userInfo.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, e);
-            }
+        if (MyStringUtils.isEmpty(username) || MyStringUtils.isEmpty(password)) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_BASICAUTH_EXCEPTION, "username or password is empty");
         }
-        return "";
+        try {
+            String userInfo = username + ":" + password;
+            return "Basic " + Base64.toBase64String(userInfo.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_BASICAUTH_EXCEPTION, e);
+        }
     }
 
     /**
@@ -280,7 +280,7 @@ public class Client {
      */
     public CsrResult genCSR(String keyAlg, String distictName) throws CommandException {
         if (MyStringUtils.isEmpty(keyAlg) || MyStringUtils.isEmpty(distictName)) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "keyAlg or distictName is empty");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "keyAlg or distictName is empty");
         }
 
         CsrResult result;
@@ -289,7 +289,7 @@ public class Client {
                 result = getSM2CsrResult(distictName);
                 break;
             default:
-                throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "Unsupport keyAlg type[" + keyAlg + "]");
+                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "Unsupport keyAlg type[" + keyAlg + "]");
         }
 
         return result;
@@ -306,7 +306,7 @@ public class Client {
             String csr = genSM2CSR(distictName, keypair);
             return new CsrResult(csr, keypair);
         } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, e);
         }
     }
 
@@ -314,7 +314,7 @@ public class Client {
 
         try {
             if (MyStringUtils.isEmpty(distictName)) {
-                throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, "distictName is empty");
+                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, "distictName is empty");
             }
 
             PKCS10CertificationRequestBuilder pkcs10Builder = new JcaPKCS10CertificationRequestBuilder(
@@ -328,40 +328,46 @@ public class Client {
         } catch (CommandException e) {
             throw e;
         } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_GENCSR_FAILED, e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, e);
         }
     }
 
     public void storeMyIdentity(byte[] cert) throws CommandException {
         try {
-            initializeIfNeeded();
+            initializeIfNeeded(null);
             PemUtils.storeCert(certFile, cert);
             logger.info("Stored client certificate at {}", certFile);
         } catch (IOException e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_STORE_IDENTITY_FAILED, e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED, e);
         }
-    }
-
-    private String buildCertFile() {
-        return String.join(File.separator, certDir, "cert.pem");
     }
 
     private void storeMyPrivateKey(CsrResult result) throws CommandException {
         try {
-            initializeIfNeeded();
+            initializeIfNeeded(null);
             final PrivateKey privateKey = result.getKeyPair().getPrivate();
             PemUtils.storePrivateKey(keyFile, privateKey);
             logger.info("Stored client private key at {}", keyFile);
         } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_STORE_PRIVATEKEY_FAILED, e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
         }
     }
 
-    private String buildPrivateKeyFile() {
+    private String buildCertFile(String certDir) throws CommandException {
+        if (MyStringUtils.isBlank(certDir)) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_CERTFILE_PATH, "certDir is blank");
+        }
+        return String.join(File.separator, certDir, "cert.pem");
+    }
+
+    private String buildPrivateKeyFile(String keyDir) throws CommandException {
+        if (MyStringUtils.isBlank(keyDir)) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_PRIVATEKEY_FILE_PATH, "keyDir is blank");
+        }
         return String.join(File.separator, keyDir, "key.pem");
     }
 
-    private void initializeIfNeeded() throws CommandException {
+    private void initializeIfNeeded(String userName) throws CommandException {
         if (!initialized) {
             try {
                 logger.info("Initializing client with config: {}", clientCfg);
@@ -372,19 +378,27 @@ public class Client {
                 mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homedir);
                 clientCfg.setMspDir(mspDir);
                 // 密钥目录和文件
-                this.keyDir = String.join(File.separator, mspDir, "keystore");
+                if (MyStringUtils.isBlank(userName) || "admin".equalsIgnoreCase(userName)) {
+                    this.keyDir = String.join(File.separator, mspDir, "keystore");
+                } else {
+                    this.keyDir = String.join(File.separator, mspDir, userName, "keystore");
+                }
                 boolean mkdirs = new File(keyDir).mkdirs();
                 if (!mkdirs) {
                     logger.info("failed to create keystore directory");
                 }
-                this.keyFile = buildPrivateKeyFile();
+                this.keyFile = buildPrivateKeyFile(keyDir);
                 // 证书目录和文件
-                this.certDir = String.join(File.separator, mspDir, "signcerts");
+                if (MyStringUtils.isBlank(userName) || "admin".equalsIgnoreCase(userName)) {
+                    this.certDir = String.join(File.separator, mspDir, "signcerts");
+                } else {
+                    this.certDir = String.join(File.separator, mspDir, userName, "signcerts");
+                }
                 mkdirs = new File(certDir).mkdirs();
                 if (!mkdirs) {
                     logger.info("failed to create keystore directory");
                 }
-                this.certFile = buildCertFile();
+                this.certFile = buildCertFile(certDir);
 
                 // CA 证书目录
                 this.caCertsDir = String.join(File.separator, mspDir, "cacerts");
@@ -395,17 +409,17 @@ public class Client {
                 // Successfully initialized the client
                 initialized = true;
             } catch (Exception e) {
-                throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_INITIALIZE_CLIENT_FAILED, "failed to init client", e);
+                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_INIT_FAILED, "failed to init client", e);
             }
         }
     }
 
     public void checkEnrollment() throws CommandException {
-        initializeIfNeeded();
+        initializeIfNeeded(null);
         boolean keyFileExists = MyFileUtils.fileExists(keyFile);
         boolean certFileExists = MyFileUtils.fileExists(certFile);
         if (!keyFileExists || !certFileExists) {
-            throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "Enrollment information does not exist. Please execute enroll command first.");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION, "Enrollment information does not exist. Please execute enroll command first.");
         }
     }
 
@@ -437,10 +451,10 @@ public class Client {
     }
 
     public EnrollmentResponse reenroll(ReenrollmentRequest reenrollmentRequest, String token, String username) throws CommandException {
-        initializeIfNeeded();
+        initializeIfNeeded(null);
         final CsrConfig csrConfig = reenrollmentRequest.getCsrConfig();
         if (csrConfig == null || csrConfig.getKey() == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
         }
         final String algo = csrConfig.getKey().getAlgo();
         final CsrResult result = genCSR(algo, csrConfig.getNames());
@@ -456,18 +470,14 @@ public class Client {
     public RegistrationResponse register(RegistrationRequest registrationRequest, String token) throws CommandException {
         RegistrationRequestNet registrationRequestNet = buildRegistrationRequestNet(registrationRequest);
         final RegistrationResponseNet responseNet = registerComms.request(registrationRequestNet, token);
-        if (responseNet.isSuccess()) {
-            return buildRegistrationResponse(responseNet);
-        } else {
-            throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS);
-        }
+        return buildRegistrationResponse(responseNet);
 
     }
 
     private RegistrationResponse buildRegistrationResponse(RegistrationResponseNet responseNet) throws CommandException {
         final String redentials = responseNet.getResult().getRedentials();
         if (MyStringUtils.isEmpty(redentials)) {
-            throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_EMPTY_PASSWORD);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REGISTER_RESPONSE_EMPTY_PASSWORD_FROM_SERVER);
         }
         return new RegistrationResponse(redentials);
     }
@@ -475,25 +485,17 @@ public class Client {
     public RevokeResponse revoke(RevokeRequest registrationRequest, String token) throws CommandException {
         RevokeRequestNet registrationRequestNet = buildRevokeRequestNet(registrationRequest);
         final RevokeResponseNet responseNet = revokeComms.request(registrationRequestNet, token);
-        if (responseNet.isSuccess()) {
-            return buildRevokeResponse(responseNet);
-        } else {
-            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_RESPONSE_NOT_SUCCESS);
-        }
+        return buildRevokeResponse(responseNet);
     }
 
     public GettCertResponse gettcert(GettCertRequest request, String token) throws CommandException {
         GettCertRequestNet gettCertRequestNet = buildGettCertRequestNet(request);
         final GettcertResponseNet responseNet = gettCertComms.request(gettCertRequestNet, token);
-        if (responseNet.isSuccess()) {
-            return buildGettCertResponse(responseNet);
-        } else {
-            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_RESPONSE_NOT_SUCCESS);
-        }
+        return buildGettCertResponse(responseNet);
     }
 
     private GettCertResponse buildGettCertResponse(GettcertResponseNet responseNet) {
-        List<Certificate> certs = new ArrayList<>();
+        List<TCert> certs = new ArrayList<>();
         return new GettCertResponse(certs);
     }
 

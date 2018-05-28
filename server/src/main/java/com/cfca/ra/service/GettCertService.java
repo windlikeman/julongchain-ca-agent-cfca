@@ -2,16 +2,38 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.GettCertRequestNet;
-import com.cfca.ra.beans.GettCertResponseNet;
+import com.cfca.ra.beans.CsrConfig;
 import com.cfca.ra.beans.ServerResponseError;
-import com.cfca.ra.ca.CA;
+import com.cfca.ra.ca.Attribute;
+import com.cfca.ra.ca.TcertKeyTree;
+import com.cfca.ra.ca.TcertManager;
+import com.cfca.ra.client.RAClientImpl;
+import com.cfca.ra.enroll.EnrollmentRequestNet;
+import com.cfca.ra.gettcert.GettCertRequest;
+import com.cfca.ra.gettcert.GettCertRequestNet;
+import com.cfca.ra.gettcert.GettCertResponse;
+import com.cfca.ra.gettcert.GettCertResponseNet;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.repository.IMessageStore;
+import com.cfca.ra.repository.MessageStore;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PublicKey;
-import java.security.Signature;
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,27 +48,99 @@ public class GettCertService {
     private static final Logger logger = LoggerFactory.getLogger(GettCertService.class);
 
     private final RAServer server;
+    private final RAClientImpl raClient;
+    private final IMessageStore messageStore;
+    private Certificate eCert;
 
     GettCertService(RAServer raServer) {
         server = raServer;
+        this.raClient = new RAClientImpl();
+        this.messageStore = MessageStore.GETTCERT_DEFAULT;
     }
 
-    public GettCertResponseNet gettcert(GettCertRequestNet data, String token) {
+    public GettCertResponseNet gettcert(GettCertRequestNet data, String token, BouncyCastleProvider provider) {
         try {
             logger.info("gettcert Entered");
-            String id = "admin";
-            verifyToken(data.getCaname(), id, token);
+            final int messageId = data.hashCode();
+            if (messageStore.containsMessage(messageId)){
+                throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+            }
+
+            final String caname = data.getCaname();
+            String enrollmentID = "admin";
+            eCert = server.getEnrollmentCert(caname, enrollmentID);
+            verifyToken(caname, enrollmentID, token);
             GettCertResponseNet resp = new GettCertResponseNet(true, null);
-            final CA ca = server.getCA(data.getCaname());
-            ca.fillGettcertInfo(resp);
+
+            IUser caller = server.getUser(caname,enrollmentID, null);
+
+            List<Attribute> attrs = caller.getAttributes(data.getAttrNames());
+            List<String> affiliationPath = caller.getAffiliationPath();
+
+            final TcertKeyTree tcertKeyTree = server.getTcertKeyTree(caname);
+            Key prekey = tcertKeyTree.getKey(affiliationPath);
+            String prekeyStr = new String(prekey.getEncoded());
+            final GettCertRequest tcertReq = new GettCertRequest.Builder(attrs, true, caname, data.getCount(), prekeyStr).build();
+            final TcertManager tcertMgr = server.getTcertMgr(caname);
+            final GettCertResponse tcertResponse = tcertMgr.getBatch(tcertReq, eCert, provider);
+            server.fillGettcertInfo(caname, resp, tcertResponse);
+
+            updateMessageId(messageId, tcertReq);
             return resp;
-        }catch (RAServerException e){
+        } catch (RAServerException e) {
             logger.error("gettcert >>>>>>Failure : " + e.getMessage());
             return buildGettcertErrorServerResponse(e);
         }
     }
 
-    private void verifyToken(String caName, String id, String token) throws RAServerException{
+    private void updateMessageId(int messageId, GettCertRequest data) throws RAServerException {
+        messageStore.updateMessage(messageId, data);
+    }
+
+    private EnrollmentRequestNet buildEnrollmentRequestNet(GettCertRequestNet data, BouncyCastleProvider provider) throws RAServerException {
+        final AlgorithmParameterSpec sm2p256v1 = new ECNamedCurveGenParameterSpec("sm2p256v1");
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", provider);
+            generator.initialize(sm2p256v1);
+            KeyPair keypair = generator.generateKeyPair();
+            logger.info("buildEnrollmentRequestNet>>>>>>getSM2CsrResult@publicKey : " + keypair.getPublic());
+            logger.info("buildEnrollmentRequestNet>>>>>>getSM2CsrResult@privateKey : " + keypair.getPrivate());
+            String distinctName = generateDistinctName();
+            String csr = genSM2CSR(distinctName, keypair);
+            final String profile = "H09358028";
+            final String label = "";
+            final String caname = data.getCaname();
+            final CsrConfig csrInfo = null;
+            return new EnrollmentRequestNet(csr, profile, label, caname, csrInfo);
+        } catch (Exception e) {
+            throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_GEN_CSR, e);
+        }
+    }
+
+
+    private String genSM2CSR(String distictName, KeyPair keypair) throws RAServerException {
+
+        try {
+            if (StringUtils.isEmpty(distictName)) {
+                throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_GEN_CSR, "distictName is empty");
+            }
+
+            PKCS10CertificationRequestBuilder pkcs10Builder = new JcaPKCS10CertificationRequestBuilder(
+                    new X500Name(distictName),
+                    keypair.getPublic());
+
+            ContentSigner contentSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(keypair.getPrivate());
+            PKCS10CertificationRequest csr = pkcs10Builder.build(contentSigner);
+            final byte[] base64Encoded = Base64.encode(csr.getEncoded());
+            return new String(base64Encoded);
+        } catch (RAServerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_GEN_CSR, e);
+        }
+    }
+
+    private void verifyToken(String caName, String id, String token) throws RAServerException {
         logger.info("verifyToken Entered>>>>>>id : " + id + ",caName=" + caName + ",token=" + token);
         String enrollmentId = server.getEnrollmentId(caName, id);
         PublicKey publicKey = server.getKey(caName, enrollmentId);
@@ -88,5 +182,9 @@ public class GettCertService {
         ServerResponseError elem = new ServerResponseError(e.getReasonCode(), e.getMessage());
         errors.add(elem);
         return new GettCertResponseNet(false, errors);
+    }
+
+    private String generateDistinctName() {
+        return "CN=051@testName@Z1234567890@53,OU=Individual-3,OU=Local RA,O=CFCA TEST CA,C=CN";
     }
 }

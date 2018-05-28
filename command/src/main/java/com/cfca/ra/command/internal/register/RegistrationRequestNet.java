@@ -1,6 +1,5 @@
 package com.cfca.ra.command.internal.register;
 
-import com.cfca.ra.command.internal.UserAttrs;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

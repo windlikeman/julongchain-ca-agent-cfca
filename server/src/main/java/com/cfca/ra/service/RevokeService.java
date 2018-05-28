@@ -2,14 +2,18 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.RevokeRequestNet;
-import com.cfca.ra.beans.RevokeResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
-import com.cfca.ra.ca.CA;
-import com.cfca.ra.register.IUser;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
-import org.apache.commons.lang3.StringUtils;
+import com.cfca.ra.register.IUser;
+import com.cfca.ra.repository.IMessageStore;
+import com.cfca.ra.repository.MessageStore;
+import com.cfca.ra.revoke.RevokeRequest;
+import com.cfca.ra.revoke.RevokeRequestNet;
+import com.cfca.ra.revoke.RevokeResponseNet;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,29 +38,36 @@ public class RevokeService {
     private static final Logger logger = LoggerFactory.getLogger(RAServiceImpl.class);
     private final RAServer server;
     private final IRAClient raClient;
+    private final IMessageStore messageStore;
 
     @Autowired
     public RevokeService(RAServer server) {
         this.server = server;
         this.raClient = new RAClientImpl();
+        this.messageStore = MessageStore.REVOKE_DEFAULT;
     }
 
-    public RevokeResponseNet revoke(RevokeRequestNet data, String auth) {
+    public RevokeResponseNet revoke(RevokeRequest request, String auth) {
         try {
-            logger.info("revoke >>>>>> data : " + data + ", auth=" + auth);
+            logger.info("revoke >>>>>> request : " + request + ", auth=" + auth);
+            final RevokeRequestNet data = request.getRevokeRequestNet();
+            final int messageId = data.hashCode();
+            if (messageStore.containsMessage(messageId)){
+                throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+            }
+
             final String caName = data.getCaname();
             final String id = data.getId();
             String enrollmentId = getEnrollmentIdFromToken(caName, id, auth);
             logger.info("revoke >>>>>> enrollmentId : " + enrollmentId);
 
-            final CA ca = server.getCA(caName);
-            ca.attributeIsTrue(id, "hf.Revoker");
+            server.attributeIsTrue(caName, id, "hf.Revoker");
             if (StringUtils.isEmpty(data.getSerial()) && StringUtils.isEmpty(data.getAki()) && StringUtils.isEmpty(data.getId())) {
                 throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_INVALID_REQUEST, "Either Name or Serial and AKI are required for a revoke request");
             }
 
             if (!StringUtils.isEmpty(data.getId())) {
-                final IUser user = ca.getRegistry().getUser(data.getId(), null);
+                final IUser user = server.getUser(caName, data.getId(), null);
                 if (user != null) {
                     user.revoke();
                 }
@@ -64,11 +75,16 @@ public class RevokeService {
 
             final String result = raClient.revoke(data);
             removeCert(caName, data.getSerial());
+            updateMessageId(messageId, request);
             return new RevokeResponseNet(true, result, null, null);
         } catch (RAServerException e) {
             logger.error("revoke >>>>>> Failure : " + e.getMessage(), e);
             return buildErrorResponse(e);
         }
+    }
+
+    private void updateMessageId(int messageId, RevokeRequest request) throws RAServerException {
+        messageStore.updateMessage(messageId, request);
     }
 
     private void removeCert(String caName, String serial) throws RAServerException {

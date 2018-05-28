@@ -1,6 +1,6 @@
 package com.cfca.ra.register;
 
-import com.cfca.ra.beans.RegistrationRequest;
+import com.cfca.ra.ca.Attribute;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,11 +17,11 @@ public class UserInfo {
     private final String pass;
     private final String type;
     private final String affiliation;
-    private final List<UserAttrs> attributes;
+    private final List<Attribute> attributes;
     private final int maxEnrollments;
     private final int state;
 
-    public UserInfo(String name, String pass, String type, String affiliation, List<UserAttrs> attributes, int maxEnrollments, int state) {
+    public UserInfo(String name, String pass, String type, String affiliation, List<Attribute> attributes, int maxEnrollments, int state) {
         this.name = name;
         this.pass = pass;
         this.type = type;
@@ -71,7 +71,7 @@ public class UserInfo {
         return affiliation;
     }
 
-    public List<UserAttrs> getAttributes() {
+    public List<Attribute> getAttributes() {
         return attributes;
     }
 

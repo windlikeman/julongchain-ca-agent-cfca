@@ -3,11 +3,17 @@ package com.cfca.ra.ca;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
+import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
+import com.cfca.ra.getcainfo.GetCAInfoResponseResult;
+import com.cfca.ra.gettcert.GettCertResponse;
+import com.cfca.ra.gettcert.GettCertResponseNet;
+import com.cfca.ra.gettcert.GettCertResponseResult;
 import com.cfca.ra.register.IUser;
 import com.cfca.ra.repository.CertCertStore;
 import com.cfca.ra.repository.EnrollIdStore;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 
@@ -52,13 +58,19 @@ public class CA {
      */
     private final IUserRegistry registry;
 
-//    private final UserStore userStore;
+    /**
+     * private final UserStore userStore;
+     */
     private final EnrollIdStore enrollIdStore;
 
     /**
-     *  用户注册信息
+     * The tcert manager for this CA
      */
-//    private final RegistryStore registryStore;
+    private final TcertManager tcertMgr;
+    /**
+     * The key tree
+     */
+    private final TcertKeyTree tcertKeyTree;
 
     private CA(Builder builder) {
         this.config = builder.config;
@@ -67,6 +79,16 @@ public class CA {
         this.server = builder.server;
         this.registry = builder.registry;
         this.enrollIdStore = builder.enrollIdStore;
+        this.tcertMgr = builder.tcertMgr;
+        this.tcertKeyTree = builder.tcertKeyTree;
+    }
+
+    public TcertManager getTcertMgr() {
+        return tcertMgr;
+    }
+
+    public TcertKeyTree getTcertKeyTree() {
+        return tcertKeyTree;
     }
 
     public CAConfig getConfig() {
@@ -150,15 +172,15 @@ public class CA {
         return iu.getPassWord();
     }
 
-    public void attributeIsTrue(String id, String s) throws RAServerException {
+    public void attributeIsTrue(String id, String attr) throws RAServerException {
     }
 
-    public void fillGettcertInfo(GettCertResponseNet resp) {
-        int id = 100;
-        int ts = 1000;
-        String key = "key";
-        List<TCert> tcerts = new ArrayList<>();
-        resp.setResult(new GettCertResponseResult(id, ts, key, tcerts));
+    public void fillGettcertInfo(GettCertResponseNet resp, GettCertResponse gettCertResponse) {
+        long id = gettCertResponse.getId();
+        long ts = gettCertResponse.getTs();
+        String key = Base64.toBase64String(gettCertResponse.getKey());
+
+        resp.setResult(new GettCertResponseResult(id, ts, key, gettCertResponse.gettCerts()));
     }
 
 
@@ -191,19 +213,32 @@ public class CA {
         private CertCertStore certStore = CertCertStore.CFCA;
         private EnrollIdStore enrollIdStore = EnrollIdStore.CFCA;
 
+        private TcertManager tcertMgr;
+        private TcertKeyTree tcertKeyTree;
+
         public Builder(RAServer server, CAConfig config, IUserRegistry registry) {
             this.server = server;
             this.config = config;
             this.registry = registry;
         }
 
-        public Builder enrollIdStore(EnrollIdStore v) {
-            this.enrollIdStore = v;
+        public Builder tcertMgr(TcertManager v) {
+            this.tcertMgr = v;
+            return this;
+        }
+
+        public Builder tcertKeyTree(TcertKeyTree v) {
+            this.tcertKeyTree = v;
             return this;
         }
 
         public Builder certStore(CertCertStore v) {
             this.certStore = v;
+            return this;
+        }
+
+        public Builder enrollIdStore(EnrollIdStore v) {
+            this.enrollIdStore = v;
             return this;
         }
 

@@ -1,5 +1,6 @@
 package com.cfca.ra.command.internal.gettcert;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +36,40 @@ public class GettCertRequest {
      */
     private final String caname;
 
-    public GettCertRequest(int count, List<String> attrNames, boolean encryptAttrs, int validityPeriod, String caname) {
-        this.count = count;
-        this.attrNames = attrNames;
-        this.encryptAttrs = encryptAttrs;
-        this.validityPeriod = validityPeriod;
-        this.caname = caname;
+    /**
+     * 用于密钥派生的前置密钥
+     */
+    private final String preKey;
+
+    /**
+     * DisableKeyDerivation 如果为 true,则禁用密钥派生,以使TCert与ECert密码不相关.
+     * 当使用不支持TCert密钥派生函数的 HSM 时,这可能是必需的.
+     */
+    private final boolean disableKeyDerivation;
+
+    private final List<Attribute> attrs;
+
+    private GettCertRequest(Builder builder) {
+        this.count = builder.count;
+        this.attrNames = builder.attrNames;
+        this.encryptAttrs = builder.encryptAttrs;
+        this.validityPeriod = builder.validityPeriod;
+        this.caname = builder.caname;
+        this.preKey = builder.preKey;
+        this.disableKeyDerivation = builder.disableKeyDerivation;
+        this.attrs = builder.attrs;
+    }
+
+    public String getPreKey() {
+        return preKey;
+    }
+
+    public boolean isDisableKeyDerivation() {
+        return disableKeyDerivation;
+    }
+
+    public List<Attribute> getAttrs() {
+        return attrs;
     }
 
     public int getCount() {
@@ -72,5 +101,44 @@ public class GettCertRequest {
                 ", validityPeriod=" + validityPeriod +
                 ", caname='" + caname + '\'' +
                 '}';
+    }
+
+    static class Builder{
+        private final boolean encryptAttrs;
+        private final String caname;
+        private final String preKey;
+        private final List<Attribute> attrs;
+
+        private int count = 1;
+        private int validityPeriod = 10;
+        private boolean disableKeyDerivation = true;
+        private List<String> attrNames = new ArrayList<>();
+
+        Builder(List<Attribute> attrs, boolean encryptAttrs, String caname, int count, String preKey) {
+            this.attrs = attrs;
+            this.encryptAttrs = encryptAttrs;
+            this.caname = caname;
+            this.count = count;
+            this.preKey = preKey;
+        }
+
+        Builder count(int v){
+            this.count = v;
+            return this;
+        }
+
+        Builder validityPeriod(int v){
+            this.validityPeriod = v;
+            return this;
+        }
+
+        Builder attrNames(List<String>  v){
+            this.attrNames = v;
+            return this;
+        }
+
+        GettCertRequest build(){
+            return new GettCertRequest(this);
+        }
     }
 }

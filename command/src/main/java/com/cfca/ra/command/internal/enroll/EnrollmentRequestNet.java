@@ -2,6 +2,8 @@ package com.cfca.ra.command.internal.enroll;
 
 import com.cfca.ra.command.config.CsrConfig;
 
+import java.util.Objects;
+
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -66,6 +68,28 @@ public class EnrollmentRequestNet {
                 ", caname='" + caname + '\'' +
                 ", csrInfo=" + csrInfo +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
+        EnrollmentRequestNet that = (EnrollmentRequestNet) o;
+        return Objects.equals(request, that.request) &&
+                Objects.equals(profile, that.profile) &&
+                Objects.equals(label, that.label) &&
+                Objects.equals(caname, that.caname) &&
+                Objects.equals(csrInfo, that.csrInfo);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(request, profile, label, caname, csrInfo);
     }
 
     public static class Builder {

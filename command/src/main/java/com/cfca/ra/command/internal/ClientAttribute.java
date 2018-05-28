@@ -15,4 +15,20 @@ public class ClientAttribute {
         this.name = name;
         this.val = val;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getVal() {
+        return val;
+    }
+
+    @Override
+    public String toString() {
+        return "ClientAttribute{" +
+                "name='" + name + '\'' +
+                ", val='" + val + '\'' +
+                '}';
+    }
 }

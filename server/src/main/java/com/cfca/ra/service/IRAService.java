@@ -1,7 +1,18 @@
 package com.cfca.ra.service;
 
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.*;
+import com.cfca.ra.enroll.EnrollmentRequest;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
+import com.cfca.ra.getcainfo.GetCAInfoRequestNet;
+import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
+import com.cfca.ra.gettcert.GettCertRequestNet;
+import com.cfca.ra.gettcert.GettCertResponseNet;
+import com.cfca.ra.reenroll.ReenrollmentRequest;
+import com.cfca.ra.register.RegistrationRequest;
+import com.cfca.ra.register.RegistrationResponseNet;
+import com.cfca.ra.revoke.RevokeRequest;
+import com.cfca.ra.revoke.RevokeResponseNet;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +31,7 @@ public interface IRAService {
      * @param auth
      * @return EnrollmentResponseNet
      */
-    EnrollmentResponseNet enroll(EnrollmentRequestNet data, String auth);
+    EnrollmentResponseNet enroll(EnrollmentRequest data, String auth);
 
     /**
      * 用户重新登记和签发证书接口
@@ -29,7 +40,7 @@ public interface IRAService {
      * @param auth
      * @return
      */
-    EnrollmentResponseNet reenroll(ReenrollmentRequestNet data,String auth);
+    EnrollmentResponseNet reenroll(ReenrollmentRequest data, String auth);
 
 
     /**
@@ -39,7 +50,7 @@ public interface IRAService {
      * @param auth
      * @return RegistrationResponseNet
      */
-    RegistrationResponseNet register(RegistrationRequestNet data, String auth) throws RAServerException;
+    RegistrationResponseNet register(RegistrationRequest data, String auth) throws RAServerException;
 
     /**
      * 吊销证书接口
@@ -47,16 +58,17 @@ public interface IRAService {
      * @param data
      * @return RevokeResponseNet
      */
-    RevokeResponseNet revoke(RevokeRequestNet data, String auth);
+    RevokeResponseNet revoke(RevokeRequest data, String auth);
 
     /**
      * 批量查询证书接口
      *
      * @param data
      * @param auth
+     * @param provider
      * @return GettCertResponseNet
      */
-    GettCertResponseNet gettcert(GettCertRequestNet data, String auth);
+    GettCertResponseNet gettcert(GettCertRequestNet data, String auth, BouncyCastleProvider provider);
 
     /**
      * 初始化:包括初始化 CA 配置列表等

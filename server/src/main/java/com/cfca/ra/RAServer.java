@@ -1,22 +1,30 @@
 package com.cfca.ra;
 
-import com.cfca.ra.ca.CA;
-import com.cfca.ra.ca.CAConfig;
-import com.cfca.ra.ca.CAInfo;
-import com.cfca.ra.ca.DefaultUserRegistry;
+import com.cfca.ra.ca.*;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
+import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
+import com.cfca.ra.gettcert.GettCertResponse;
+import com.cfca.ra.gettcert.GettCertResponseNet;
+import com.cfca.ra.register.IUser;
 import com.cfca.ra.repository.CertCertStore;
 import com.cfca.ra.repository.EnrollIdStore;
 import com.cfca.ra.utils.MyFileUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.cfca.ra.utils.PemUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
+import java.security.Key;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,6 +67,9 @@ public class RAServer {
      * A map of CAs stored by CA name as key
      */
     private Map<String, CA> caMap = new HashMap<>();
+
+    private final static byte[] keybytes = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+            0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38};
 
     public void initialize() throws RAServerException {
         if (StringUtils.isEmpty(serverHomeDir)) {
@@ -104,7 +115,6 @@ public class RAServer {
             }
         }
         caMap.put(caName, adding);
-
     }
 
     private CA initCA(final CAConfig caConfig) throws RAServerException {
@@ -130,13 +140,39 @@ public class RAServer {
             local = new CAConfig.Builder(caInfo).build();
         }
         DefaultUserRegistry registry = new DefaultUserRegistry();
+
+        // Initialize TCert handling
+        final String keyfile = String.join(File.separator, local.getCA().getHomeDir(), local.getCA().getKeyfile());
+        final String certfile = String.join(File.separator, local.getCA().getHomeDir(), local.getCA().getCertfile());
+        TcertManager tcertMgr = loadTcertMgr(keyfile, certfile);
+        // FIXME: root 前置密钥 需要序列化到数据库或者本地文件
+        Key rootKey = genRootKey();
+        final TcertKeyTree tcertKeyTree = new TcertKeyTree(rootKey);
+
         CA.Builder defaultCABuilder = new CA.Builder(this, local, registry)
                 .enrollIdStore(EnrollIdStore.CFCA)
-                .certStore(CertCertStore.CFCA);
+                .certStore(CertCertStore.CFCA)
+                .tcertKeyTree(tcertKeyTree)
+                .tcertMgr(tcertMgr);
         CA defaultCA = defaultCABuilder.build();
 
         logger.info("Init default CA with home {} and config {}", defaultCA.getHomeDir(), defaultCA.getConfig());
         return defaultCA;
+    }
+
+    Key genRootKey() {
+        return new SecretKeySpec(keybytes, "AES256");
+    }
+
+    private TcertManager loadTcertMgr(String keyfile, String certfile) throws RAServerException {
+        try {
+            PrivateKey caKey = PemUtils.loadPrivateKey(keyfile);
+            Certificate caCert = PemUtils.loadCert(certfile);
+            ContentSigner caCertSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(caKey);
+            return new TcertManager.Builder(caKey, caCert).caCertSigner(caCertSigner).builder();
+        } catch (Exception e) {
+            throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_LOAD_TCERT_MGR, e);
+        }
     }
 
     public CA getCA(final String caName) throws RAServerException {
@@ -179,8 +215,49 @@ public class RAServer {
         ca.checkIdRegistered(id);
     }
 
-    public String findCertFile(String caName, String serial) throws RAServerException{
+    public String findCertFile(String caName, String serial) throws RAServerException {
         final CA ca = getCA(caName);
         return ca.getCertFile(serial);
+    }
+
+    public void fillCAInfo(String caname, GetCAInfoResponseNet resp) throws RAServerException {
+        final CA ca = getCA(caname);
+        ca.fillCAInfo(resp);
+    }
+
+    public void fillCAInfo(String caname, EnrollmentResponseNet resp) throws RAServerException {
+        final CA ca = getCA(caname);
+        ca.fillCAInfo(resp);
+    }
+
+    public IUser getUser(String caname, String enrollmentID, String[] attrs) throws RAServerException {
+        final CA ca = getCA(caname);
+        IUser caller = ca.getRegistry().getUser(enrollmentID, null);
+        return caller;
+    }
+
+    public TcertKeyTree getTcertKeyTree(String caname) throws RAServerException {
+        final CA ca = getCA(caname);
+        return ca.getTcertKeyTree();
+    }
+
+    public TcertManager getTcertMgr(String caname) throws RAServerException {
+        final CA ca = getCA(caname);
+        return ca.getTcertMgr();
+    }
+
+    public void fillGettcertInfo(String caname, GettCertResponseNet resp, GettCertResponse tcertResponse) throws RAServerException {
+        final CA ca = getCA(caname);
+        ca.fillGettcertInfo(resp, tcertResponse);
+    }
+
+    public Certificate getEnrollmentCert(String caname, String enrollmentID) throws RAServerException {
+        final CA ca = getCA(caname);
+        return ca.loadCert(enrollmentID);
+    }
+
+    public void attributeIsTrue(String caName, String id, String attr) throws RAServerException {
+        final CA ca = getCA(caName);
+        ca.attributeIsTrue(id, attr);
     }
 }

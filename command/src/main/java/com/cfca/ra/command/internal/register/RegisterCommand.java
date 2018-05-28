@@ -3,6 +3,7 @@ package com.cfca.ra.command.internal.register;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
+import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,6 +47,7 @@ public final class RegisterCommand extends BaseClientCommand {
     @Override
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
+
         final RegistrationRequest registrationRequest = new Gson().fromJson(content, RegistrationRequest.class);
         logger.info(registrationRequest.toString());
         clientCfg.setRegistrationRequest(registrationRequest);
@@ -74,8 +76,21 @@ public final class RegisterCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS);
         }
 
-        registered.put(registrationRequest.getName(), secret);
+        final String name = registrationRequest.getName();
+        logger.info("new registered user : "+name);
+        registered.put(name, secret);
         updateRegisterFile();
+        mkNewUserDir(name);
+    }
+
+    private void mkNewUserDir(String name) {
+        final String mspDir = clientCfg.getMspDir();
+        String userDir = String.join(File.separator, mspDir, name);
+        userDir = MyFileUtils.makeFileAbs(userDir);
+        boolean mkdirs = new File(userDir).mkdirs();
+        if (!mkdirs) {
+            logger.info("failed to create new user directory");
+        }
 
     }
 

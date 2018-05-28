@@ -1,7 +1,7 @@
 package com.cfca.ra;
 
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +38,10 @@ public class RAServerException extends Exception {
      * ENROLL 服务检查鉴权信息失败
      */
     public static final int REASON_CODE_ENROLL_SERVICE_CHECK_AUTH = 0x5006;
+    /**
+     * ENROLL 服务消息ID重复,防止重放攻击
+     */
+    public static final int REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE = 0x5007;
 
     /**
      * REGISTER 命令失败:该用户已经注册过
@@ -84,6 +88,10 @@ public class RAServerException extends Exception {
      * REENROLL 命令失败:获取CA失败,ca 名称是空
      */
     public static final int REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY = 0x7004;
+    /**
+     * REENROLL 命令失败:消息重复
+     */
+    public static final int REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE = 0x7005;
 
     /**
      * REVOKE 命令失败: REVOKE 之前必须ENROLL
@@ -109,19 +117,63 @@ public class RAServerException extends Exception {
      * REVOKE 命令失败: 无效的请求参数
      */
     public static final int REASON_CODE_REVOKE_SERVICE_INVALID_REQUEST = 0x8006;
+    /**
+     * REVOKE 命令失败: 无效的请求参数
+     */
+    public static final int REASON_CODE_REVOKE_SERVICE_MESSAGE_DUPLICATE = 0x8007;
 
     /**
-     * GETTCERT 命令失败: 在geitcert前必须先enroll
+     * GETTCERT 命令失败: 在 geitcert 前必须先enroll
      */
     public static final int REASON_CODE_GETTCERT_SERVICE_NOT_ENROLL = 0x9001;
     /**
-     * GETTCERT 命令失败: 无效的token
+     * GETTCERT 命令失败: 无效的 token
      */
     public static final int REASON_CODE_GETTCERT_SERVICE_INVALID_TOKEN = 0x9002;
     /**
-     * GETTCERT 命令失败: 校验token失败
+     * GETTCERT 命令失败: 校验 token 失败
      */
     public static final int REASON_CODE_GETTCERT_SERVICE_VERIFY_TOKEN = 0x9003;
+    /**
+     * GETTCERT 命令失败: 生成 csr 失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_GEN_CSR = 0x9004;
+    /**
+     * GETTCERT 命令失败: 初始化keytree 派生密钥失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_DERIVE_CHILD_KEY = 0x9005;
+    /**
+     * GETTCERT 命令失败: 加载 TCERT MGR 失败
+     */
+    public static final int REASON_CODE_RA_SERVER_LOAD_TCERT_MGR = 0x9006;
+    /**
+     * GETTCERT 命令失败: 处理批处理请求失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_GET_BATCH = 0x9007;
+    /**
+     * GETTCERT 命令失败: 生成派生密钥失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_GEN_KDF_KEY = 0x9008;
+    /**
+     * GETTCERT 命令失败: 使用CBC方式+PKCS7填充加密失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_CBC_PKCS7_ENCRYPT = 0x9009;
+    /**
+     * GETTCERT 命令失败: 从身份证书派生公钥失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_GENERATE_PUBLIC_KEY = 0x900a;
+    /**
+     * GETTCERT 命令失败: 使用CBC方式+PKCS7填充解密失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_CBC_PKCS7_DECRYPT = 0x900b;
+    /**
+     * GETTCERT 命令失败: 使用RATK 下载证书失败
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_RATK_PROCESS = 0x900c;
+    /**
+     * GETTCERT 命令失败: 消息重复
+     */
+    public static final int REASON_CODE_GETTCERT_SERVICE_MESSAGE_DUPLICATE = 0x900d;
 
     /**
      * RA Server 没有初始化
@@ -198,6 +250,12 @@ public class RAServerException extends Exception {
      */
     public static final int REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE = 0xe002;
 
+    /**
+     * MESSAGE_STORE:加载 MESSAGE STORE 失败
+     */
+    public static final int REASON_CODE_MESSAGE_STORE_LOAD = 0xf001;
+
+
     private String message;
 
     private int reasonCode;
@@ -209,6 +267,7 @@ public class RAServerException extends Exception {
             put(REASON_CODE_ENROLL_SERVICE_BUILD_RATK_REQUEST, "enrollment service failed to build ratk request");
             put(REASON_CODE_ENROLL_SERVICE_RATK_PROCESS, "enrollment service failed to process ratk request");
             put(REASON_CODE_ENROLL_SERVICE_CHECK_AUTH, "enrollment service failed to check auth");
+            put(REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE, "enrollment service failed due to duplicate message ID");
 
             put(REASON_CODE_REGISTER_SERVICE_ALREADY_REGISTERED, "register service failed to register by already registered");
             put(REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "register service failed with invalid token");
@@ -222,6 +281,7 @@ public class RAServerException extends Exception {
             put(REASON_CODE_REENROLL_SERVICE_NOT_ENROLL, "reenroll service failed with must enroll first");
             put(REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "reenroll service failed due to invalid token");
             put(REASON_CODE_REENROLL_SERVICE_GET_CA_NAME_EMPTY, "reenroll service failed due to ca name is empty");
+            put(REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE, "reenroll service failed due to duplicate message");
 
             put(REASON_CODE_REVOKE_SERVICE_NOT_ENROLL, "revoke service failed with must enroll first");
             put(REASON_CODE_REVOKE_SERVICE_INVALID_TOKEN, "revoke service failed due to invalid token");
@@ -229,10 +289,21 @@ public class RAServerException extends Exception {
             put(REASON_CODE_REVOKE_SERVICE_RATK_PROCESS, "revoke service failed to process ratk request");
             put(REASON_CODE_REVOKE_SERVICE_REMOVE_CERT, "revoke service failed to remove cert been revoked");
             put(REASON_CODE_REVOKE_SERVICE_INVALID_REQUEST, "revoke service failed due to invalid request");
+            put(REASON_CODE_REVOKE_SERVICE_MESSAGE_DUPLICATE, "revoke service failed due to duplicate message");
 
             put(REASON_CODE_GETTCERT_SERVICE_NOT_ENROLL, "gettcert service failed with must enroll first");
             put(REASON_CODE_GETTCERT_SERVICE_INVALID_TOKEN, "gettcert service failed due to invalid token");
             put(REASON_CODE_GETTCERT_SERVICE_VERIFY_TOKEN, "gettcert service failed due to verify token");
+            put(REASON_CODE_GETTCERT_SERVICE_GEN_CSR, "gettcert service failed due to generate csr");
+            put(REASON_CODE_RA_SERVER_LOAD_TCERT_MGR, "gettcert service failed due to load tcert manger");
+            put(REASON_CODE_GETTCERT_SERVICE_DERIVE_CHILD_KEY, "gettcert service failed due to derive child key");
+            put(REASON_CODE_GETTCERT_SERVICE_GET_BATCH, "gettcert service failed due to get batch");
+            put(REASON_CODE_GETTCERT_SERVICE_GEN_KDF_KEY, "gettcert service failed due to generate kdf key");
+            put(REASON_CODE_GETTCERT_SERVICE_CBC_PKCS7_ENCRYPT, "gettcert service failed due to cbc pkcs7 encrypt");
+            put(REASON_CODE_GETTCERT_SERVICE_CBC_PKCS7_DECRYPT, "gettcert service failed due to cbc pkcs7 decrypt");
+            put(REASON_CODE_GETTCERT_SERVICE_GENERATE_PUBLIC_KEY, "gettcert service failed due to generate public key derivative from ecert");
+            put(REASON_CODE_GETTCERT_SERVICE_RATK_PROCESS, "gettcert service failed due to process ratk request");
+            put(REASON_CODE_GETTCERT_SERVICE_MESSAGE_DUPLICATE, "gettcert service failed due to duplicate message");
 
             put(REASON_CODE_RA_SERVER_GET_KEY_EXCEPTION, "RA Server failed to register service due to invalid token");
             put(REASON_CODE_RA_SERVER_GET_CA_NOT_FOUND, "RA Server not found CA by ca name");
@@ -254,7 +325,7 @@ public class RAServerException extends Exception {
 
             put(REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE, "enrollid store fail to update enroll id dat file");
             put(REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE, "enrollid store fail to load update enroll id dat file");
-
+            put(REASON_CODE_MESSAGE_STORE_LOAD, "message store fail to load");
         }
     };
 

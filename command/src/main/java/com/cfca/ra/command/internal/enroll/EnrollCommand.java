@@ -3,12 +3,14 @@ package com.cfca.ra.command.internal.enroll;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.config.CsrConfig;
+import com.cfca.ra.command.config.Enrollment;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
-import com.cfca.ra.command.internal.ParsedUrl;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
+import com.google.gson.Gson;
+import com.sun.deploy.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +45,28 @@ public final class EnrollCommand extends BaseClientCommand {
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
 
+        processConfigFile();
+        if (!MyStringUtils.isBlank(content) && !"{}".equalsIgnoreCase(content)) {
+            processContent();
+        }
+    }
+
+    private void processContent() {
+        final EnrollmentRequest overrideEnrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
+        clientCfg.setCaName(overrideEnrollmentRequest.getCaName());
+        clientCfg.setAdmin(overrideEnrollmentRequest.getUsername());
+        clientCfg.setAdminpwd(overrideEnrollmentRequest.getPassword());
+        clientCfg.setCsrConfig(overrideEnrollmentRequest.getCsrConfig());
+        clientCfg.setEnrollmentRequest(overrideEnrollmentRequest);
+    }
+
+    private void processConfigFile() throws CommandException {
         ConfigBean configBean = loadConfigFile();
-
-        final EnrollmentRequest enrollmentRequest = buildEnrollmentRequestfromConfig(configBean);
-        clientCfg.setEnrollmentRequest(enrollmentRequest);
-
-//        final EnrollmentRequest enrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
-
+        clientCfg.setCaName(configBean.getCaname());
+        clientCfg.setAdmin(configBean.getAdmin());
+        clientCfg.setAdminpwd(configBean.getAdminpwd());
+        clientCfg.setCsrConfig(configBean.getCsr());
+        clientCfg.setEnrollmentRequest(buildEnrollmentRequestfromConfig(configBean));
     }
 
     @Override

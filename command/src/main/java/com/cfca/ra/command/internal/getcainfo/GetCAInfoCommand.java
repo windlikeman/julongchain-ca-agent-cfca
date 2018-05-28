@@ -31,6 +31,7 @@ public class GetCAInfoCommand extends BaseClientCommand {
 
         ConfigBean configBean = loadConfigFile();
         clientCfg.setMspDir(configBean.getMspdir());
+
         final GetCAInfoRequest getCAInfoRequest = new Gson().fromJson(content, GetCAInfoRequest.class);
         logger.error("prepare<<<<<<" + getCAInfoRequest.toString());
         clientCfg.setGetCAInfoRequest(getCAInfoRequest);

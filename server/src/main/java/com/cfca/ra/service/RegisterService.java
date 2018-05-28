@@ -3,12 +3,12 @@ package com.cfca.ra.service;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
+import com.cfca.ra.ca.Attribute;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.ca.IUserRegistry;
-import com.cfca.ra.register.DefaultUser;
-import com.cfca.ra.register.IUser;
-import com.cfca.ra.register.UserAttrs;
-import com.cfca.ra.register.UserInfo;
+import com.cfca.ra.register.*;
+import com.cfca.ra.repository.IMessageStore;
+import com.cfca.ra.repository.MessageStore;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,10 +79,10 @@ public class RegisterService {
         }
     }
 
-    public RegistrationResponseNet registerUser(RegistrationRequestNet data, String auth) {
+    public RegistrationResponseNet registerUser(RegistrationRequest req, String auth) {
         try {
-            final String caname = data.getCaname();
-            final String id = data.getId();
+            final String caname = req.getCaName();
+            final String id = req.getName();
             checkIdRegistered(caname, id);
             String enrollmentId = getEnrollmentIdFromToken(caname, id, auth);
             logger.info("registerUser >>>>>> enrollmentId : " + enrollmentId);
@@ -93,7 +93,6 @@ public class RegisterService {
 //            normalizeRegistrationRequest(data, user);
             //FIXME: 是否允许注册
 //            canRegister(user, data);
-            RegistrationRequest req = new RegistrationRequest(data);
             String pass = req.getName() + ":" + req.getSecret();
             pass = Base64.toBase64String(pass.getBytes("UTF-8"));
 
@@ -159,8 +158,8 @@ public class RegisterService {
         return insert.getPass();
     }
 
-    private void addAttributeToRequest(AttributeNames attributeName, String value, List<UserAttrs> attribute) {
-        attribute.add(new UserAttrs(attributeName.getName(), value));
+    private void addAttributeToRequest(AttributeNames attributeName, String value, List<Attribute> attribute) {
+        attribute.add(new Attribute(attributeName.getName(), value, true));
     }
 
     private int getMaxEnrollments(int maxEnrollments, int maxEnrollments1) {

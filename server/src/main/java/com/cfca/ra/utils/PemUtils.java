@@ -1,10 +1,12 @@
 package com.cfca.ra.utils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.security.PrivateKey;
 import java.util.Collections;
 
 /**
@@ -46,7 +49,7 @@ public class PemUtils {
         final PemObject certObject = loadFile(fileName);
         final byte[] certDecoded = certObject.getContent();
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(certDecoded);
-        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
+//        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         return Certificate.getInstance(asn1Primitive);
     }
 
@@ -62,5 +65,17 @@ public class PemUtils {
              PemReader p = new PemReader(fileReader)) {
             return p.readPemObject();
         }
+    }
+
+    public static PrivateKey loadPrivateKey(String fileName) throws IOException {
+        if (StringUtils.isBlank(fileName)) {
+            throw new IOException("loadPrivateKey fileName is blank");
+        }
+        final PemObject certObject = loadFile(fileName);
+        final byte[] content = certObject.getContent();
+        final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(content);
+//        logger.info("loadPrivateKey>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
+        final PrivateKeyInfo info = PrivateKeyInfo.getInstance(asn1Primitive);
+        return BouncyCastleProvider.getPrivateKey(info);
     }
 }

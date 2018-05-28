@@ -1,6 +1,7 @@
 package com.cfca.ra.command.config;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zhangchong
@@ -110,5 +111,28 @@ public class CsrConfig {
                 ", key=" + key +
                 ", ca=" + ca +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CsrConfig csrConfig = (CsrConfig) o;
+        return Objects.equals(cn, csrConfig.cn) &&
+                Objects.equals(serialnumber, csrConfig.serialnumber) &&
+                Objects.equals(names, csrConfig.names) &&
+                Objects.equals(hosts, csrConfig.hosts) &&
+                Objects.equals(key, csrConfig.key) &&
+                Objects.equals(ca, csrConfig.ca);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(cn, serialnumber, names, hosts, key, ca);
     }
 }

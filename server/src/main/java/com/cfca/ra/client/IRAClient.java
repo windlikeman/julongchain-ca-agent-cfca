@@ -1,10 +1,16 @@
 package com.cfca.ra.client;
 
 import cfca.ra.common.vo.response.CertServiceResponseVO;
-import com.cfca.ra.beans.EnrollmentRequestNet;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.ReenrollmentRequestNet;
-import com.cfca.ra.beans.RevokeRequestNet;
+import com.cfca.ra.enroll.EnrollmentRequestNet;
+import com.cfca.ra.gettcert.GettCertRequest;
+import com.cfca.ra.gettcert.GettCertResponse;
+import com.cfca.ra.gettcert.TCertReq;
+import com.cfca.ra.reenroll.ReenrollmentRequestNet;
+import com.cfca.ra.revoke.RevokeRequestNet;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import java.util.List;
 
 /**
  * @author zhangchong
@@ -33,4 +39,6 @@ public interface IRAClient {
     CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException;
 
     String revoke(RevokeRequestNet data) throws RAServerException;
+
+    GettCertResponse gettcert(GettCertRequest req, List<TCertReq> set, BouncyCastleProvider provider) throws RAServerException;
 }

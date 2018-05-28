@@ -4,7 +4,7 @@ import com.cfca.ra.RAServerException;
 import com.cfca.ra.utils.MyFileUtils;
 import com.cfca.ra.utils.PemUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -121,8 +121,6 @@ public enum CertCertStore implements ICACertStore {
             return null;
         }
 
-        private final String DIGITS = "0123456789ABCDEF";
-
         private String getStringSerialNumber(Certificate certificate) {
             byte[] snData = certificate.getSerialNumber().getPositiveValue().toByteArray();
             if (snData != null) {
@@ -141,6 +139,7 @@ public enum CertCertStore implements ICACertStore {
     };
     protected static final Logger logger = LoggerFactory.getLogger(CertCertStore.class);
     protected final String caName;
+    protected final String DIGITS = "0123456789ABCDEF";
 
     CertCertStore(String caName) {
         this.caName = caName;

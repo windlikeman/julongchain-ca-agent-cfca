@@ -1,5 +1,7 @@
 package com.cfca.ra.command.config;
 
+import java.util.Objects;
+
 /**
  * @author zhangchong
  * @create 2018/5/15
@@ -43,5 +45,25 @@ public class CAConfig {
                 ", pathlenzero=" + pathlenzero +
                 ", expiry=" + expiry +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CAConfig caConfig = (CAConfig) o;
+        return pathlen == caConfig.pathlen &&
+                pathlenzero == caConfig.pathlenzero &&
+                expiry == caConfig.expiry;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(pathlen, pathlenzero, expiry);
     }
 }

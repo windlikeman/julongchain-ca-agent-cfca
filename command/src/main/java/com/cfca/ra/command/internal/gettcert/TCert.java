@@ -9,7 +9,7 @@ import java.util.List;
  * @CodeReviewer
  * @since v3.0.0
  */
-class TCert {
+public class TCert {
     /**
      * 基于 B64 编码的交易证书
      */
@@ -23,5 +23,13 @@ class TCert {
     TCert(String cert, List<TKey> keys) {
         this.cert = cert;
         this.keys = keys;
+    }
+
+    @Override
+    public String toString() {
+        return "TCert{" +
+                "cert='" + cert + '\'' +
+                ", keys=" + keys +
+                '}';
     }
 }
