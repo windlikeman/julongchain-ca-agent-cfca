@@ -2,7 +2,6 @@ package com.cfca.ra.service;
 
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.CsrConfig;
 import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.Attribute;
 import com.cfca.ra.ca.TcertKeyTree;
@@ -16,8 +15,6 @@ import com.cfca.ra.gettcert.GettCertResponseNet;
 import com.cfca.ra.register.IUser;
 import com.cfca.ra.repository.IMessageStore;
 import com.cfca.ra.repository.MessageStore;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -53,9 +50,10 @@ public class GettCertService {
     private Certificate eCert;
 
     GettCertService(RAServer raServer) {
-        server = raServer;
+        this.server = raServer;
         this.raClient = new RAClientImpl();
         this.messageStore = MessageStore.GETTCERT_DEFAULT;
+        MessageStore.GETTCERT_DEFAULT.setServerHomeDir(this.server.getServerHomeDir());
     }
 
     public GettCertResponseNet gettcert(GettCertRequestNet data, String token, BouncyCastleProvider provider) {
@@ -110,8 +108,7 @@ public class GettCertService {
             final String profile = "H09358028";
             final String label = "";
             final String caname = data.getCaname();
-            final CsrConfig csrInfo = null;
-            return new EnrollmentRequestNet(csr, profile, label, caname, csrInfo);
+            return new EnrollmentRequestNet(csr, profile, label, caname);
         } catch (Exception e) {
             throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_GEN_CSR, e);
         }

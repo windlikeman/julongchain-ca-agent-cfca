@@ -29,7 +29,7 @@
 //    CFCA("CFCA") {
 //        private Map<String, String> userStore;
 //
-//        private String getHomeDir() {
+//        private String getServerHomeDir() {
 //            String homeDir = String.join(File.separator, System.getProperty("user.dir"), caName);
 //            return MyFileUtils.getAbsFilePath(homeDir);
 //        }
@@ -45,7 +45,7 @@
 //        private void updateUserFile() throws RAServerException {
 //            if (userStore != null) {
 //                final String s = new Gson().toJson(userStore);
-//                final String filename = String.join(File.separator, getHomeDir(), "user.dat");
+//                final String filename = String.join(File.separator, getServerHomeDir(), "user.dat");
 //                try {
 //                    FileUtils.writeStringToFile(new File(filename), s);
 //                } catch (IOException e) {
@@ -77,7 +77,7 @@
 //            }};
 //
 //            try {
-//                final String filename = String.join(File.separator, getHomeDir(), "user.dat");
+//                final String filename = String.join(File.separator, getServerHomeDir(), "user.dat");
 //                File file = new File(filename);
 //                if (file.exists()) {
 //                    final String s = FileUtils.readFileToString(file);

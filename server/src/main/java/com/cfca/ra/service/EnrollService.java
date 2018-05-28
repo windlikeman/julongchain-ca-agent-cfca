@@ -47,6 +47,7 @@ public class EnrollService {
         this.server = server;
         this.raClient = new RAClientImpl();
         this.messageStore = MessageStore.ENROLL_DEFAULT;
+        MessageStore.ENROLL_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
     public EnrollmentResponseNet enroll(EnrollmentRequest request, String auth) {

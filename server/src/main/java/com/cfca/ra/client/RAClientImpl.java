@@ -167,15 +167,12 @@ public class RAClientImpl implements IRAClient {
             String identNo = data.getProfile();
 
             String branchCode = "678";
-            String email = "zc@demo.com";
+//            String email = "zc@demo.com";
+            String keyAlg = "SM2";
+            int keyLength = 256;
 
             String caName = data.getCaname();
             String p10 = data.getRequest();
-
-            //密钥算法"SM2"
-            String keyAlg = data.getCsrInfo().getKey().getAlgo();
-            //密钥长度"256"
-            int keyLength = data.getCsrInfo().getKey().getSize();
 
             CertServiceRequestVO certServiceRequestVO = new CertServiceRequestVO();
             certServiceRequestVO.setTxCode("1101");
@@ -188,7 +185,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
             certServiceRequestVO.setKeyAlg(keyAlg);
             certServiceRequestVO.setBranchCode(branchCode);
-            certServiceRequestVO.setEmail(email);
+//            certServiceRequestVO.setEmail(email);
             certServiceRequestVO.setP10(p10);
             return certServiceRequestVO;
         } catch (Exception e) {
@@ -205,15 +202,15 @@ public class RAClientImpl implements IRAClient {
             String customerType = "1";
             String identType = "Z";
             String branchCode = "678";
-            String email = "test@demo.com";
+//            String email = "test@demo.com";
+            //密钥算法"SM2"
+            String keyAlg = "SM2";
+            //密钥长度"256"
+            int keyLength = 256;
 
             String identNo = data.getProfile();
             String caName = data.getCaname();
             String p10 = data.getRequest();
-            //密钥算法"SM2"
-            String keyAlg = data.getCsrInfo().getKey().getAlgo();
-            //密钥长度"256"
-            int keyLength = data.getCsrInfo().getKey().getSize();
 
             CertServiceRequestVO certServiceRequestVO = new CertServiceRequestVO();
             certServiceRequestVO.setTxCode("1101");
@@ -226,7 +223,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
             certServiceRequestVO.setKeyAlg(keyAlg);
             certServiceRequestVO.setBranchCode(branchCode);
-            certServiceRequestVO.setEmail(email);
+//            certServiceRequestVO.setEmail(email);
             certServiceRequestVO.setP10(p10);
             return certServiceRequestVO;
         } catch (Exception e) {

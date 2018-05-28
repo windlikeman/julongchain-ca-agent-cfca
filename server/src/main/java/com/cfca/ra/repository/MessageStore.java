@@ -2,6 +2,10 @@ package com.cfca.ra.repository;
 
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.BaseRequest;
+import com.cfca.ra.enroll.EnrollmentRequest;
+import com.cfca.ra.gettcert.GettCertRequest;
+import com.cfca.ra.reenroll.ReenrollmentRequest;
+import com.cfca.ra.revoke.RevokeRequest;
 import com.cfca.ra.utils.MyFileUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,6 +46,38 @@ public enum MessageStore implements IMessageStore {
                 updateMessageFile("enroll-message.dat");
             }
         }
+
+        private Map<Integer, BaseRequest> loadMessageFile(String fileName) throws RAServerException {
+            try {
+                Map<Integer, BaseRequest> store = new HashMap<>();
+                final String filePath = String.join(File.separator, getServerHomeDir(), fileName);
+                final File storefile = new File(filePath);
+                if (storefile.exists()) {
+                    final String s = FileUtils.readFileToString(storefile);
+                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        storefile.delete();
+                        return store;
+                    }
+
+                    Type elemType = new TypeToken<Map<Integer, EnrollmentRequest>>() {
+                    }.getType();
+                    final Map<Integer, EnrollmentRequest> map = new Gson().fromJson(s, elemType);
+                    Iterator<Map.Entry<Integer, EnrollmentRequest>> it = map.entrySet().iterator();
+                    Integer key;
+                    EnrollmentRequest value;
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, EnrollmentRequest> entry = it.next();
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        store.put(key, value);
+                    }
+                }
+                return store;
+            } catch (Exception e) {
+                throw new RAServerException(RAServerException.REASON_CODE_MESSAGE_STORE_LOAD, e);
+            }
+        }
+
     },
 
     /**
@@ -61,6 +97,37 @@ public enum MessageStore implements IMessageStore {
             if (store != null) {
                 store.put(messageId, s);
                 updateMessageFile("reenroll-message.dat");
+            }
+        }
+
+        private Map<Integer, BaseRequest> loadMessageFile(String fileName) throws RAServerException {
+            try {
+                Map<Integer, BaseRequest> store = new HashMap<>();
+                final String filePath = String.join(File.separator, getServerHomeDir(), fileName);
+                final File storefile = new File(filePath);
+                if (storefile.exists()) {
+                    final String s = FileUtils.readFileToString(storefile);
+                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        storefile.delete();
+                        return store;
+                    }
+
+                    Type elemType = new TypeToken<Map<Integer, ReenrollmentRequest>>() {
+                    }.getType();
+                    final Map<Integer, ReenrollmentRequest> map = new Gson().fromJson(s, elemType);
+                    Iterator<Map.Entry<Integer, ReenrollmentRequest>> it = map.entrySet().iterator();
+                    Integer key;
+                    ReenrollmentRequest value;
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, ReenrollmentRequest> entry = it.next();
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        store.put(key, value);
+                    }
+                }
+                return store;
+            } catch (Exception e) {
+                throw new RAServerException(RAServerException.REASON_CODE_MESSAGE_STORE_LOAD, e);
             }
         }
     },
@@ -84,6 +151,37 @@ public enum MessageStore implements IMessageStore {
                 updateMessageFile("revoke-message.dat");
             }
         }
+
+        private Map<Integer, BaseRequest> loadMessageFile(String fileName) throws RAServerException {
+            try {
+                Map<Integer, BaseRequest> store = new HashMap<>();
+                final String filePath = String.join(File.separator, getServerHomeDir(), fileName);
+                final File storefile = new File(filePath);
+                if (storefile.exists()) {
+                    final String s = FileUtils.readFileToString(storefile);
+                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        storefile.delete();
+                        return store;
+                    }
+
+                    Type elemType = new TypeToken<Map<Integer, RevokeRequest>>() {
+                    }.getType();
+                    final Map<Integer, RevokeRequest> map = new Gson().fromJson(s, elemType);
+                    Iterator<Map.Entry<Integer, RevokeRequest>> it = map.entrySet().iterator();
+                    Integer key;
+                    RevokeRequest value;
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, RevokeRequest> entry = it.next();
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        store.put(key, value);
+                    }
+                }
+                return store;
+            } catch (Exception e) {
+                throw new RAServerException(RAServerException.REASON_CODE_MESSAGE_STORE_LOAD, e);
+            }
+        }
     },
 
     /**
@@ -105,6 +203,37 @@ public enum MessageStore implements IMessageStore {
                 updateMessageFile("gettcert-message.dat");
             }
         }
+
+        private Map<Integer, BaseRequest> loadMessageFile(String fileName) throws RAServerException {
+            try {
+                Map<Integer, BaseRequest> store = new HashMap<>();
+                final String filePath = String.join(File.separator, getServerHomeDir(), fileName);
+                final File storefile = new File(filePath);
+                if (storefile.exists()) {
+                    final String s = FileUtils.readFileToString(storefile);
+                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                        storefile.delete();
+                        return store;
+                    }
+
+                    Type elemType = new TypeToken<Map<Integer, GettCertRequest>>() {
+                    }.getType();
+                    final Map<Integer, GettCertRequest> map = new Gson().fromJson(s, elemType);
+                    Iterator<Map.Entry<Integer, GettCertRequest>> it = map.entrySet().iterator();
+                    Integer key;
+                    GettCertRequest value;
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, GettCertRequest> entry = it.next();
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        store.put(key, value);
+                    }
+                }
+                return store;
+            } catch (Exception e) {
+                throw new RAServerException(RAServerException.REASON_CODE_MESSAGE_STORE_LOAD, e);
+            }
+        }
     };
 
     protected Map<Integer, BaseRequest> store;
@@ -120,7 +249,7 @@ public enum MessageStore implements IMessageStore {
                     .enableComplexMapKeySerialization()
                     .create();
             final String json = gson.toJson(store);
-            final String registerFilePath = String.join(File.separator, getHomeDir(), fileName);
+            final String registerFilePath = String.join(File.separator, getServerHomeDir(), fileName);
             final File registerFile = new File(registerFilePath);
             FileUtils.writeStringToFile(registerFile, json);
         } catch (Exception e) {
@@ -128,40 +257,13 @@ public enum MessageStore implements IMessageStore {
         }
     }
 
-    protected Map<Integer, BaseRequest> loadMessageFile(String fileName) throws RAServerException {
-        try {
-            Map<Integer, BaseRequest> store = new HashMap<>();
-            final String homeDir = getHomeDir();
-            final String filePath = String.join(File.separator, homeDir, fileName);
-            final File storefile = new File(filePath);
-            if (storefile.exists()) {
-                final String s = FileUtils.readFileToString(storefile);
-                if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
-                    storefile.delete();
-                    return store;
-                }
+    protected String serverHomeDir;
 
-                Type elemType = new TypeToken<Map<Long, BaseRequest>>() {
-                }.getType();
-                final Map<Integer, BaseRequest> map = new Gson().fromJson(s, elemType);
-                Iterator<Map.Entry<Integer, BaseRequest>> it = map.entrySet().iterator();
-                Integer key;
-                BaseRequest value;
-                while (it.hasNext()) {
-                    Map.Entry<Integer, BaseRequest> entry = it.next();
-                    key = entry.getKey();
-                    value = entry.getValue();
-                    store.put(key, value);
-                }
-            }
-            return store;
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_MESSAGE_STORE_LOAD, e);
-        }
+    protected String getServerHomeDir() {
+        return MyFileUtils.getAbsFilePath(serverHomeDir);
     }
 
-    protected String getHomeDir() {
-        final String homeDir = System.getProperty("user.dir");
-        return MyFileUtils.getAbsFilePath(homeDir);
+    public void setServerHomeDir(String serverHomeDir) {
+        this.serverHomeDir = serverHomeDir;
     }
 }

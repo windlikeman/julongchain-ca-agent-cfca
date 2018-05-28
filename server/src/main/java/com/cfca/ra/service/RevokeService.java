@@ -45,6 +45,7 @@ public class RevokeService {
         this.server = server;
         this.raClient = new RAClientImpl();
         this.messageStore = MessageStore.REVOKE_DEFAULT;
+        MessageStore.REVOKE_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
     public RevokeResponseNet revoke(RevokeRequest request, String auth) {

@@ -1,7 +1,5 @@
 package com.cfca.ra.enroll;
 
-import com.cfca.ra.beans.CsrConfig;
-
 import java.util.Objects;
 
 /**
@@ -29,14 +27,12 @@ public class EnrollmentRequestNet {
      */
     private final String caname;
 
-    private final CsrConfig csrInfo;
 
-    public EnrollmentRequestNet(final String request, final String profile, final String label, final String caname, final CsrConfig csrInfo) {
+    public EnrollmentRequestNet(final String request, final String profile, final String label, final String caname) {
         this.request = request;
         this.profile = profile;
         this.label = label;
         this.caname = caname;
-        this.csrInfo = csrInfo;
     }
 
     public String getRequest() {
@@ -55,25 +51,25 @@ public class EnrollmentRequestNet {
         return caname;
     }
 
-    public CsrConfig getCsrInfo() {
-        return csrInfo;
-    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EnrollmentRequestNet that = (EnrollmentRequestNet) o;
         return Objects.equals(request, that.request) &&
                 Objects.equals(profile, that.profile) &&
                 Objects.equals(label, that.label) &&
-                Objects.equals(caname, that.caname) &&
-                Objects.equals(csrInfo, that.csrInfo);
+                Objects.equals(caname, that.caname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(request, profile, label, caname, csrInfo);
+        return Objects.hash(request, profile, label, caname);
     }
 
     @Override
@@ -83,7 +79,6 @@ public class EnrollmentRequestNet {
                 ", profile='" + profile + '\'' +
                 ", label='" + label + '\'' +
                 ", caname='" + caname + '\'' +
-                ", csrInfo=" + csrInfo +
                 '}';
     }
 }

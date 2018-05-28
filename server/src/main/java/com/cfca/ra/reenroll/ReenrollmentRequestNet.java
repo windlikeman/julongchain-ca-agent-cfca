@@ -1,7 +1,5 @@
 package com.cfca.ra.reenroll;
 
-import com.cfca.ra.beans.CsrConfig;
-
 import java.util.Objects;
 
 /**
@@ -29,14 +27,11 @@ public class ReenrollmentRequestNet {
      */
     private final String caname;
 
-    private final CsrConfig csrInfo;
-
     private ReenrollmentRequestNet(Builder builder) {
         this.request = builder.request;
         this.profile = builder.profile;
         this.label = builder.label;
         this.caname = builder.caname;
-        this.csrInfo = builder.csrInfo;
     }
 
     public String getRequest() {
@@ -55,10 +50,6 @@ public class ReenrollmentRequestNet {
         return caname;
     }
 
-    public CsrConfig getCsrInfo() {
-        return csrInfo;
-    }
-
     @Override
     public String toString() {
         return "EnrollmentRequestNet{" +
@@ -66,7 +57,6 @@ public class ReenrollmentRequestNet {
                 ", profile='" + profile + '\'' +
                 ", label='" + label + '\'' +
                 ", caname='" + caname + '\'' +
-                ", csrInfo=" + csrInfo +
                 '}';
     }
 
@@ -82,13 +72,12 @@ public class ReenrollmentRequestNet {
         return Objects.equals(request, that.request) &&
                 Objects.equals(profile, that.profile) &&
                 Objects.equals(label, that.label) &&
-                Objects.equals(caname, that.caname) &&
-                Objects.equals(csrInfo, that.csrInfo);
+                Objects.equals(caname, that.caname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(request, profile, label, caname, csrInfo);
+        return Objects.hash(request, profile, label, caname);
     }
 
     static class Builder {
@@ -105,18 +94,16 @@ public class ReenrollmentRequestNet {
          * Name of the CA to direct traffic to within server.
          */
         private final String caname;
-        private final CsrConfig csrInfo;
 
         /**
          * Optional:The label used in HSM operations
          */
         private String label = "";
 
-        Builder(String request, String profile, String caname, CsrConfig csrInfo) {
+        Builder(String request, String profile, String caname) {
             this.request = request;
             this.profile = profile;
             this.caname = caname;
-            this.csrInfo = csrInfo;
         }
 
         Builder label(String label) {

@@ -13,29 +13,47 @@ public class CAInfo {
     /**
      * Certificate Authority name
      */
-    private final String name;
+    private String name;
     /**
      * PEM-encoded CA key file
      */
-    private final String keyfile;
+    private String keyfile;
     /**
      * PEM-encoded CA certificate file
      */
-    private final String certfile;
+    private String certfile;
 
     /**
      * PEM-encoded CA chain file
      */
-    private final String chainfile;
+    private String chainfile;
 
-    private final String homeDir;
 
-    private CAInfo(Builder builder) {
-        this.name = builder.name;
-        this.keyfile = builder.keyfile;
-        this.certfile = builder.certfile;
-        this.chainfile = builder.chainfile;
-        this.homeDir = builder.homeDir;
+//    private CAInfo(Builder builder) {
+//        this.name = builder.name;
+//        this.keyfile = builder.keyfile;
+//        this.certfile = builder.certfile;
+//        this.chainfile = builder.chainfile;
+//        this.homeDir = builder.homeDir;
+//    }
+
+    public CAInfo() {
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setKeyfile(String keyfile) {
+        this.keyfile = keyfile;
+    }
+
+    public void setCertfile(String certfile) {
+        this.certfile = certfile;
+    }
+
+    public void setChainfile(String chainfile) {
+        this.chainfile = chainfile;
     }
 
     public String getName() {
@@ -54,9 +72,6 @@ public class CAInfo {
         return chainfile;
     }
 
-    public String getHomeDir() {
-        return homeDir;
-    }
 
     public static class Builder {
         private final String name;
@@ -85,9 +100,9 @@ public class CAInfo {
             return this;
         }
 
-        public CAInfo build() {
-            return new CAInfo(this);
-        }
+//        public CAInfo build() {
+//            return new CAInfo(this);
+//        }
     }
 
     @Override
@@ -102,13 +117,12 @@ public class CAInfo {
         return Objects.equals(name, caInfo.name) &&
                 Objects.equals(keyfile, caInfo.keyfile) &&
                 Objects.equals(certfile, caInfo.certfile) &&
-                Objects.equals(chainfile, caInfo.chainfile) &&
-                Objects.equals(homeDir, caInfo.homeDir);
+                Objects.equals(chainfile, caInfo.chainfile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, keyfile, certfile, chainfile, homeDir);
+        return Objects.hash(name, keyfile, certfile, chainfile);
     }
 
     @Override
@@ -118,7 +132,6 @@ public class CAInfo {
                 ", keyfile='" + keyfile + '\'' +
                 ", certfile='" + certfile + '\'' +
                 ", chainfile='" + chainfile + '\'' +
-                ", homeDir='" + homeDir + '\'' +
                 '}';
     }
 }

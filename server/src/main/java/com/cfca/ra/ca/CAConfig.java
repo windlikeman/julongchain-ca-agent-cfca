@@ -15,11 +15,13 @@ public class CAConfig {
     private final String version;
     private final CAInfo CA;
     private final CAConfigRegistry registry;
+    private final String homeDir;
 
     private CAConfig(Builder builder) {
         this.version = builder.version;
         this.CA = builder.CA;
         this.registry = builder.registry;
+        this.homeDir = builder.homeDir;
     }
 
     public String getVersion() {
@@ -32,6 +34,10 @@ public class CAConfig {
 
     public CAConfigRegistry getRegistry() {
         return registry;
+    }
+
+    public String getHomeDir() {
+        return homeDir;
     }
 
     @Override
@@ -67,9 +73,11 @@ public class CAConfig {
         private final CAInfo CA;
         private String version = "0";
         private CAConfigRegistry registry = new CAConfigRegistry(-1, new ArrayList<CAConfigIdentity>());
+        public final String homeDir;
 
-        public Builder(CAInfo ca) {
-            CA = ca;
+        public Builder(CAInfo ca, String homeDir) {
+            this.CA = ca;
+            this.homeDir = homeDir;
         }
 
         public Builder registry(CAConfigRegistry v) {

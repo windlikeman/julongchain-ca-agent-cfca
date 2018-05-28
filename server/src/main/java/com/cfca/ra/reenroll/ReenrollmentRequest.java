@@ -11,7 +11,7 @@ import java.util.Objects;
  * @CodeReviewer
  * @since v3.0.0
  */
-public class ReenrollmentRequest  extends BaseRequest {
+public class ReenrollmentRequest extends BaseRequest {
     private final ReenrollmentRequestNet reenrollmentRequestNet;
     private final long timestamp;
 

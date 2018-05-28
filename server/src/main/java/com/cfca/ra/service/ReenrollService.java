@@ -45,6 +45,7 @@ public class ReenrollService {
         this.server = server;
         this.raClient = new RAClientImpl();
         this.messageStore = MessageStore.REENROLL_DEFAULT;
+        MessageStore.REENROLL_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
     private void verifyTokenByEnrollmentId(String caName, String id, String auth) throws RAServerException {

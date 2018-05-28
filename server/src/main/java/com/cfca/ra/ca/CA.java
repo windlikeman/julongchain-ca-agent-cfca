@@ -116,11 +116,7 @@ public class CA {
         if (config == null) {
             return homeDir;
         }
-        final CAInfo ca = config.getCA();
-        if (ca != null) {
-            homeDir = ca.getHomeDir();
-        }
-        return homeDir;
+        return config.getHomeDir();
     }
 
     private String getName() {

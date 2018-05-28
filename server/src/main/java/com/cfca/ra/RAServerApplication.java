@@ -16,12 +16,14 @@
 
 package com.cfca.ra;
 
+import com.cfca.ra.ca.CAInfo;
 import io.undertow.UndertowOptions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.embedded.undertow.UndertowEmbeddedServletContainerFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +40,12 @@ public class RAServerApplication {
         UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
         factory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true));
         return factory;
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "ca")
+    public CAInfo caInfo() {
+        return new CAInfo();
     }
 
     public static void main(final String[] args) {

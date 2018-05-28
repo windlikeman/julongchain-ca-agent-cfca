@@ -18,6 +18,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,20 +44,14 @@ public class RAServer {
 
     private static final Logger logger = LoggerFactory.getLogger(RAServer.class);
 
-    @Value("${server.ca.expiry}")
-    private String caExpiry;
-
-    @Value("${server.ca.pathlenzero}")
-    private String caPathlenzero;
-
-    @Value("${server.ca.pathlen}")
-    private String caPathlen;
-
     /**
-     * The home directory for the server
+     * 服务器的工作目录
      */
     @Value("${server.homeDir}")
     private String serverHomeDir;
+
+    @Autowired
+    private CAInfo caInfo;
 
     /**
      * RAServer's default CA
@@ -84,6 +79,10 @@ public class RAServer {
 
         defaultCA = initCA(null);
         addCA(defaultCA);
+    }
+
+    public String getServerHomeDir() {
+        return serverHomeDir;
     }
 
     public String getUserSecret(final String caName, final String user) throws RAServerException {
@@ -120,8 +119,8 @@ public class RAServer {
     private CA initCA(final CAConfig caConfig) throws RAServerException {
         CAConfig local = caConfig;
         if (local == null) {
-            final String name = "CFCA";
-            String homeDir = String.join(File.separator, System.getProperty("user.dir"), name);
+            final String name = caInfo.getName();
+            String homeDir = String.join(File.separator, serverHomeDir, name);
             homeDir = MyFileUtils.getAbsFilePath(homeDir);
             final File file = new File(homeDir);
             if (file.isDirectory()) {
@@ -136,14 +135,14 @@ public class RAServer {
                 logger.warn("failed to init CA with create CA home directory due to homeDir not dir type:{}", homeDir);
             }
 
-            final CAInfo caInfo = new CAInfo.Builder(name, homeDir).build();
-            local = new CAConfig.Builder(caInfo).build();
+//            final CAInfo caInfo = new CAInfo.Builder(name, homeDir).build();
+            local = new CAConfig.Builder(caInfo, homeDir).build();
         }
         DefaultUserRegistry registry = new DefaultUserRegistry();
 
         // Initialize TCert handling
-        final String keyfile = String.join(File.separator, local.getCA().getHomeDir(), local.getCA().getKeyfile());
-        final String certfile = String.join(File.separator, local.getCA().getHomeDir(), local.getCA().getCertfile());
+        final String keyfile = String.join(File.separator, local.getHomeDir(), local.getCA().getKeyfile());
+        final String certfile = String.join(File.separator, local.getHomeDir(), local.getCA().getCertfile());
         TcertManager tcertMgr = loadTcertMgr(keyfile, certfile);
         // FIXME: root 前置密钥 需要序列化到数据库或者本地文件
         Key rootKey = genRootKey();
