@@ -116,7 +116,6 @@ public class RegisterService {
             final UserInfo insert = new UserInfo(req, pass, 1);
             final String secret = registerUserID(req, ca, insert);
             final RegistrationResponseNet registrationResponseNet = buildRegistrationResponseNet(secret);
-            updateCallerStore(caname, enrollmentId, id);
             return registrationResponseNet;
         } catch (RAServerException e) {
             logger.error("registerUser >>>>>> Failure : " + e.getMessage(), e);
@@ -209,8 +208,4 @@ public class RegisterService {
         }
     }
 
-    private void updateCallerStore(String caname, String callerID, String id) throws RAServerException {
-        final CA ca = server.getCA(caname);
-        ca.updateEnrollIdStore(callerID, id);
-    }
 }

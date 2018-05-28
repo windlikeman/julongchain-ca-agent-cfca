@@ -204,11 +204,6 @@ public class RAServer {
         }
     }
 
-    public String getEnrollmentId(final String caName, final String id) throws RAServerException {
-        final CA ca = getCA(caName);
-        return ca.getEnrollmentId(id);
-    }
-
     public void checkIdRegistered(final String caname, final String id) throws RAServerException {
         final CA ca = getCA(caname);
         ca.checkIdRegistered(id);
@@ -260,19 +255,4 @@ public class RAServer {
         ca.attributeIsTrue(id, attr);
     }
 
-    public void updateEnrollIdStore(String caName, String enrollmentID, String id) throws RAServerException {
-        final CA ca = getCA(caName);
-        ca.updateEnrollIdStore(enrollmentID, id);
-
-    }
-
-    public boolean containsCert(String caName, String enrollmentID) throws RAServerException {
-        final CA ca = getCA(caName);
-        return ca.containsCert(enrollmentID);
-    }
-
-    public String loadCert(String caName, String enrollmentID) throws RAServerException {
-        final CA ca = getCA(caName);
-        return ca.loadB64CertString(enrollmentID);
-    }
 }

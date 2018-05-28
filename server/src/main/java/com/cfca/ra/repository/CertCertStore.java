@@ -134,34 +134,6 @@ public enum CertCertStore implements ICACertStore {
             return null;
         }
 
-        @Override
-        public boolean containsCert(String enrollmentId) throws RAServerException {
-            if (StringUtils.isBlank(enrollmentId)) {
-                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_CONTAINS_CERT, "enrollmentId is blank");
-            }
-            final String homeDir = getHomeDir();
-            final String certDir = String.join(File.separator, homeDir, "certs");
-            final String certFile = String.format("%s-b64cert.cer", enrollmentId);
-            Collection listFiles = FileUtils.listFiles(new File(certDir),
-                    FileFilterUtils.andFileFilter(EmptyFileFilter.NOT_EMPTY, new NameFileFilter(certFile, IOCase.SENSITIVE)),
-                    DirectoryFileFilter.INSTANCE);
-
-            return listFiles.size() > 0;
-        }
-
-        @Override
-        public String loadB64CertString(String enrollmentId) throws RAServerException {
-            try {
-                final String homeDir = getHomeDir();
-                final String certDir = String.join(File.separator, homeDir, "certs");
-                final String certFile = String.format("%s-b64cert.cer", enrollmentId);
-                final String certFilePath = String.join(File.separator, certDir, certFile);
-                return FileUtils.readFileToString(new File(certFilePath));
-            } catch (Exception e) {
-                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_B64_CERT_STRING, e);
-            }
-        }
-
         private String getStringSerialNumber(Certificate certificate) {
             byte[] snData = certificate.getSerialNumber().getPositiveValue().toByteArray();
             if (snData != null) {

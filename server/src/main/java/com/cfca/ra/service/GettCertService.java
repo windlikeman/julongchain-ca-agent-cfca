@@ -149,7 +149,7 @@ public class GettCertService {
 
     private void verifyToken(String caName, String id, String token) throws RAServerException {
         logger.info("verifyToken Entered>>>>>>id : " + id + ",caName=" + caName + ",token=" + token);
-        String enrollmentId = server.getEnrollmentId(caName, id);
+        String enrollmentId = getEnrollmentIdFromAuth(token);
         PublicKey publicKey = server.getKey(caName, enrollmentId);
         if (publicKey == null) {
             throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");

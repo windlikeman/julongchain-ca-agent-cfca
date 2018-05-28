@@ -65,11 +65,6 @@ public class EnrollService {
             //enrollmentID : admin
             String enrollmentID = authInfo.getUser();
             EnrollmentResponseNet response;
-//            if (server.containsCert(caName, enrollmentID)){
-//                String b64cert = server.loadCert(caName, enrollmentID);
-//                response = new EnrollmentResponseNet(true, b64cert, null, null);
-//                return response;
-//            }
             final CertServiceResponseVO enrollResponseFromRA = raClient.enroll(data, enrollmentID);
 
             final String resultCode = enrollResponseFromRA.getResultCode();
@@ -85,7 +80,6 @@ public class EnrollService {
                     enrollmentID = CertUtils.getSubjectName(b64cert);
                     server.fillCAInfo(caName, response, enrollmentID);
                     server.storeCert(caName, enrollmentID, b64cert);
-                    server.updateEnrollIdStore(caName, enrollmentID, enrollmentID);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();

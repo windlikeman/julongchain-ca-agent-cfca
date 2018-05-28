@@ -59,11 +59,6 @@ public class CA {
     private final IUserRegistry registry;
 
     /**
-     * private final UserStore userStore;
-     */
-    private final EnrollIdStore enrollIdStore;
-
-    /**
      * The tcert manager for this CA
      */
     private final TcertManager tcertMgr;
@@ -78,7 +73,6 @@ public class CA {
         this.certStore = builder.certStore;
         this.server = builder.server;
         this.registry = builder.registry;
-        this.enrollIdStore = builder.enrollIdStore;
         this.tcertMgr = builder.tcertMgr;
         this.tcertKeyTree = builder.tcertKeyTree;
     }
@@ -179,14 +173,6 @@ public class CA {
         resp.setResult(new GettCertResponseResult(id, ts, key, gettCertResponse.gettCerts()));
     }
 
-    public String getEnrollmentId(String id) throws RAServerException {
-        return enrollIdStore.getEnrollmentId(id);
-    }
-
-    public void updateEnrollIdStore(String enrollmentId, String id) throws RAServerException {
-        enrollIdStore.updateEnrollIdStore(enrollmentId, id);
-    }
-
     public void storeCert(String enrollmentID, String b64cert) throws RAServerException {
         certStore.storeCert(enrollmentID, b64cert);
     }
@@ -197,14 +183,6 @@ public class CA {
 
     public String getCertFile(String serial) throws RAServerException {
         return certStore.getCertFilePath(serial);
-    }
-
-    public boolean containsCert(String enrollmentID) throws RAServerException {
-        return certStore.containsCert(enrollmentID);
-    }
-
-    public String loadB64CertString(String enrollmentID) throws RAServerException {
-        return certStore.loadB64CertString(enrollmentID);
     }
 
     public static class Builder {
@@ -268,13 +246,12 @@ public class CA {
                 Objects.equals(configFilePath, ca.configFilePath) &&
                 Objects.equals(certStore, ca.certStore) &&
                 Objects.equals(server, ca.server) &&
-                Objects.equals(registry, ca.registry) &&
-                enrollIdStore == ca.enrollIdStore;
+                Objects.equals(registry, ca.registry);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(config, configFilePath, certStore, server, registry, enrollIdStore);
+        return Objects.hash(config, configFilePath, certStore, server, registry);
     }
 
     public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet, String enrollmentID) throws RAServerException {
