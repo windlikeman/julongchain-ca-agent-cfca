@@ -121,9 +121,19 @@ public class RevokeService {
         return new RevokeResponseNet(false, null, errors, null);
     }
 
+    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
+        final String[] split = auth.split("\\.");
+        if (split.length != 2) {
+            throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
+        }
+        final String b64EnrollmentId = split[0];
+
+        return new String(Base64.decode(b64EnrollmentId));
+    }
+
     private String getEnrollmentIdFromToken(String caName, String id, String auth) throws RAServerException {
         logger.info("getEnrollmentIdFromToken>>>>>>id : " + id + ",caName=" + caName + ",auth=" + auth);
-        String enrollmentId = server.getEnrollmentId(caName, id);
+        String enrollmentId = getEnrollmentIdFromAuth(auth);
         PublicKey publicKey = server.getKey(caName, enrollmentId);
         if (publicKey == null) {
             throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");

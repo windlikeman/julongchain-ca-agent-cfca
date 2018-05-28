@@ -32,11 +32,10 @@ public interface IRAClient {
     /**
      * 重新签发证书
      * @param enrollmentRequestNet 网络请求
-     * @param enrollmentID 身份ID
      * @return CertServiceResponseVO
      * @throws RAServerException 遇到异常则返回
      */
-    CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException;
+    CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet) throws RAServerException;
 
     String revoke(RevokeRequestNet data) throws RAServerException;
 

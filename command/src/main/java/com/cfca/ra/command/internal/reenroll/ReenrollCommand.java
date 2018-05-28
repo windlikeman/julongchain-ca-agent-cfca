@@ -9,7 +9,10 @@ import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
 import com.cfca.ra.command.internal.enroll.EnrollmentResponse;
+import com.cfca.ra.command.internal.register.RegistrationRequest;
 import com.cfca.ra.command.utils.ConfigUtils;
+import com.cfca.ra.command.utils.MyStringUtils;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +42,32 @@ public class ReenrollCommand extends BaseClientCommand {
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
 
+        processConfigFile();
+        if (!MyStringUtils.isBlank(content) && !EMPTY_JSON_STRING.equalsIgnoreCase(content)) {
+            processContent();
+        }
+    }
+
+    private void processContent() {
+        final EnrollmentRequest enrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
+        logger.info(enrollmentRequest.toString());
+        clientCfg.setEnrollmentRequest(enrollmentRequest);
+    }
+
+    private void processConfigFile() throws CommandException {
         ConfigBean configBean = loadConfigFile();
-        prepareClientConfig(configBean);
+        clientCfg.setCaName(configBean.getCaname());
+        clientCfg.setAdmin(configBean.getAdmin());
+        clientCfg.setAdminpwd(configBean.getAdminpwd());
+        final CsrConfig csr = configBean.getCsr();
+        clientCfg.setCsrConfig(csr);
+        String caName = configBean.getCaname();
+        if (null == configBean.getEnrollment()) {
+            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT);
+        }
+        final String profile = configBean.getEnrollment().getProfile();
+        clientCfg.setEnrollmentRequest(new EnrollmentRequest.Builder(null, null, profile, csr, caName).build());
+        clientCfg.setEnrollmentId(csr.getCn());
     }
 
     @Override
@@ -48,14 +75,6 @@ public class ReenrollCommand extends BaseClientCommand {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
             logger.error("ca-client reenroll -h serverAddr -p serverPort -a <json string>");
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "fail to build reenroll command ,because args is invalid : args=" + Arrays.toString(args));
-        }
-    }
-
-    private ConfigBean loadConfigFile() throws CommandException {
-        try {
-            return ConfigUtils.load(this.cfgFileName);
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_LOAD_CONFIG_FAILED, "reenroll command failed to load config file:" + this.cfgFileName, e);
         }
     }
 
@@ -74,6 +93,9 @@ public class ReenrollCommand extends BaseClientCommand {
 
         ServerInfo serverInfo = resp.getServerInfo();
         storeCAChain(clientCfg, serverInfo);
+        final String enrollmentId = serverInfo.getEnrollmentId();
+        replaceConfigCommonName(enrollmentId);
+        enrollIdStore.updateEnrollIdStore(enrollmentId, clientCfg.getEnrollmentRequest().getUsername());
     }
 
     private ReenrollmentRequest buildReenrollmentRequest(ClientConfig clientCfg) {
@@ -84,21 +106,6 @@ public class ReenrollCommand extends BaseClientCommand {
         final CsrConfig csrConfig = req.getCsrConfig();
         final String caName = req.getCaName();
         return new ReenrollmentRequest.Builder(username, password, profile, csrConfig, caName).build();
-    }
-
-    private void prepareClientConfig(ConfigBean configBean) throws CommandException {
-        clientCfg.setCaName(configBean.getCaname());
-        clientCfg.setAdmin(configBean.getAdmin());
-        clientCfg.setAdminpwd(configBean.getAdminpwd());
-        final CsrConfig csr = configBean.getCsr();
-        clientCfg.setCsrConfig(csr);
-        String caName = configBean.getCaname();
-        if (null == configBean.getEnrollment()) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT);
-        }
-        final String profile = configBean.getEnrollment().getProfile();
-        clientCfg.setEnrollmentRequest(new EnrollmentRequest.Builder(null, null, profile, csr, caName).build());
-
     }
 
     @Override

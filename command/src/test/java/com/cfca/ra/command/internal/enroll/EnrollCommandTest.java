@@ -52,8 +52,7 @@ public class EnrollCommandTest {
         String profile = configBean.getEnrollment().getProfile();
         CsrConfig csrConfig = configBean.getCsr();
         String caName = configBean.getCaname();
-        //"test", "dGVzdDoxMjM0"// "test2":"dGVzdDI6MTIzNA=="
-        final EnrollmentRequest.Builder builder = new EnrollmentRequest.Builder("admin","1234", profile, csrConfig, caName);
+        final EnrollmentRequest.Builder builder = new EnrollmentRequest.Builder("test5","dGVzdDU6MTIzNA==", profile, csrConfig, caName);
         final EnrollmentRequest enrollmentRequest = builder.build();
         final EnrollCommand enrollCommand = new EnrollCommand();
         String[] args = new String[]{"enroll", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(enrollmentRequest)};

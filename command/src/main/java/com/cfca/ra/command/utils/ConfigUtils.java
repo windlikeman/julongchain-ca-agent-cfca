@@ -172,7 +172,7 @@ public class ConfigUtils {
         return  yaml.loadAs(new FileInputStream(configFilePath), ConfigBean.class);
     }
 
-    public static void dump(String configFilePath, ConfigBean configBean) throws Exception {
+    public static void update(String configFilePath, ConfigBean configBean) throws Exception {
         Yaml yaml = new Yaml();
         final File file = new File(configFilePath);
         final FileWriter fileWriter = new FileWriter(file);

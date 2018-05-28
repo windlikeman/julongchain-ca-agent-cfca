@@ -22,10 +22,13 @@ public class ServerInfo {
      */
     private final String version;
 
+    private final String enrollmentId;
+
     private ServerInfo(Builder builder){
         this.caName = builder.caName;
         this.caChain = builder.caChain;
         this.version = builder.version;
+        this.enrollmentId = builder.enrollmentId;
     }
 
     public static class Builder{
@@ -40,6 +43,12 @@ public class ServerInfo {
          * 服务器版本号
          */
         private String version = "v3.0.0";
+        private String enrollmentId;
+
+        public Builder enrollmentId(String enrollmentId){
+            this.enrollmentId = enrollmentId;
+            return this;
+        }
 
         public Builder caName(String caName){
             this.caName = caName;
@@ -73,12 +82,17 @@ public class ServerInfo {
         return version;
     }
 
+    public String getEnrollmentId() {
+        return enrollmentId;
+    }
+
     @Override
     public String toString() {
         return "ServerInfo{" +
                 "caName='" + caName + '\'' +
                 ", caChain=" + Arrays.toString(caChain) +
                 ", version='" + version + '\'' +
+                ", enrollmentId='" + enrollmentId + '\'' +
                 '}';
     }
 }

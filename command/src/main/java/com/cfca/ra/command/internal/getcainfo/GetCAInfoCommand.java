@@ -68,11 +68,4 @@ public class GetCAInfoCommand extends BaseClientCommand {
         return "ca-client cainfo -h host -p port -a <json>";
     }
 
-    private ConfigBean loadConfigFile() throws CommandException {
-        try {
-            return ConfigUtils.load(this.cfgFileName);
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_LOAD_CONFIG_FILE, "failed to load config file:" + this.cfgFileName, e);
-        }
-    }
 }

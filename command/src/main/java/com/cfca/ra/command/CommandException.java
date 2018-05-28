@@ -51,6 +51,10 @@ public class CommandException extends Exception {
      * 存储CA CHAIN 文件失败
      */
     public static final int REASON_CODE_BASE_COMMAND_STORE_CA_CHAIN = 0x2004;
+    /**
+     * 加载配置文件失败
+     */
+    public static final int REASON_CODE_BASE_COMMAND_LOAD_CONFIG_FAILED = 0x2005;
 
     /**
      * ENROLL 命令的参数无效
@@ -64,6 +68,18 @@ public class CommandException extends Exception {
      * ENROLL 命令加载配置文件失败
      */
     public static final int REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED = 0x5003;
+    /**
+     * ENROLL 命令更新配置文件失败
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_UPDATE_CONFIG_FAILED = 0x5004;
+    /**
+     * ENROLL 命令加载用户与证书绑定关系失败
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_LOAD_ENROLLID_FILE = 0x5005;
+    /**
+     * ENROLL 命令更新用户与证书绑定关系失败
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_UPDATE_ENROLLID_FILE = 0x5006;
 
     /**
      * GETCAINFO 命令网络通信失败
@@ -232,10 +248,14 @@ public class CommandException extends Exception {
             put(REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, "the base command fail to parse CLI parameters due to missing port");
             put(REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, "the base command fail to parse CLI parameters due to missing content");
             put(REASON_CODE_BASE_COMMAND_STORE_CA_CHAIN, "the base command fail to store ca chain file");
+            put(REASON_CODE_BASE_COMMAND_LOAD_CONFIG_FAILED, "the base command fail to load config file");
 
             put(REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "the enrollment command fail to parse CLI parameters");
             put(REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "the enrollment command failed to communicate with server");
             put(REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED, "the enrollment command failed to initiallize with config file");
+            put(REASON_CODE_ENROLL_COMMAND_UPDATE_CONFIG_FAILED, "the enrollment command failed to update the config file with enrollmentId");
+            put(REASON_CODE_ENROLL_COMMAND_LOAD_ENROLLID_FILE , "the enrollment command failed to load enrollmentId user binding file");
+            put(REASON_CODE_ENROLL_COMMAND_UPDATE_ENROLLID_FILE, "the enrollment command failed to update enrollmentId user binding file");
 
             put(REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION, "the internal client fail to load identity");
             put(REASON_CODE_INTERNAL_CLIENT_BUILD_CERTFILE_PATH, "the internal client fail to build cert file path");

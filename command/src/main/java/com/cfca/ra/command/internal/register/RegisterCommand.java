@@ -1,8 +1,10 @@
 package com.cfca.ra.command.internal.register;
 
 import com.cfca.ra.command.CommandException;
+import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
+import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
@@ -48,9 +50,25 @@ public final class RegisterCommand extends BaseClientCommand {
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
 
+
+        processConfigFile();
+        if (!MyStringUtils.isBlank(content) && !EMPTY_JSON_STRING.equalsIgnoreCase(content)) {
+            processContent();
+        }
+    }
+
+    private void processContent() {
         final RegistrationRequest registrationRequest = new Gson().fromJson(content, RegistrationRequest.class);
         logger.info(registrationRequest.toString());
         clientCfg.setRegistrationRequest(registrationRequest);
+    }
+
+    private void processConfigFile() throws CommandException {
+        ConfigBean configBean = loadConfigFile();
+        clientCfg.setCaName(configBean.getCaname());
+        clientCfg.setAdmin(configBean.getAdmin());
+        clientCfg.setAdminpwd(configBean.getAdminpwd());
+        clientCfg.setEnrollmentId(configBean.getCsr().getCn());
     }
 
     @Override
@@ -65,9 +83,9 @@ public final class RegisterCommand extends BaseClientCommand {
     public void execute() throws CommandException {
         logger.info("Entered runRegister");
 
-        Identity id = client.loadMyIdentity();
-
         RegistrationRequest registrationRequest = clientCfg.getRegistrationRequest();
+
+        Identity id = client.loadMyIdentity();
         RegistrationResponse resp = id.register(registrationRequest);
 
         final String secret = resp.getSecret();

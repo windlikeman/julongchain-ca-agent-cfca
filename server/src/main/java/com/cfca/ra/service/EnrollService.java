@@ -5,17 +5,16 @@ import cfca.ra.toolkit.RAClient;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.AuthInfo;
-import com.cfca.ra.enroll.EnrollmentRequest;
-import com.cfca.ra.enroll.EnrollmentRequestNet;
-import com.cfca.ra.enroll.EnrollmentResponseNet;
 import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.client.IRAClient;
 import com.cfca.ra.client.RAClientImpl;
+import com.cfca.ra.enroll.EnrollmentRequest;
+import com.cfca.ra.enroll.EnrollmentRequestNet;
+import com.cfca.ra.enroll.EnrollmentResponseNet;
 import com.cfca.ra.repository.IMessageStore;
 import com.cfca.ra.repository.MessageStore;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.cfca.ra.utils.CertUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -56,30 +55,37 @@ public class EnrollService {
             EnrollmentRequestNet data = request.getEnrollmentRequestNet();
             final int messageId = data.hashCode();
             if (messageStore.containsMessage(messageId)) {
-                throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+                throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
             }
 
             final String caName = data.getCaname();
             AuthInfo authInfo = getUserNameFromAuth(auth);
             checkAuth(caName, authInfo);
 
-            final String enrollmentID = authInfo.getUser();
+            //enrollmentID : admin
+            String enrollmentID = authInfo.getUser();
+            EnrollmentResponseNet response;
+//            if (server.containsCert(caName, enrollmentID)){
+//                String b64cert = server.loadCert(caName, enrollmentID);
+//                response = new EnrollmentResponseNet(true, b64cert, null, null);
+//                return response;
+//            }
             final CertServiceResponseVO enrollResponseFromRA = raClient.enroll(data, enrollmentID);
 
             final String resultCode = enrollResponseFromRA.getResultCode();
             final String resultMessage = enrollResponseFromRA.getResultMessage();
             logger.info(resultCode);
             logger.info(resultMessage);
-            EnrollmentResponseNet response;
+
             switch (resultCode) {
                 case RAClient.SUCCESS:
                     logger.info(enrollResponseFromRA.toString());
-                    final CA ca = getCA(caName);
                     String b64cert = enrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
-                    ca.fillCAInfo(response);
+                    enrollmentID = CertUtils.getSubjectName(b64cert);
+                    server.fillCAInfo(caName, response, enrollmentID);
                     server.storeCert(caName, enrollmentID, b64cert);
-                    ca.updateEnrollIdStore(enrollmentID, enrollmentID);
+                    server.updateEnrollIdStore(caName, enrollmentID, enrollmentID);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();
@@ -149,7 +155,7 @@ public class EnrollService {
         }
 
         final byte[] decode = Base64.decode(remaining);
-        String userInfo ;
+        String userInfo;
         try {
             userInfo = new String(decode, "UTF-8");
             logger.info("checkAuth<<<<<<decoded auth is: " + userInfo);

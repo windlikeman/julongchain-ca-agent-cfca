@@ -40,7 +40,7 @@ public class RevokeRequestTest {
     public void testRevoke() throws Exception{
         String id = "admin";
         String aki = "sss";
-        String serial = "1032162421";
+        String serial = "1032162646";
         String reason = "expire";
         String caname = "CFCA";
 

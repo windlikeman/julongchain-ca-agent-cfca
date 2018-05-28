@@ -41,7 +41,7 @@ public class ReenrollCommandTest {
         CsrConfig csrConfig = configBean.getCsr();
         String caName = configBean.getCaname();
         //"test", "dGVzdDoxMjM0"// "test2":"dGVzdDI6MTIzNA=="
-        final ReenrollmentRequest.Builder builder = new ReenrollmentRequest.Builder("admin","1234", profile, csrConfig, caName);
+        final ReenrollmentRequest.Builder builder = new ReenrollmentRequest.Builder("test4","dGVzdDQ6MTIzNA==", profile, csrConfig, caName);
         final ReenrollmentRequest reenrollmentRequest = builder.build();
         String[] args = new String[]{"enroll", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(reenrollmentRequest)};
         reenrollCommand.prepare(args);

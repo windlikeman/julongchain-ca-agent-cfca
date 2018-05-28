@@ -13,9 +13,8 @@ import com.cfca.ra.command.internal.revoke.*;
 import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.cfca.ra.command.utils.PemUtils;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
@@ -44,6 +43,7 @@ import java.util.List;
  */
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
+    private static final String USER_ADMIN = "admin";
 
     /**
      * 客户端配置
@@ -67,22 +67,18 @@ public class Client {
 
     private boolean initialized;
 
+    private final IEnrollIdStore enrollIdStore;
+
     /**
      * 文件和目录
      */
     private String keyFile;
     private String certFile;
     private String caCertsDir;
-
-    private static Provider provider;
-
-    static {
-        provider = new BouncyCastleProvider();
-        Security.addProvider(provider);
-    }
-
     private String certDir;
     private String keyDir;
+
+    private final Provider provider;
 
     public Client(ClientConfig clientCfg, String homedir) {
         this.clientCfg = clientCfg;
@@ -93,6 +89,9 @@ public class Client {
         this.registerComms = new RegisterComms(clientCfg);
         this.revokeComms = new RevokeComms(clientCfg);
         this.gettCertComms = new GettCertComms(clientCfg);
+        this.enrollIdStore = EnrollIdStore.CFCA;
+        this.provider = new BouncyCastleProvider();
+        Security.addProvider(provider);
     }
 
     public ClientConfig getClientCfg() {
@@ -110,11 +109,32 @@ public class Client {
         final String username = enrollmentRequest.getUsername();
         String basicAuth = buildBasicAuth(username, password);
         logger.info("basicAuth=" + basicAuth);
-        final CsrResult result = genCSR(algo, csrConfig.getNames());
+        final String names = csrConfig.getNames();
+        final CsrResult result = genCSR(algo, names);
+        logger.info("names=" + names);
         storeMyPrivateKey(result);
         EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, result.getCsr());
 
         final EnrollmentResponseNet responseNet = enrollmentComms.request(enrollmentRequestNet, basicAuth);
+
+        return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
+    }
+
+    public EnrollmentResponse reenroll(ReenrollmentRequest reenrollmentRequest, String token, String username) throws CommandException {
+        initializeIfNeeded(null);
+        final CsrConfig csrConfig = reenrollmentRequest.getCsrConfig();
+        if (csrConfig == null || csrConfig.getKey() == null) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
+        }
+        final String algo = csrConfig.getKey().getAlgo();
+        final String names = csrConfig.getNames();
+        final CsrResult result = genCSR(algo, names);
+        logger.info("names=" + names);
+
+        storeMyPrivateKey(result);
+
+        ReenrollmentRequestNet reenrollmentRequestNet = buildEnrollmentRequestNet(reenrollmentRequest, result.getCsr());
+        final EnrollmentResponseNet responseNet = reenrollmentComms.request(reenrollmentRequestNet, token);
 
         return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
     }
@@ -159,6 +179,7 @@ public class Client {
             String caName;
             String version;
             String caChain;
+            String enrollmentId;
             ServerInfo.Builder serverInfo = new ServerInfo.Builder();
             for (ServerResponseMessage message : messages) {
                 if (message == null) {
@@ -176,9 +197,11 @@ public class Client {
                         break;
                     case ServerResponseMessage.RESPONSE_MESSAGE_CODE_CACHAIN:
                         caChain = message.getMessage();
-
                         serverInfo.caChain(caChain.getBytes("UTF-8"));
-
+                        break;
+                    case ServerResponseMessage.RESPONSE_MESSAGE_CODE_ENROLLMENTID:
+                        enrollmentId = message.getMessage();
+                        serverInfo.enrollmentId(enrollmentId);
                         break;
                     default:
                         break;
@@ -335,7 +358,11 @@ public class Client {
         try {
             initializeIfNeeded(null);
             PemUtils.storeCert(certFile, cert);
-            logger.info("Stored client certificate at {}", certFile);
+
+            Certificate c = PemUtils.loadCert(cert);
+            clientCfg.setEnrollmentId(c.getSubject().toString());
+
+            logger.info("Stored client certificate at {} , enrollmentId is {}", certFile, clientCfg.getEnrollmentId());
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED, e);
         }
@@ -377,7 +404,7 @@ public class Client {
                 mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homedir);
                 clientCfg.setMspDir(mspDir);
                 // 密钥目录和文件
-                if (MyStringUtils.isBlank(userName) || "admin".equalsIgnoreCase(userName)) {
+                if (MyStringUtils.isBlank(userName) || USER_ADMIN.equalsIgnoreCase(userName)) {
                     this.keyDir = String.join(File.separator, mspDir, "keystore");
                 } else {
                     this.keyDir = String.join(File.separator, mspDir, userName, "keystore");
@@ -413,8 +440,8 @@ public class Client {
         }
     }
 
-    public void checkEnrollment() throws CommandException {
-        initializeIfNeeded(null);
+    public void checkEnrollment(String userName) throws CommandException {
+        initializeIfNeeded(userName);
         boolean keyFileExists = MyFileUtils.fileExists(keyFile);
         boolean certFileExists = MyFileUtils.fileExists(certFile);
         if (!keyFileExists || !certFileExists) {
@@ -424,49 +451,40 @@ public class Client {
 
     public Identity loadMyIdentity() throws CommandException {
         try {
+            String enrollmentId = clientCfg.getEnrollmentId();
+            String userName = getUserName(enrollmentId);
+            logger.info("loadMyIdentity<<<<<<enrollmentId[{}]=>userName[{}]", enrollmentId, userName);
+            initializeIfNeeded(userName);
+
             final PrivateKey privateKey = PemUtils.loadPrivateKey(keyFile);
             final byte[] certDecoded = PemUtils.loadFileContent(certFile);
 
-            logger.info("loadMyIdentity<<<<<<cert:\n" + ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(certDecoded)));
-            logger.info("loadMyIdentity<<<<<<privateKey:\n" + privateKey);
+            if (MyStringUtils.isBlank(enrollmentId)) {
+                Certificate c = PemUtils.loadCert(certFile);
+                clientCfg.setEnrollmentId(c.getSubject().toString());
+            }
+            enrollmentId = clientCfg.getEnrollmentId();
 
-            String name = clientCfg.getAdmin();
-            return buildIdentity(name, certDecoded, privateKey);
+            return buildIdentity(enrollmentId, certDecoded, privateKey);
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION, e);
         }
     }
 
+    private String getUserName(String enrollmentId) throws CommandException {
+        return enrollIdStore.getUserName(enrollmentId);
+    }
+
     private Identity buildIdentity(String name, byte[] cert, PrivateKey key) {
-        try {
-            logger.info("buildIdentity<<<<<<cert:\n" + ASN1Dump.dumpAsString(ASN1Primitive.fromByteArray(cert)));
-            logger.info("buildIdentity<<<<<<key:\n" + key);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        logger.info("buildIdentity<<<<<<PrivateKey:\n" + key);
 
         Signer ecert = new Signer(key, cert, this);
         return new Identity(name, ecert, this);
     }
 
-    public EnrollmentResponse reenroll(ReenrollmentRequest reenrollmentRequest, String token, String username) throws CommandException {
-        initializeIfNeeded(null);
-        final CsrConfig csrConfig = reenrollmentRequest.getCsrConfig();
-        if (csrConfig == null || csrConfig.getKey() == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
-        }
-        final String algo = csrConfig.getKey().getAlgo();
-        final CsrResult result = genCSR(algo, csrConfig.getNames());
-
-        storeMyPrivateKey(result);
-
-        ReenrollmentRequestNet reenrollmentRequestNet = buildEnrollmentRequestNet(reenrollmentRequest, result.getCsr());
-        final EnrollmentResponseNet responseNet = reenrollmentComms.request(reenrollmentRequestNet, token);
-
-        return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
-    }
-
     public RegistrationResponse register(RegistrationRequest registrationRequest, String token) throws CommandException {
+        final String userName = clientCfg.getAdmin();
+        initializeIfNeeded(userName);
         RegistrationRequestNet registrationRequestNet = buildRegistrationRequestNet(registrationRequest);
         final RegistrationResponseNet responseNet = registerComms.request(registrationRequestNet, token);
         return buildRegistrationResponse(responseNet);

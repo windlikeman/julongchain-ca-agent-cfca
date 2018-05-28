@@ -68,7 +68,6 @@ public class PemUtils {
         final PemObject certObject = loadFile(fileName);
         final byte[] content = certObject.getContent();
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(content);
-        logger.info("loadPrivateKey>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         final PrivateKeyInfo info = PrivateKeyInfo.getInstance(asn1Primitive);
         return BouncyCastleProvider.getPrivateKey(info);
     }

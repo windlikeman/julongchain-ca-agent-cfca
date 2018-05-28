@@ -4,6 +4,7 @@ import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
 import com.cfca.ra.command.internal.getcainfo.GetCAInfoRequest;
 import com.cfca.ra.command.internal.gettcert.GettCertRequest;
+import com.cfca.ra.command.internal.reenroll.ReenrollmentRequest;
 import com.cfca.ra.command.internal.register.RegistrationRequest;
 import com.cfca.ra.command.internal.revoke.RevokeRequest;
 
@@ -70,6 +71,8 @@ public enum ClientConfig {
     private RevokeRequest revokeRequest;
 
     private GettCertRequest gettCertRequest;
+
+    private String enrollmentId;
 
     public GettCertRequest getGettCertRequest() {
         return gettCertRequest;
@@ -159,6 +162,14 @@ public enum ClientConfig {
         this.revokeRequest = revokeRequest;
     }
 
+    public void setEnrollmentId(String enrollmentId) {
+        this.enrollmentId = enrollmentId;
+    }
+
+    public String getEnrollmentId() {
+        return enrollmentId;
+    }
+
     @Override
     public String toString() {
         return "ClientConfig{" +
@@ -172,6 +183,8 @@ public enum ClientConfig {
                 ", registrationRequest=" + registrationRequest +
                 ", getCAInfoRequest=" + getCAInfoRequest +
                 ", revokeRequest=" + revokeRequest +
+                ", enrollmentId=" + enrollmentId +
                 '}';
     }
+
 }

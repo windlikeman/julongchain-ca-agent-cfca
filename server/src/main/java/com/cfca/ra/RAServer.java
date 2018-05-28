@@ -224,9 +224,9 @@ public class RAServer {
         ca.fillCAInfo(resp);
     }
 
-    public void fillCAInfo(String caname, EnrollmentResponseNet resp) throws RAServerException {
+    public void fillCAInfo(String caname, EnrollmentResponseNet resp, String enrollmentID) throws RAServerException {
         final CA ca = getCA(caname);
-        ca.fillCAInfo(resp);
+        ca.fillCAInfo(resp, enrollmentID);
     }
 
     public IUser getUser(String caname, String enrollmentID, String[] attrs) throws RAServerException {
@@ -258,5 +258,21 @@ public class RAServer {
     public void attributeIsTrue(String caName, String id, String attr) throws RAServerException {
         final CA ca = getCA(caName);
         ca.attributeIsTrue(id, attr);
+    }
+
+    public void updateEnrollIdStore(String caName, String enrollmentID, String id) throws RAServerException {
+        final CA ca = getCA(caName);
+        ca.updateEnrollIdStore(enrollmentID, id);
+
+    }
+
+    public boolean containsCert(String caName, String enrollmentID) throws RAServerException {
+        final CA ca = getCA(caName);
+        return ca.containsCert(enrollmentID);
+    }
+
+    public String loadCert(String caName, String enrollmentID) throws RAServerException {
+        final CA ca = getCA(caName);
+        return ca.loadB64CertString(enrollmentID);
     }
 }

@@ -79,13 +79,30 @@ public class RegisterService {
         }
     }
 
+    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
+        final String[] split = auth.split("\\.");
+        if (split.length != 2) {
+            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
+        }
+        final String b64EnrollmentId = split[0];
+
+        return new String(Base64.decode(b64EnrollmentId));
+    }
+
     public RegistrationResponseNet registerUser(RegistrationRequest req, String auth) {
         try {
             final String caname = req.getCaName();
             final String id = req.getName();
             checkIdRegistered(caname, id);
-            String enrollmentId = getEnrollmentIdFromToken(caname, id, auth);
+
+            final String enrollmentId = getEnrollmentIdFromAuth(auth);
             logger.info("registerUser >>>>>> enrollmentId : " + enrollmentId);
+            PublicKey publicKey = server.getKey(caname, enrollmentId);
+            if (publicKey == null) {
+                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");
+            }
+
+            verify(auth, publicKey);
 
             final CA ca = server.getCA(caname);
 //            IUser user = ca.getRegistry().getUser(enrollmentId, null);
@@ -164,20 +181,6 @@ public class RegisterService {
 
     private int getMaxEnrollments(int maxEnrollments, int maxEnrollments1) {
         return (maxEnrollments > maxEnrollments1) ? maxEnrollments1 : maxEnrollments;
-    }
-
-    private String getEnrollmentIdFromToken(String caName, String id, String auth) throws RAServerException {
-        logger.info("getEnrollmentIdFromToken>>>>>>id : " + id + ",caName=" + caName + ",auth=" + auth);
-
-        String enrollmentId = server.getEnrollmentId(caName, id);
-
-        PublicKey publicKey = server.getKey(caName, enrollmentId);
-        if (publicKey == null) {
-            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");
-        }
-
-        verify(auth, publicKey);
-        return enrollmentId;
     }
 
     private void verify(String auth, PublicKey publicKey) throws RAServerException {

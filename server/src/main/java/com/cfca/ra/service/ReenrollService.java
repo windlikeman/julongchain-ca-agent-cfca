@@ -12,8 +12,7 @@ import com.cfca.ra.reenroll.ReenrollmentRequest;
 import com.cfca.ra.reenroll.ReenrollmentRequestNet;
 import com.cfca.ra.repository.IMessageStore;
 import com.cfca.ra.repository.MessageStore;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.cfca.ra.utils.CertUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +39,7 @@ public class ReenrollService {
     private final IRAClient raClient;
 
     private final IMessageStore messageStore;
+
     @Autowired
     public ReenrollService(RAServer server) {
         this.server = server;
@@ -48,10 +48,8 @@ public class ReenrollService {
         MessageStore.REENROLL_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
-    private void verifyTokenByEnrollmentId(String caName, String id, String auth) throws RAServerException {
-        logger.info("verifyTokenByEnrollmentId>>>>>>id : " + id+",caName=" + caName + ",auth=" + auth);
-
-        String enrollmentId = server.getEnrollmentId(caName, id);
+    private void verifyTokenByEnrollmentId(String caName, String enrollmentId, String auth) throws RAServerException {
+        logger.info("verifyTokenByEnrollmentId>>>>>>enrollmentId : " + enrollmentId + ", caName=" + caName + ", auth=" + auth);
 
         PublicKey publicKey = server.getKey(caName, enrollmentId);
         if (publicKey == null) {
@@ -91,14 +89,14 @@ public class ReenrollService {
         try {
             final ReenrollmentRequestNet data = request.getReenrollmentRequestNet();
             final int messageId = data.hashCode();
-            if(messageStore.containsMessage(messageId)){
-                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
+            if (messageStore.containsMessage(messageId)) {
+                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
             }
             final String caname = data.getCaname();
-            final String enrollmentId = "admin";
+            String enrollmentId = getEnrollmentIdFromAuth(auth);
             verifyTokenByEnrollmentId(caname, enrollmentId, auth);
 
-            final CertServiceResponseVO reenrollResponseFromRA = raClient.reenroll(data, enrollmentId);
+            final CertServiceResponseVO reenrollResponseFromRA = raClient.reenroll(data);
 
             final String resultCode = reenrollResponseFromRA.getResultCode();
             final String resultMessage = reenrollResponseFromRA.getResultMessage();
@@ -110,7 +108,11 @@ public class ReenrollService {
                     logger.info(reenrollResponseFromRA.toString());
                     String b64cert = reenrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
-                    server.fillCAInfo(caname, response);
+
+                    enrollmentId = CertUtils.getSubjectName(b64cert);
+
+                    server.fillCAInfo(caname, response, enrollmentId);
+                    //FIXME:enrollmentID
                     server.storeCert(caname, enrollmentId, b64cert);
                     break;
                 default:
@@ -126,6 +128,16 @@ public class ReenrollService {
             logger.error("reenroll >>>>>> Failure : " + e.getMessage(), e);
             return buildErrorServerResponse(e);
         }
+    }
+
+    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
+        final String[] split = auth.split("\\.");
+        if (split.length != 2) {
+            throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
+        }
+        final String b64EnrollmentId = split[0];
+
+        return new String(Base64.decode(b64EnrollmentId));
     }
 
     private void updateMessage(int messageId, ReenrollmentRequest request) throws RAServerException {

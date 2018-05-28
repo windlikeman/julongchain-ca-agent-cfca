@@ -57,15 +57,6 @@ public class Identity {
         return client;
     }
 
-    @Override
-    public String toString() {
-        return "Identity{" +
-                "name='" + name + '\'' +
-                ", ecert=" + ecert +
-                ", client=" + client +
-                '}';
-    }
-
     public void store() throws CommandException {
         client.storeMyIdentity(ecert.getCert());
     }
@@ -105,18 +96,20 @@ public class Identity {
             PublicKey publicKey = converter.getPublicKey(subjectPublicKeyInfo);
             logger.info("createToken<<<<<<publicKey : " + publicKey);
 
-            String b64Cert = Base64.toBase64String(cert);
+            final byte[] enrollmentIdBytes = name.getBytes();
+            String b64EnrollmentId = Base64.toBase64String(enrollmentIdBytes);
+
             Signature signature = Signature.getInstance("SM3withSM2", "BC");
             signature.initSign(privateKey);
-            signature.update(cert);
+            signature.update(enrollmentIdBytes);
             final byte[] sign = signature.sign();
             String b64Sig = new String(Base64.encode(sign));
-            final String s = b64Cert + "." + b64Sig;
+            final String s = b64EnrollmentId + "." + b64Sig;
             logger.info("createToken<<<<<<token : " + s);
 
             Signature signature1 = Signature.getInstance("SM3withSM2", "BC");
             signature1.initVerify(publicKey);
-            signature1.update(cert);
+            signature1.update(enrollmentIdBytes);
             final boolean verify = signature1.verify(sign);
             if (!verify) {
                 throw new CommandException(CommandException.REASON_CODE_IDENTITY_CREATE_TOKEN, "verify failed");
@@ -140,5 +133,14 @@ public class Identity {
     public GettCertResponse gettcert(GettCertRequest request) throws CommandException {
         final String token = addTokenAuthHdr();
         return client.gettcert(request, token);
+    }
+
+    @Override
+    public String toString() {
+        return "Identity{" +
+                "name='" + name + '\'' +
+                ", ecert=" + ecert +
+                ", client=" + client +
+                '}';
     }
 }

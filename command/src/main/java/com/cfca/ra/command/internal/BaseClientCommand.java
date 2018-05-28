@@ -3,6 +3,10 @@ package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.IClientCommand;
+import com.cfca.ra.command.config.ConfigBean;
+import com.cfca.ra.command.config.CsrConfig;
+import com.cfca.ra.command.internal.enroll.EnrollIdStore;
+import com.cfca.ra.command.internal.enroll.IEnrollIdStore;
 import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
@@ -35,6 +39,10 @@ public abstract class BaseClientCommand implements IClientCommand {
     public static final String COMMAND_NAME_REGISTER = "register";
 
     private static final String CA_CLIENT_CONFIG_FILENAME = "ca-client-config.yaml";
+
+    protected static final String EMPTY_JSON_STRING = "{}";
+
+    protected final IEnrollIdStore enrollIdStore = EnrollIdStore.CFCA;
     /**
      * 具体命令的名字
      */
@@ -78,6 +86,14 @@ public abstract class BaseClientCommand implements IClientCommand {
      * @throws CommandException 遇到错误返回异常
      */
     public abstract void checkArgs(String[] args) throws CommandException;
+
+    protected ConfigBean loadConfigFile() throws CommandException {
+        try {
+            return ConfigUtils.load(this.cfgFileName);
+        } catch (Exception e) {
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_LOAD_CONFIG_FAILED, "failed to load config file:" + this.cfgFileName, e);
+        }
+    }
 
     private void parseArgs(String[] args) throws CommandException {
         for (int i = 0, size = args.length; i < size; i++) {
@@ -141,12 +157,22 @@ public abstract class BaseClientCommand implements IClientCommand {
                 throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "failed to check config file ", e);
             }
         }
+        logger.info("Initializing client with config: {}", clientCfg);
+        String mspDir = clientCfg.getMspDir();
+        if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
+            clientCfg.setMspDir("msp");
+        }
+        mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homeDirectory);
+        clientCfg.setMspDir(mspDir);
     }
 
     private void initializeClient() throws CommandException {
         client = new Client(clientCfg, homeDirectory);
         if (requiresEnrollment()) {
-            checkForEnrollment();
+            final ConfigBean configBean = loadConfigFile();
+            final String enrollmentId = configBean.getCsr().getCn();
+            final String userName = enrollIdStore.getUserName(enrollmentId);
+            checkForEnrollment(userName);
         }
     }
 
@@ -168,9 +194,9 @@ public abstract class BaseClientCommand implements IClientCommand {
         }
     }
 
-    private void checkForEnrollment() throws CommandException {
+    private void checkForEnrollment(String userName) throws CommandException {
         logger.info("Checking for enrollment");
-        client.checkEnrollment();
+        client.checkEnrollment(userName);
     }
 
     private boolean requiresEnrollment() {
@@ -253,6 +279,22 @@ public abstract class BaseClientCommand implements IClientCommand {
         fileName = fileName.replace(".", "-");
         fileName = fileName + ".pem";
         return fileName;
+    }
+
+    protected void replaceConfigCommonName(String enrollmentId) throws CommandException {
+        ConfigBean configBean = loadConfigFile();
+        final CsrConfig csr = configBean.getCsr();
+        csr.setCn(enrollmentId);
+        configBean.setCsr(csr);
+        updateConfigFile(configBean);
+    }
+
+    private void updateConfigFile(ConfigBean configBean) throws CommandException {
+        try {
+            ConfigUtils.update(this.cfgFileName, configBean);
+        } catch (Exception e) {
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_UPDATE_CONFIG_FAILED, "failed to update config file:" + this.cfgFileName, e);
+        }
     }
 
 }

@@ -1,8 +1,10 @@
 package com.cfca.ra.command.internal.revoke;
 
 import com.cfca.ra.command.CommandException;
+import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
+import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +37,19 @@ public final class RevokeCommand extends BaseClientCommand {
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
 
+        processConfigFile();
+        if (!MyStringUtils.isBlank(content) && !EMPTY_JSON_STRING.equalsIgnoreCase(content)) {
+            processContent();
+        }
+    }
+
+    private void processContent() {
         final RevokeRequest revokeRequest = new Gson().fromJson(content, RevokeRequest.class);
         clientCfg.setRevokeRequest(revokeRequest);
+    }
+
+    private void processConfigFile() throws CommandException {
+        final ConfigBean configBean = loadConfigFile();
     }
 
     @Override

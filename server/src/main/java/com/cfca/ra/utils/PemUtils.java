@@ -32,6 +32,9 @@ public class PemUtils {
              PemWriter pWrt = new PemWriter(new OutputStreamWriter(bOut))) {
             PemObject pemObj = new PemObject("CERTIFICATE", Collections.EMPTY_LIST, data);
             pWrt.writeObject(pemObj);
+            final byte[] certDecoded = pemObj.getContent();
+            final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(certDecoded);
+            logger.info("storeCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         }
     }
 

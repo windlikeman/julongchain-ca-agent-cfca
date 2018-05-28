@@ -4,6 +4,11 @@ import com.cfca.ra.RAServerException;
 import com.cfca.ra.utils.MyFileUtils;
 import com.cfca.ra.utils.PemUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.EmptyFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.util.ASN1Dump;
@@ -44,12 +49,14 @@ public enum CertCertStore implements ICACertStore {
 
             byte[] decode = null;
             try {
-                decode = Base64.decode(b64cert);
                 final String homeDir = getHomeDir();
+                final String certB64File = buildCertB64File(homeDir, enrollmentID);
+                FileUtils.writeStringToFile(new File(certB64File), b64cert);
+                logger.info("storeCert<<<<<< store cert b64 file to :" + certB64File);
+                decode = Base64.decode(b64cert);
+
                 final String certFile = buildCertFile(homeDir, enrollmentID);
-                if (logger.isInfoEnabled()) {
-                    logger.info("storeCert<<<<<< store cert to :" + certFile);
-                }
+                logger.info("storeCert<<<<<< store cert pem file to :" + certFile);
                 PemUtils.storeCert(certFile, decode);
             } catch (DecoderException e) {
                 final String msg = "storeCert>>>>>> Failure cert:\n" + Hex.toHexString(decode) + "\nfail to decode b64";
@@ -80,24 +87,30 @@ public enum CertCertStore implements ICACertStore {
             return String.join(File.separator, certDir, certFile);
         }
 
+        private String buildCertB64File(String homeDir, String enrollmentId) {
+            final String certDir = String.join(File.separator, homeDir, "certs");
+            final String certFile = String.format("%s-b64cert.cer", enrollmentId);
+            return String.join(File.separator, certDir, certFile);
+        }
+
         @Override
         public Certificate loadCert(String enrollmentId) throws RAServerException {
             try {
                 final String homeDir = getHomeDir();
                 if (StringUtils.isBlank(enrollmentId)) {
-                    enrollmentId = "admin";
+                    throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_CERT, "enrollmentId is blank");
                 }
                 final String certFile = buildCertFile(homeDir, enrollmentId);
                 return PemUtils.loadCert(certFile);
             } catch (IOException e) {
-                throw new RAServerException(RAServerException.REASON_CODE_CA_CERTSTORE_LOAD_CERT, e);
+                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_CERT, e);
             }
         }
 
         @Override
         public String getCertFilePath(String serial) throws RAServerException {
             if (StringUtils.isBlank(serial)) {
-                throw new RAServerException(RAServerException.REASON_CODE_CA_CERTSTORE_GET_CERT_FILE_PATH, "serial is blank");
+                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_GET_CERT_FILE_PATH, "serial is blank");
             }
             final String homeDir = getHomeDir();
             final String certDir = String.join(File.separator, homeDir, "certs");
@@ -119,6 +132,34 @@ public enum CertCertStore implements ICACertStore {
                 }
             }
             return null;
+        }
+
+        @Override
+        public boolean containsCert(String enrollmentId) throws RAServerException {
+            if (StringUtils.isBlank(enrollmentId)) {
+                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_CONTAINS_CERT, "enrollmentId is blank");
+            }
+            final String homeDir = getHomeDir();
+            final String certDir = String.join(File.separator, homeDir, "certs");
+            final String certFile = String.format("%s-b64cert.cer", enrollmentId);
+            Collection listFiles = FileUtils.listFiles(new File(certDir),
+                    FileFilterUtils.andFileFilter(EmptyFileFilter.NOT_EMPTY, new NameFileFilter(certFile, IOCase.SENSITIVE)),
+                    DirectoryFileFilter.INSTANCE);
+
+            return listFiles.size() > 0;
+        }
+
+        @Override
+        public String loadB64CertString(String enrollmentId) throws RAServerException {
+            try {
+                final String homeDir = getHomeDir();
+                final String certDir = String.join(File.separator, homeDir, "certs");
+                final String certFile = String.format("%s-b64cert.cer", enrollmentId);
+                final String certFilePath = String.join(File.separator, certDir, certFile);
+                return FileUtils.readFileToString(new File(certFilePath));
+            } catch (Exception e) {
+                throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_B64_CERT_STRING, e);
+            }
         }
 
         private String getStringSerialNumber(Certificate certificate) {

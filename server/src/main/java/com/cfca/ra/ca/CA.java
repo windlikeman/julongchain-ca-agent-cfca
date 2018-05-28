@@ -179,9 +179,12 @@ public class CA {
         resp.setResult(new GettCertResponseResult(id, ts, key, gettCertResponse.gettCerts()));
     }
 
-
     public String getEnrollmentId(String id) throws RAServerException {
         return enrollIdStore.getEnrollmentId(id);
+    }
+
+    public void updateEnrollIdStore(String enrollmentId, String id) throws RAServerException {
+        enrollIdStore.updateEnrollIdStore(enrollmentId, id);
     }
 
     public void storeCert(String enrollmentID, String b64cert) throws RAServerException {
@@ -192,12 +195,16 @@ public class CA {
         return certStore.loadCert(enrollmentId);
     }
 
-    public void updateEnrollIdStore(String enrollmentId, String id) throws RAServerException {
-        enrollIdStore.updateEnrollIdStore(enrollmentId, id);
-    }
-
     public String getCertFile(String serial) throws RAServerException {
         return certStore.getCertFilePath(serial);
+    }
+
+    public boolean containsCert(String enrollmentID) throws RAServerException {
+        return certStore.containsCert(enrollmentID);
+    }
+
+    public String loadB64CertString(String enrollmentID) throws RAServerException {
+        return certStore.loadB64CertString(enrollmentID);
     }
 
     public static class Builder {
@@ -270,18 +277,20 @@ public class CA {
         return Objects.hash(config, configFilePath, certStore, server, registry, enrollIdStore);
     }
 
-    public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet) throws RAServerException {
+    public void fillCAInfo(EnrollmentResponseNet enrollmentResponseNet, String enrollmentID) throws RAServerException {
         final List<ServerResponseMessage> messages = new ArrayList<>();
         ServerResponseMessage e1 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_CANAME, getName());
         ServerResponseMessage e2 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_VERSION, config.getVersion());
+        ServerResponseMessage e3 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_ENROLLMENTID, enrollmentID);
         messages.add(e1);
         messages.add(e2);
+        messages.add(e3);
 
         byte[] caChain = getCAChain();
         if (caChain != null) {
             final String chain = Base64.toBase64String(caChain);
-            ServerResponseMessage e3 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_CACHAIN, chain);
-            messages.add(e3);
+            ServerResponseMessage e4 = new ServerResponseMessage(ServerResponseMessage.RESPONSE_MESSAGE_CODE_CACHAIN, chain);
+            messages.add(e4);
         }
         enrollmentResponseNet.setMessages(messages);
     }

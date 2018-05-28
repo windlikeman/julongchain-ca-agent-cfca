@@ -3,14 +3,12 @@ package com.cfca.ra.command.internal.enroll;
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.config.CsrConfig;
-import com.cfca.ra.command.config.Enrollment;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
-import com.sun.deploy.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +27,6 @@ public final class EnrollCommand extends BaseClientCommand {
 
     private static final String HTTP_PREFIX = "http://";
     private static final String HTTPS_PREFIX = "https://";
-
 
     public EnrollCommand() {
         this.name = COMMAND_NAME_ENROLL;
@@ -77,14 +74,6 @@ public final class EnrollCommand extends BaseClientCommand {
         }
     }
 
-    private ConfigBean loadConfigFile() throws CommandException {
-        try {
-            return ConfigUtils.load(this.cfgFileName);
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED, "failed to load config file:" + this.cfgFileName, e);
-        }
-    }
-
     @Override
     public void execute() throws CommandException {
         logger.info("Entered enroll");
@@ -95,12 +84,17 @@ public final class EnrollCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "failed to execute, but I do not know why");
         }
 
+
         Identity id = resp.getIdentity();
 
         id.store();
 
         ServerInfo serverInfo = resp.getServerInfo();
         storeCAChain(clientCfg, serverInfo);
+
+        final String enrollmentId = serverInfo.getEnrollmentId();
+        replaceConfigCommonName(enrollmentId);
+        enrollIdStore.updateEnrollIdStore(enrollmentId, clientCfg.getEnrollmentRequest().getUsername());
     }
 
     private EnrollmentRequest buildEnrollmentRequestfromConfig(ConfigBean configBean) throws CommandException {

@@ -176,6 +176,11 @@ public class RAServerException extends Exception {
     public static final int REASON_CODE_GETTCERT_SERVICE_MESSAGE_DUPLICATE = 0x900d;
 
     /**
+     * CERTUTILS 操作失败: 获取证书的使用者名称失败
+     */
+    public static final int REASON_CODE_CERTUTILS_GET_SUBJECT_NAME = 0xa001;
+
+    /**
      * RA Server 没有初始化
      */
     public static final int REASON_CODE_CA_NOT_READY = 0xb001;
@@ -223,11 +228,11 @@ public class RAServerException extends Exception {
     /**
      * CA:加载公钥文件失败
      */
-    public static final int REASON_CODE_CA_CERTSTORE_LOAD_CERT = 0xc005;
+    public static final int REASON_CODE_CA_CERT_STORE_LOAD_CERT = 0xc005;
     /**
      * CA:公钥 Store 获取文件路径失败
      */
-    public static final int REASON_CODE_CA_CERTSTORE_GET_CERT_FILE_PATH = 0xc006;
+    public static final int REASON_CODE_CA_CERT_STORE_GET_CERT_FILE_PATH = 0xc006;
     /**
      * CA:检查 ID 是否被注册时失败
      */
@@ -240,6 +245,14 @@ public class RAServerException extends Exception {
      * CA:读取该CA的证书链文件失败
      */
     public static final int REASON_CODE_CA_READ_CACHAIN_FILE = 0xc009;
+    /**
+     * CA:从证书库中寻找对应用户的公钥失败
+     */
+    public static final int REASON_CODE_CA_CERT_STORE_CONTAINS_CERT = 0xc00a;
+    /**
+     * CA:从证书库中寻找对应用户的证书并转为B64字符串读取出来
+     */
+    public static final int REASON_CODE_CA_CERT_STORE_LOAD_B64_CERT_STRING = 0xc00b;
 
     /**
      * ENROLLIDSTORE:更新ENROLLID失败
@@ -254,6 +267,7 @@ public class RAServerException extends Exception {
      * MESSAGE_STORE:加载 MESSAGE STORE 失败
      */
     public static final int REASON_CODE_MESSAGE_STORE_LOAD = 0xf001;
+
 
 
     private String message;
@@ -317,8 +331,10 @@ public class RAServerException extends Exception {
             put(REASON_CODE_CA_CERT_STORE_CERT_B64_DECODE, "ca fail to store cert due to decode b64 string");
             put(REASON_CODE_CA_CERT_STORE_CERT_WITH_PEM, "ca fail to store cert due to pem file format");
             put(REASON_CODE_CA_CERT_STORE_CERT_INVALID_ARGS, "ca fail to store cert due to invalid args");
-            put(REASON_CODE_CA_CERTSTORE_GET_CERT_FILE_PATH, "ca fail to get cert file path from cert store");
-            put(REASON_CODE_CA_CERTSTORE_LOAD_CERT, "ca fail to load cert due to pem operation");
+            put(REASON_CODE_CA_CERT_STORE_GET_CERT_FILE_PATH, "ca fail to get cert file path from cert store");
+            put(REASON_CODE_CA_CERT_STORE_LOAD_CERT, "ca fail to load cert due to pem operation");
+            put(REASON_CODE_CA_CERT_STORE_CONTAINS_CERT, "ca fail to check whether contains this enrollmentId cert");
+            put(REASON_CODE_CA_CERT_STORE_LOAD_B64_CERT_STRING, "ca fail to load the b64 string of the cert");
             put(REASON_CODE_CA_CHECK_ID_REGISTERED, "ca fail to check id registered");
             put(REASON_CODE_CA_NOT_FOUND_CACHAIN_FILE, "ca fail to read chain file due to not found");
             put(REASON_CODE_CA_READ_CACHAIN_FILE, "ca fail to read chain file");
@@ -326,6 +342,8 @@ public class RAServerException extends Exception {
             put(REASON_CODE_ENROLLIDSTORE_UPDATE_ENROLLID_FILE, "enrollid store fail to update enroll id dat file");
             put(REASON_CODE_ENROLLIDSTORE_LOAD_ENROLLID_FILE, "enrollid store fail to load update enroll id dat file");
             put(REASON_CODE_MESSAGE_STORE_LOAD, "message store fail to load");
+
+            put(REASON_CODE_CERTUTILS_GET_SUBJECT_NAME, "cert utils fail to get subject name of cert");
         }
     };
 

@@ -56,7 +56,17 @@ public class GettCertService {
         MessageStore.GETTCERT_DEFAULT.setServerHomeDir(this.server.getServerHomeDir());
     }
 
-    public GettCertResponseNet gettcert(GettCertRequestNet data, String token, BouncyCastleProvider provider) {
+    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
+        final String[] split = auth.split("\\.");
+        if (split.length != 2) {
+            throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
+        }
+        final String b64EnrollmentId = split[0];
+
+        return new String(Base64.decode(b64EnrollmentId));
+    }
+
+    public GettCertResponseNet gettcert(GettCertRequestNet data, String auth, BouncyCastleProvider provider) {
         try {
             logger.info("gettcert Entered");
             final int messageId = data.hashCode();
@@ -65,9 +75,9 @@ public class GettCertService {
             }
 
             final String caname = data.getCaname();
-            String enrollmentID = "admin";
+            String enrollmentID = getEnrollmentIdFromAuth(auth);
             eCert = server.getEnrollmentCert(caname, enrollmentID);
-            verifyToken(caname, enrollmentID, token);
+            verifyToken(caname, enrollmentID, auth);
             GettCertResponseNet resp = new GettCertResponseNet(true, null);
 
             IUser caller = server.getUser(caname,enrollmentID, null);

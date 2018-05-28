@@ -16,4 +16,8 @@ public interface ICACertStore {
     Certificate loadCert(String enrollmentId) throws RAServerException;
 
     String getCertFilePath(String serial) throws RAServerException;
+
+    boolean containsCert(String enrollmentID)throws RAServerException;
+
+    String loadB64CertString(String enrollmentID)throws RAServerException;
 }

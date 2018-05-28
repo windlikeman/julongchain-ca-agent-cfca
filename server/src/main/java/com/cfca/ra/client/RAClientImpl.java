@@ -50,12 +50,10 @@ public class RAClientImpl implements IRAClient {
     }
 
     @Override
-    public CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet, String enrollmentID) throws RAServerException {
-        CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet, enrollmentID);
-
+    public CertServiceResponseVO reenroll(ReenrollmentRequestNet enrollmentRequestNet) throws RAServerException {
         try {
-            CertServiceResponseVO certServiceResponseVO = (CertServiceResponseVO) client.process(certServiceRequestVO);
-            return certServiceResponseVO;
+            CertServiceRequestVO certServiceRequestVO = buildCertServiceRequestVO(enrollmentRequestNet);
+            return (CertServiceResponseVO) client.process(certServiceRequestVO);
         } catch (RATKException e) {
             throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_RATK_PROCESS, e);
         }
@@ -156,7 +154,7 @@ public class RAClientImpl implements IRAClient {
         }
     }
 
-    private CertServiceRequestVO buildCertServiceRequestVO(ReenrollmentRequestNet data, String enrollmentID) throws RAServerException {
+    private CertServiceRequestVO buildCertServiceRequestVO(ReenrollmentRequestNet data) throws RAServerException {
         try {
             // 普通证书 普通：1 高级：2
             // 复合证书 单单1-1 单双1-2 双单2-1 双双2-2
@@ -167,9 +165,9 @@ public class RAClientImpl implements IRAClient {
             String identNo = data.getProfile();
 
             String branchCode = "678";
-//            String email = "zc@demo.com";
             String keyAlg = "SM2";
             int keyLength = 256;
+            String enrollmentID = "admin";
 
             String caName = data.getCaname();
             String p10 = data.getRequest();
@@ -180,6 +178,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setCertType(certType);
             certServiceRequestVO.setCustomerType(customerType);
             certServiceRequestVO.setUserName(enrollmentID);
+            certServiceRequestVO.setUserNameInDn(enrollmentID);
             certServiceRequestVO.setIdentType(identType);
             certServiceRequestVO.setIdentNo(identNo);
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
@@ -224,6 +223,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setKeyAlg(keyAlg);
             certServiceRequestVO.setBranchCode(branchCode);
 //            certServiceRequestVO.setEmail(email);
+            certServiceRequestVO.setUserNameInDn(enrollmentID);
             certServiceRequestVO.setP10(p10);
             return certServiceRequestVO;
         } catch (Exception e) {
