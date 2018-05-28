@@ -16,7 +16,6 @@ import com.cfca.ra.command.utils.PemUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
@@ -113,7 +112,7 @@ public class Client {
         logger.info("basicAuth=" + basicAuth);
         final CsrResult result = genCSR(algo, csrConfig.getNames());
         storeMyPrivateKey(result);
-        EnrollmentRequestNet enrollmentRequestNet = buildReenrollmentRequestNet(enrollmentRequest, result.getCsr());
+        EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, result.getCsr());
 
         final EnrollmentResponseNet responseNet = enrollmentComms.request(enrollmentRequestNet, basicAuth);
 
@@ -215,7 +214,7 @@ public class Client {
 
     }
 
-    private EnrollmentRequestNet buildReenrollmentRequestNet(EnrollmentRequest enrollmentRequest, String p10) throws CommandException {
+    private EnrollmentRequestNet buildEnrollmentRequestNet(EnrollmentRequest enrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing csrConfig ");
@@ -234,11 +233,11 @@ public class Client {
         if (MyStringUtils.isEmpty(caName)) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing CA Name");
         }
-        return new EnrollmentRequestNet.Builder(p10, profile, caName, csrConfig).build();
+        return new EnrollmentRequestNet.Builder(p10, profile, caName).build();
     }
 
 
-    private ReenrollmentRequestNet buildReenrollmentRequestNet(ReenrollmentRequest enrollmentRequest, String p10) throws CommandException {
+    private ReenrollmentRequestNet buildEnrollmentRequestNet(ReenrollmentRequest enrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing csrConfig ");
@@ -461,7 +460,7 @@ public class Client {
 
         storeMyPrivateKey(result);
 
-        ReenrollmentRequestNet reenrollmentRequestNet = buildReenrollmentRequestNet(reenrollmentRequest, result.getCsr());
+        ReenrollmentRequestNet reenrollmentRequestNet = buildEnrollmentRequestNet(reenrollmentRequest, result.getCsr());
         final EnrollmentResponseNet responseNet = reenrollmentComms.request(reenrollmentRequestNet, token);
 
         return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
