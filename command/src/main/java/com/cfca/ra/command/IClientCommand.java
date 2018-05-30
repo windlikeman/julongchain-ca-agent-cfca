@@ -1,6 +1,8 @@
 package com.cfca.ra.command;
 
 
+import com.google.gson.JsonObject;
+
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -13,7 +15,7 @@ public interface IClientCommand {
      * 执行命令接口
      * @throws CommandException 命令执行遇到错误则抛出异常
      */
-    void execute() throws CommandException;
+    JsonObject execute() throws CommandException;
 
     /**
      * 准备命令接口

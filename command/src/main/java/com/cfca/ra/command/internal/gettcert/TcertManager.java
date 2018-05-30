@@ -19,32 +19,32 @@ import java.util.UUID;
  * @create 2018/5/24
  * @Description 交易证书管理类
  * @CodeReviewer
- * @since
+ * @since v3.0.0
  */
 public class TcertManager {
 
     private static final Logger logger = LoggerFactory.getLogger(TcertManager.class);
 
     /**
-     * CAKey is used for signing a certificate request
+     * CAKey 用于证书签名
      */
     private final PrivateKey caKey;
 
     /**
-     * CACert is used for extracting CA data to associate with issued certificates
+     * CACert 是CA用于提取与颁发证书相关联的数据
      */
     private final Certificate caCert;
 
     /**
-     * ValidityPeriod is the duration that the issued certificate will be valid
-     * unless the user requests a shorter validity period.
-     * The default value is 1 year.
+     * ValidityPeriod是颁发的证书有效的持续时间
+     * 除非用户请求更短的有效期.
+     * 默认是 1 年.
      */
     private final long validityPeriod;
 
     /**
-     * MaxAllowedBatchSize is the maximum number of TCerts which can be requested at a time.
-     * The default value is 1000.
+     * MaxAllowedBatchSize是一次可以请求的TCerts的最大数量.
+     * 默认值是 1000.
      */
     private final int maxAllowedBatchSize;
 
@@ -59,9 +59,6 @@ public class TcertManager {
         logger.info("GetBatch req={}", req);
 
         try {
-            // Set numTCertsInBatch to the number of TCerts to get.
-            // If 0 are requested, retrieve the maximum allowable;
-            // otherwise, retrieve the number requested it not too many.
             int numTCertsInBatch;
             if (req.getCount() == 0) {
                 numTCertsInBatch = maxAllowedBatchSize;
@@ -74,105 +71,30 @@ public class TcertManager {
             }
 
             long vp = validityPeriod;
-            // Certs are valid for the min of requested and configured max
             if (req.getValidityPeriod() > 0 && req.getValidityPeriod() < validityPeriod) {
                 vp = req.getValidityPeriod();
             }
 
-            // Create a template from which to create all other TCerts.
-            // Since a TCert is anonymous and unlinkable, do not include
-//            template:= &x509.Certificate {
-//                Subject:
-//                tcertSubject,
-//            }
-//            template.NotBefore = time.Now();
-//            template.NotAfter = template.NotBefore.Add(vp);
-//            template.IsCA = false;
-//            template.KeyUsage = x509.KeyUsageDigitalSignature;
-//            template.SubjectKeyId = []byte {
-//                1, 2, 3, 4
-//            } ;
-
-            // Generate nonce for TCertIndex
-            byte[] nonce = new byte[16];// 8 bytes rand, 8 bytes timestamp
-//            rand.Reader.Read(nonce[:8]);
+            byte[] nonce = new byte[16];
 
             final SubjectPublicKeyInfo info = ecert.getSubjectPublicKeyInfo();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             PublicKey pub = converter.getPublicKey(info);
 
             byte[] kdfKey = KeyUtil.getEncodedSubjectPublicKeyInfo(info);
-//            mac:=hmac.New(sha512.New384,[]byte(createHMACKey()));
-//            raw, _ :=x509.MarshalPKIXPublicKey(pub);
-//            mac.Write(raw);
-//            kdfKey:=mac.Sum(nil);
 
             List<TCert> set = new ArrayList<>();
 
             for (int i = 0; i < numTCertsInBatch; i++) {
                 String tcertid = UUID.randomUUID().toString();
-//                tcertid = generateIntUUID();
-
-                // Compute TCertIndex
-//                tidx:= []byte(strconv.Itoa(2 * i + 1));
-//                tidx = append(tidx[:],nonce[:]...);
-//                tidx = append(tidx[:],Padding...);
-//
-//                mac:=hmac.New(sha512.New384, kdfKey);
-//                mac.Write([]byte {
-//                    1
-//                });
-//                extKey:=mac.Sum(nil)[:32];
-//
-//                mac = hmac.New(sha512.New384, kdfKey);
-//                mac.Write([]byte {
-//                    2
-//                });
-//                mac = hmac.New(sha512.New384, mac.Sum(nil));
-//                mac.Write(tidx);
-//
-//                one:=new (big.Int).SetInt64(1);
-//                k:=new (big.Int).SetBytes(mac.Sum(nil));
-//                k.Mod(k, new (big.Int).Sub(pub.Curve.Params().N, one));
-//                k.Add(k, one);
-//
-//                tmpX, tmpY :=pub.ScalarBaseMult(k.Bytes())
-//                txX, txY :=pub.Curve.Add(pub.X, pub.Y, tmpX, tmpY)
-//                txPub:=ecdsa.PublicKey {
-//                    Curve:
-//                    pub.Curve, X:txX, Y:txY
-//                }
-
-                // Compute encrypted TCertIndex
-//                encryptedTidx = CBCPKCS7Encrypt(extKey, tidx);
-//
-//                (extensions, ks) =generateExtensions(tcertid, encryptedTidx, ecert, req);
-//
-//                template.PublicKey = txPub;
-//                template.Extensions = extensions;
-//                template.ExtraExtensions = extensions;
-//                template.SerialNumber = tcertid;
-
-//                raw =x509.CreateCertificate(rand.Reader, template, tm.CACert, & txPub, tm.CAKey)
-//            if err != nil {
-//                return nil, fmt.Errorf("Failed in TCert x509.CreateCertificate: %s", err)
-//            }
-
-//                pem:=ConvertDERToPEM(raw, "CERTIFICATE");
-//
-//                set = append(set, api.TCert {
-//                    Cert: pem,
-//                    Keys: ks
-//                });
             }
 
-            long tcertID = genNumber(/*big.NewInt(20)*/);
+            long tcertID = genNumber();
 
             GettCertResponse tcertResponse = new GettCertResponse(null);
             tcertResponse.id = tcertID;
             tcertResponse.ts = System.currentTimeMillis();
             tcertResponse.key = kdfKey;
-//            tcertResponse.tCerts = tCerts;
 
             return tcertResponse;
         } catch (Exception e) {

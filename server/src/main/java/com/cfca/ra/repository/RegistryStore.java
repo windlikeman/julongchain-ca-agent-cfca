@@ -30,6 +30,9 @@ import java.util.Map;
  * @since v3.0.0
  */
 public enum RegistryStore implements IRegistryStore {
+    /**
+     * CA 对应注册命令的注册信息库的默认文件实现方式
+     */
     CFCA("CFCA") {
 
         private Map<String, IUser> registerStore;
@@ -105,7 +108,7 @@ public enum RegistryStore implements IRegistryStore {
                 final File registerFile = new File(registerFilePath);
                 if (registerFile.exists()) {
                     s = FileUtils.readFileToString(registerFile);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         registerFile.delete();
                         return registerStore;
                     }
@@ -128,6 +131,7 @@ public enum RegistryStore implements IRegistryStore {
             }
         }
     };
+    private static final String FILE_NULL_CONTENT = "null";
     protected static final Logger logger = LoggerFactory.getLogger(RegistryStore.class);
     protected final String caName;
 

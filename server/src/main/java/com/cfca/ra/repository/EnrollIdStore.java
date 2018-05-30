@@ -25,6 +25,9 @@ import java.util.Map;
  * @since v3.0.0
  */
 public enum EnrollIdStore implements IEnrollIdStore {
+    /**
+     * CA的注册者证书 与用户映射信息的默认文件实现方式
+     */
     CFCA("CFCA") {
         private Map<String, String> enrollIdStore;
 
@@ -58,7 +61,7 @@ public enum EnrollIdStore implements IEnrollIdStore {
                 File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
                 if (file.exists()) {
                     final String s = FileUtils.readFileToString(file);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         file.delete();
                         return enrollIdStore;
                     }
@@ -103,6 +106,7 @@ public enum EnrollIdStore implements IEnrollIdStore {
             }
         }
     };
+    private static final String FILE_NULL_CONTENT = "null";
     protected static final Logger logger = LoggerFactory.getLogger(EnrollIdStore.class);
     protected final String caName;
 

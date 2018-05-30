@@ -59,7 +59,9 @@ public class RAController {
 
         EnrollmentRequest request = buildEnrollmentRequest(data);
         EnrollmentResponseNet response = raService.enroll(request, auth);
-        logger.info("/enroll <<<<<< Finished");
+        if (logger.isInfoEnabled()) {
+            logger.info("/enroll <<<<<< Finished : response=>{}", response);
+        }
         return response;
     }
 

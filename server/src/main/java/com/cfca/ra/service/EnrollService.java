@@ -36,6 +36,7 @@ import java.util.List;
 @Service
 public class EnrollService {
     private static final Logger logger = LoggerFactory.getLogger(EnrollService.class);
+    private static final int AUTH_ELEMENT_NUM = 2;
     private final RAServer server;
 
     private final IRAClient raClient;
@@ -83,7 +84,7 @@ public class EnrollService {
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();
-                    ServerResponseError error = new ServerResponseError(1002, resultMessage);
+                    ServerResponseError error = new ServerResponseError(ServerResponseError.RACLIENT_ERROR_CODE, resultMessage);
                     errors.add(error);
                     response = new EnrollmentResponseNet(false, null, errors, null);
                     break;
@@ -163,7 +164,7 @@ public class EnrollService {
             throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_READ_AUTH);
         }
         final String[] usernameAndPwd = userInfo.split(":");
-        if (2 != usernameAndPwd.length) {
+        if (AUTH_ELEMENT_NUM != usernameAndPwd.length) {
             logger.error("usernameAndPwd expected[username:password], but now split length=" + usernameAndPwd.length);
             throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_READ_AUTH, "failed to check auth:invalid auth");
         }

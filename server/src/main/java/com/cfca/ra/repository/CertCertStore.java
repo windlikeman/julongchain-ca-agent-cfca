@@ -31,6 +31,9 @@ import java.util.Collection;
  * @since v3.0.0
  */
 public enum CertCertStore implements ICACertStore {
+    /**
+     * 证书管理库的默认文件实现方式
+     */
     CFCA("CFCA") {
         private String getHomeDir() {
             String homeDir = String.join(File.separator, System.getProperty("user.dir"), caName);
@@ -101,6 +104,7 @@ public enum CertCertStore implements ICACertStore {
                     throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_CERT, "enrollmentId is blank");
                 }
                 final String certFile = buildCertFile(homeDir, enrollmentId);
+                logger.info("loadCert<<<<<<certFile at {}", certFile);
                 return PemUtils.loadCert(certFile);
             } catch (IOException e) {
                 throw new RAServerException(RAServerException.REASON_CODE_CA_CERT_STORE_LOAD_CERT, e);
@@ -118,13 +122,12 @@ public enum CertCertStore implements ICACertStore {
             Certificate certificate;
             String serialNumber;
             for (File file : listFiles) {
-                logger.info(file.getName());
                 try {
                     certificate = PemUtils.loadCert(file);
                     serialNumber = getStringSerialNumber(certificate);
                     if (serialNumber.equalsIgnoreCase(serial)) {
                         final String absolutePath = file.getAbsolutePath();
-                        logger.info("found cert file at: {}", absolutePath);
+                        logger.info("getCertFilePath<<<<<<found cert file at: {}", absolutePath);
                         return absolutePath;
                     }
                 } catch (IOException e) {

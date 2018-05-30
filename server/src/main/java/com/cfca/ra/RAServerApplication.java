@@ -29,6 +29,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+/**
+ * @author zhangchong
+ * @create 2018/5/16
+ * @Description 服务器启动类
+ * @CodeReviewer
+ * @since v3.0.0
+ */
 @Configuration
 @EnableCaching
 @EnableAsync

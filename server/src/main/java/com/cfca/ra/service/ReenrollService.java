@@ -49,8 +49,6 @@ public class ReenrollService {
     }
 
     private void verifyTokenByEnrollmentId(String caName, String enrollmentId, String auth) throws RAServerException {
-        logger.info("verifyTokenByEnrollmentId>>>>>>enrollmentId : " + enrollmentId + ", caName=" + caName + ", auth=" + auth);
-
         PublicKey publicKey = server.getKey(caName, enrollmentId);
         if (publicKey == null) {
             throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_NOT_ENROLL, "not found the pubkey file, this user may not enroll first. Please execute enroll command first.");
@@ -63,17 +61,18 @@ public class ReenrollService {
         try {
             final String[] split = auth.split("\\.");
             if (split.length != 2) {
-                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "expected:<cert.sig>,but invalid auth:" + auth);
+                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
             }
-            final String b64Cert = split[0];
+            final String b64EnrollmentId = split[0];
             final String b64Sig = split[1];
-            final byte[] cert = Base64.decode(b64Cert);
+            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
             if (logger.isInfoEnabled()) {
-                logger.info("verify>>>>>>publicKey : " + publicKey);
+                logger.info("verify>>>>>>publicKey    : " + publicKey);
+                logger.info("verify>>>>>>enrollmentId : " + new String(enrollmentId));
             }
             Signature signature = Signature.getInstance("SM3withSM2", "BC");
             signature.initVerify(publicKey);
-            signature.update(cert);
+            signature.update(enrollmentId);
 
             final byte[] sign = Base64.decode(b64Sig);
             final boolean verify = signature.verify(sign);

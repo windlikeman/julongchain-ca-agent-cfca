@@ -54,7 +54,7 @@ public enum MessageStore implements IMessageStore {
                 final File storefile = new File(filePath);
                 if (storefile.exists()) {
                     final String s = FileUtils.readFileToString(storefile);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         storefile.delete();
                         return store;
                     }
@@ -107,7 +107,7 @@ public enum MessageStore implements IMessageStore {
                 final File storefile = new File(filePath);
                 if (storefile.exists()) {
                     final String s = FileUtils.readFileToString(storefile);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         storefile.delete();
                         return store;
                     }
@@ -159,7 +159,7 @@ public enum MessageStore implements IMessageStore {
                 final File storefile = new File(filePath);
                 if (storefile.exists()) {
                     final String s = FileUtils.readFileToString(storefile);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         storefile.delete();
                         return store;
                     }
@@ -211,7 +211,7 @@ public enum MessageStore implements IMessageStore {
                 final File storefile = new File(filePath);
                 if (storefile.exists()) {
                     final String s = FileUtils.readFileToString(storefile);
-                    if (StringUtils.isBlank(s) || s.trim().equalsIgnoreCase("null")) {
+                    if (StringUtils.isBlank(s) || FILE_NULL_CONTENT.equalsIgnoreCase(s.trim())) {
                         storefile.delete();
                         return store;
                     }
@@ -236,6 +236,7 @@ public enum MessageStore implements IMessageStore {
         }
     };
 
+    private static final String FILE_NULL_CONTENT = "null";
     protected Map<Integer, BaseRequest> store;
 
     protected void updateMessageFile(String fileName) throws RAServerException {

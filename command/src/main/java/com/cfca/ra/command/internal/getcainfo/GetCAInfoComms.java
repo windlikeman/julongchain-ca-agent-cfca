@@ -66,12 +66,12 @@ public class GetCAInfoComms {
             Response<GetCAInfoResponseNet> response = call.execute();
             GetCAInfoResponseNet decodedResponse = response.body();
             if (!response.isSuccessful()) {
-                logger.error("response is not successful : " + response.message());
+                logger.error("syncHandle<<<<<<response is not successful : " + response.message());
                 return null;
             }
 
             if (decodedResponse == null) {
-                logger.error("response body is null");
+                logger.error("syncHandle<<<<<<response body is null");
                 return null;
             }
 

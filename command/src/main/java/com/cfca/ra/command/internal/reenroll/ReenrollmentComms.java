@@ -85,12 +85,12 @@ public class ReenrollmentComms {
             Response<EnrollmentResponseNet> response = call.execute();
             EnrollmentResponseNet decodedResponse = response.body();
             if (!response.isSuccessful()) {
-                logger.error("response is not successful : " + response.message());
+                logger.error("syncHandle<<<<<<response is not successful : " + response.message());
                 return null;
             }
 
             if (decodedResponse == null) {
-                logger.error("response body is null");
+                logger.error("syncHandle<<<<<<response body is null");
                 return null;
             }
 

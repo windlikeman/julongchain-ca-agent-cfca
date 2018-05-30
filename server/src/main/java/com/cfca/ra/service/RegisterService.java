@@ -31,6 +31,7 @@ import java.util.List;
 @Service
 public class RegisterService {
     private static final Logger logger = LoggerFactory.getLogger(RAServiceImpl.class);
+    private static final int AUTH_ELEMENT_NUM = 2;
     private final RAServer server;
 
     @Autowired
@@ -81,7 +82,7 @@ public class RegisterService {
 
     private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
         final String[] split = auth.split("\\.");
-        if (split.length != 2) {
+        if (split.length != AUTH_ELEMENT_NUM) {
             throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
         }
         final String b64EnrollmentId = split[0];
@@ -96,7 +97,6 @@ public class RegisterService {
             checkIdRegistered(caname, id);
 
             final String enrollmentId = getEnrollmentIdFromAuth(auth);
-            logger.info("registerUser >>>>>> enrollmentId : " + enrollmentId);
             PublicKey publicKey = server.getKey(caname, enrollmentId);
             if (publicKey == null) {
                 throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");
@@ -185,18 +185,17 @@ public class RegisterService {
     private void verify(String auth, PublicKey publicKey) throws RAServerException {
         try {
             final String[] split = auth.split("\\.");
-            if (split.length != 2) {
-                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<cert.sig>,but invalid auth:" + auth);
+            if (split.length != AUTH_ELEMENT_NUM) {
+                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
             }
-            final String b64Cert = split[0];
+            final String b64EnrollmentId = split[0];
             final String b64Sig = split[1];
-            final byte[] cert = Base64.decode(b64Cert);
-            if (logger.isInfoEnabled()) {
-                logger.info("createToken>>>>>>publicKey : " + publicKey);
-            }
+            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
+            logger.info("verify>>>>>> enrollmentId : " + new String(enrollmentId));
+            logger.info("verify>>>>>> publicKey    : " + publicKey);
             Signature signature = Signature.getInstance("SM3withSM2", "BC");
             signature.initVerify(publicKey);
-            signature.update(cert);
+            signature.update(enrollmentId);
 
             final byte[] sign = Base64.decode(b64Sig);
             final boolean verify = signature.verify(sign);

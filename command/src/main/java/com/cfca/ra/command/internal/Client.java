@@ -44,6 +44,7 @@ import java.util.List;
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
     private static final String USER_ADMIN = "admin";
+    public static final String ADMIN = "admin";
 
     /**
      * 客户端配置
@@ -108,10 +109,8 @@ public class Client {
         final String password = enrollmentRequest.getPassword();
         final String username = enrollmentRequest.getUsername();
         String basicAuth = buildBasicAuth(username, password);
-        logger.info("basicAuth=" + basicAuth);
         final String names = csrConfig.getNames();
         final CsrResult result = genCSR(algo, names);
-        logger.info("names=" + names);
         storeMyPrivateKey(result);
         EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, result.getCsr());
 
@@ -121,7 +120,7 @@ public class Client {
     }
 
     public EnrollmentResponse reenroll(ReenrollmentRequest reenrollmentRequest, String token, String username) throws CommandException {
-        initializeIfNeeded(null);
+        initializeIfNeeded(reenrollmentRequest.getUsername());
         final CsrConfig csrConfig = reenrollmentRequest.getCsrConfig();
         if (csrConfig == null || csrConfig.getKey() == null) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
@@ -129,7 +128,6 @@ public class Client {
         final String algo = csrConfig.getKey().getAlgo();
         final String names = csrConfig.getNames();
         final CsrResult result = genCSR(algo, names);
-        logger.info("names=" + names);
 
         storeMyPrivateKey(result);
 
@@ -362,7 +360,7 @@ public class Client {
             Certificate c = PemUtils.loadCert(cert);
             clientCfg.setEnrollmentId(c.getSubject().toString());
 
-            logger.info("Stored client certificate at {} , enrollmentId is {}", certFile, clientCfg.getEnrollmentId());
+            logger.info("storeMyIdentity  <<<<<<store certificate at {} , enrollmentId is {}", certFile, clientCfg.getEnrollmentId());
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED, e);
         }
@@ -373,7 +371,7 @@ public class Client {
             initializeIfNeeded(null);
             final PrivateKey privateKey = result.getKeyPair().getPrivate();
             PemUtils.storePrivateKey(keyFile, privateKey);
-            logger.info("Stored client private key at {}", keyFile);
+            logger.info("storeMyPrivateKey<<<<<<store private key at {}", keyFile);
         } catch (Exception e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
         }
@@ -396,7 +394,7 @@ public class Client {
     private void initializeIfNeeded(String userName) throws CommandException {
         if (!initialized) {
             try {
-                logger.info("Initializing client with config: {}", clientCfg);
+                logger.info("initializeIfNeeded<<<<<<Initializing client with config: {}", clientCfg);
                 String mspDir = clientCfg.getMspDir();
                 if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
                     clientCfg.setMspDir("msp");
@@ -411,26 +409,28 @@ public class Client {
                 }
                 boolean mkdirs = new File(keyDir).mkdirs();
                 if (!mkdirs) {
-                    logger.info("failed to create keystore directory");
+                    logger.warn("initializeIfNeeded<<<<<<failed to create keystore directory");
                 }
                 this.keyFile = buildPrivateKeyFile(keyDir);
+                logger.info("initializeIfNeeded<<<<<<use keyFile at {}", keyFile);
                 // 证书目录和文件
-                if (MyStringUtils.isBlank(userName) || "admin".equalsIgnoreCase(userName)) {
+                if (MyStringUtils.isBlank(userName) || ADMIN.equalsIgnoreCase(userName)) {
                     this.certDir = String.join(File.separator, mspDir, "signcerts");
                 } else {
                     this.certDir = String.join(File.separator, mspDir, userName, "signcerts");
                 }
                 mkdirs = new File(certDir).mkdirs();
                 if (!mkdirs) {
-                    logger.info("failed to create keystore directory");
+                    logger.warn("initializeIfNeeded<<<<<<failed to create keystore directory");
                 }
                 this.certFile = buildCertFile(certDir);
+                logger.info("initializeIfNeeded<<<<<<use certFile at {}", certFile);
 
                 // CA 证书目录
                 this.caCertsDir = String.join(File.separator, mspDir, "cacerts");
                 mkdirs = new File(caCertsDir).mkdirs();
                 if (!mkdirs) {
-                    logger.info("failed to create keystore directory");
+                    logger.info("initializeIfNeeded<<<<<<failed to create keystore directory");
                 }
                 // Successfully initialized the client
                 initialized = true;
@@ -475,6 +475,13 @@ public class Client {
         return enrollIdStore.getUserName(enrollmentId);
     }
 
+    /**
+     *
+     * @param name 用户名
+     * @param cert 通过b64解码得到的证书的原始字节
+     * @param key 私钥
+     * @return 用户标识
+     */
     private Identity buildIdentity(String name, byte[] cert, PrivateKey key) {
         logger.info("buildIdentity<<<<<<PrivateKey:\n" + key);
 
@@ -529,7 +536,7 @@ public class Client {
         return new RevokeRequestNet(registrationRequest);
     }
 
-    private RevokeResponse buildRevokeResponse(RevokeResponseNet responseNet) throws CommandException {
+    private RevokeResponse buildRevokeResponse(RevokeResponseNet responseNet) {
         return new RevokeResponse(responseNet.getResult());
     }
 

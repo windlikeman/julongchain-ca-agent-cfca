@@ -80,7 +80,7 @@ public class RegisterComms {
             RegistrationResponseNet decodedResponse = response.body();
 
             if (decodedResponse == null) {
-                logger.error("response body is null");
+                logger.error("syncHandle<<<<<<response body is null");
                 return null;
             }
 

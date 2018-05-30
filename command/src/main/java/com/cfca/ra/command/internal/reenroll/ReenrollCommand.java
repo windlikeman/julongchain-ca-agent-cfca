@@ -9,10 +9,10 @@ import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
 import com.cfca.ra.command.internal.enroll.EnrollmentResponse;
-import com.cfca.ra.command.internal.register.RegistrationRequest;
-import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class ReenrollCommand extends BaseClientCommand {
     /**
      * ca-client reenroll -u http://serverAddr:serverPort
      *
-     * @param args           命令行参数
+     * @param args 命令行参数
      * @throws CommandException 失败则返回
      */
     @Override
@@ -73,13 +73,13 @@ public class ReenrollCommand extends BaseClientCommand {
     @Override
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
-            logger.error("ca-client reenroll -h serverAddr -p serverPort -a <json string>");
+            logger.error("Usage : " + getUsage());
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "fail to build reenroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
 
     @Override
-    public void execute() throws CommandException {
+    public JsonObject execute() throws CommandException {
         logger.info("Entered reenroll");
         Identity id = client.loadMyIdentity();
 
@@ -89,13 +89,22 @@ public class ReenrollCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_COMMS_FAILED, "reenroll command failed to execute, but I do not know why");
         }
 
-        resp.getIdentity().store();
+        final Identity identity = resp.getIdentity();
+        identity.store();
 
         ServerInfo serverInfo = resp.getServerInfo();
         storeCAChain(clientCfg, serverInfo);
         final String enrollmentId = serverInfo.getEnrollmentId();
         replaceConfigCommonName(enrollmentId);
         enrollIdStore.updateEnrollIdStore(enrollmentId, clientCfg.getEnrollmentRequest().getUsername());
+        return buildResult(identity);
+    }
+
+    private JsonObject buildResult(Identity identity) {
+        final byte[] cert = identity.getEcert().getCert();
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("cert", Base64.toBase64String(cert));
+        return jsonObject;
     }
 
     private ReenrollmentRequest buildReenrollmentRequest(ClientConfig clientCfg) {

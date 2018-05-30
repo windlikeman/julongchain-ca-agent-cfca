@@ -20,7 +20,11 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 /**
- * Created by 10128044 on 2017/8/18.
+ * @author zhangchong
+ * @create 2018/5/22
+ * @Description OkHttp 网路工具类,用于封装网络通信功能
+ * @CodeReviewer
+ * @since v3.0.0
  */
 public class OkHttpUtils {
 
@@ -32,7 +36,7 @@ public class OkHttpUtils {
                 @Override
                 public void log(String message) {
                     //打印retrofit日志
-                    logger.info("retrofitBack = " + message);
+                    logger.info("HttpLoggingInterceptor<<<<<<retrofitBack = " + message);
                 }
             });
 

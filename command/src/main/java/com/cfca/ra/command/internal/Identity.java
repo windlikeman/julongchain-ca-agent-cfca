@@ -72,7 +72,7 @@ public class Identity {
      * @return
      */
     private String addTokenAuthHdr() throws CommandException {
-        logger.info("Adding token-based authorization header");
+        logger.info("addTokenAuthHdr<<<<<<Adding token-based authorization header");
         byte[] cert = ecert.getCert();
         PrivateKey key = ecert.getKey();
         return createToken(cert, key);
@@ -94,7 +94,8 @@ public class Identity {
             final SubjectPublicKeyInfo subjectPublicKeyInfo = certificate.getSubjectPublicKeyInfo();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             PublicKey publicKey = converter.getPublicKey(subjectPublicKeyInfo);
-            logger.info("createToken<<<<<<publicKey : " + publicKey);
+            logger.info("createToken<<<<<<publicKey  : {}", publicKey);
+            logger.info("createToken<<<<<<privateKey : {}", privateKey);
 
             final byte[] enrollmentIdBytes = name.getBytes();
             String b64EnrollmentId = Base64.toBase64String(enrollmentIdBytes);

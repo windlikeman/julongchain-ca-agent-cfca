@@ -48,6 +48,5 @@ public class RevokeRequestTest {
         String[] args = new String[]{"revoke", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(revokeRequest)};
         revokeCommand.prepare(args);
         revokeCommand.execute();
-
     }
 }

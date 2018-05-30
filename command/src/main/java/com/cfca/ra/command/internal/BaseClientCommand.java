@@ -151,13 +151,13 @@ public abstract class BaseClientCommand implements IClientCommand {
             try {
                 if (!MyFileUtils.fileExists(this.cfgFileName)) {
                     this.cfgFileName = createDefaultConfigFile(CA_CLIENT_CONFIG_FILENAME);
-                    logger.info("Created a default configuration file at {}", this.cfgFileName);
+                    logger.info("initializeConfig<<<<<<Created a default configuration file at {}", this.cfgFileName);
                 }
             } catch (Exception e) {
                 throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "failed to check config file ", e);
             }
         }
-        logger.info("Initializing client with config: {}", clientCfg);
+        logger.info("initializeConfig<<<<<<Initializing client with config: {}", clientCfg);
         String mspDir = clientCfg.getMspDir();
         if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
             clientCfg.setMspDir("msp");
@@ -195,7 +195,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     }
 
     private void checkForEnrollment(String userName) throws CommandException {
-        logger.info("Checking for enrollment");
+        logger.info("checkForEnrollment<<<<<<Running : userName[{}]", userName);
         client.checkEnrollment(userName);
     }
 
@@ -226,7 +226,7 @@ public abstract class BaseClientCommand implements IClientCommand {
         this.homeDirectory = MyStringUtils.trimRight(this.homeDirectory, File.separator);
 
         if (configFileSet && homeDirSet) {
-            logger.info("Using both --config and --home CLI flags; --config will take precedence");
+            logger.info("validateAndReturnAbsConfigFile<<<<<<Using both --config and --home CLI flags; --config will take precedence");
         }
 
         if (configFileSet) {

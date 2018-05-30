@@ -4,6 +4,7 @@ import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class GettCertCommand extends BaseClientCommand {
     }
 
     @Override
-    public void execute() throws CommandException {
+    public JsonObject execute() throws CommandException {
         logger.info("Entered getTCert");
         Identity id = client.loadMyIdentity();
 
@@ -32,6 +33,7 @@ public class GettCertCommand extends BaseClientCommand {
         if (resp == null) {
             throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_COMMS_FAILED, "gettcert command failed to execute, but I do not know why");
         }
+        return new JsonObject();
     }
 
     @Override

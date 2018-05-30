@@ -4,8 +4,9 @@ import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.ServerInfo;
-import com.cfca.ra.command.utils.ConfigUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,18 +47,27 @@ public class GetCAInfoCommand extends BaseClientCommand {
     @Override
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
-            logger.error("Useage : " + getUsage());
+            logger.error("Usage : " + getUsage());
             throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_ARGS_INVALID, "getcainfo command args is invalid =>" + getUsage());
         }
     }
 
     @Override
-    public void execute() throws CommandException {
+    public JsonObject execute() throws CommandException {
         logger.info("Entered getcainfo <<<<<< clientCfg:"+clientCfg.toString());
         GetCAInfoRequest req = clientCfg.getGetCAInfoRequest();
 
         ServerInfo si = client.getCAInfo(req);
         storeCAChain(client.getClientCfg(), si);
+
+        return buildResult(si);
+    }
+
+    private JsonObject buildResult(ServerInfo si) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("caname", si.getCaName());
+        jsonObject.addProperty("cachain", Base64.toBase64String(si.getCaChain()));
+        return jsonObject;
     }
 
     @Override

@@ -9,7 +9,9 @@ import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +76,14 @@ public final class RegisterCommand extends BaseClientCommand {
     @Override
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
-            logger.error("Useage : " + getUsage());
+            logger.error("Usage : " + getUsage());
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_ARGS_INVALID, "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
 
     @Override
-    public void execute() throws CommandException {
-        logger.info("Entered runRegister");
+    public JsonObject execute() throws CommandException {
+        logger.info("execute<<<<<<Entered runRegister");
 
         RegistrationRequest registrationRequest = clientCfg.getRegistrationRequest();
 
@@ -89,16 +91,24 @@ public final class RegisterCommand extends BaseClientCommand {
         RegistrationResponse resp = id.register(registrationRequest);
 
         final String secret = resp.getSecret();
-        logger.info("Password: {}", secret);
+        logger.info("execute<<<<<<Password: {}", secret);
         if (MyStringUtils.isEmpty(secret)) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_RESPONSE_NOT_SUCCESS);
         }
 
         final String name = registrationRequest.getName();
-        logger.info("new registered user : "+name);
+        logger.info("execute<<<<<<new registered user : {}", name);
         registered.put(name, secret);
         updateRegisterFile();
         mkNewUserDir(name);
+        return buildResult(secret);
+    }
+
+
+    private JsonObject buildResult(String s) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("credentials", s);
+        return jsonObject;
     }
 
     private void mkNewUserDir(String name) {
@@ -107,7 +117,7 @@ public final class RegisterCommand extends BaseClientCommand {
         userDir = MyFileUtils.makeFileAbs(userDir);
         boolean mkdirs = new File(userDir).mkdirs();
         if (!mkdirs) {
-            logger.info("failed to create new user directory");
+            logger.warn("mkNewUserDir<<<<<<failed to create new user directory");
         }
 
     }

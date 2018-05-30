@@ -20,11 +20,14 @@ import java.util.Map;
 /**
  * @author zhangchong
  * @create 2018/5/16
- * @Description CA的注册者证书 ID 映射信息
+ * @Description 注册者证书 与用户的ID 映射信息
  * @CodeReviewer
  * @since v3.0.0
  */
 public enum EnrollIdStore implements IEnrollIdStore {
+    /**
+     * 默认记录文件的实现
+     */
     CFCA("CFCA") {
         private Map<String, String> enrollIdStore;
 

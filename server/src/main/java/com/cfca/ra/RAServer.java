@@ -63,7 +63,7 @@ public class RAServer {
      */
     private Map<String, CA> caMap = new HashMap<>();
 
-    private final static byte[] keybytes = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+    private final static byte[] KEY_BYTES = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38};
 
     public void initialize() throws RAServerException {
@@ -160,7 +160,7 @@ public class RAServer {
     }
 
     Key genRootKey() {
-        return new SecretKeySpec(keybytes, "AES256");
+        return new SecretKeySpec(KEY_BYTES, "AES256");
     }
 
     private TcertManager loadTcertMgr(String keyfile, String certfile) throws RAServerException {

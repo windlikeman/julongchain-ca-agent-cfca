@@ -37,15 +37,15 @@ public class MyFileUtils {
                 final File parentFile = file.getParentFile();
                 final boolean mkdirs = parentFile.mkdirs();
                 if (!mkdirs) {
-                    logger.warn("failed to mkdirs at {} ", parentFile.getAbsolutePath());
+                    logger.warn("createNewFile<<<<<<failed to mkdirs at {} ", parentFile.getAbsolutePath());
                 }
 
                 final boolean newFile = file.createNewFile();
                 if (!newFile) {
-                    logger.warn("a default configuration file at {} already exists", filePath);
+                    logger.warn("createNewFile<<<<<<a default configuration file at {} already exists", filePath);
                 }
             }
-            logger.info("Created a default configuration file at {}", filePath);
+            logger.info("createNewFile<<<<<<Created a default configuration file at {}", filePath);
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_FILE_CREATE_NEW_FILE, "failed to create file:" + filePath);
         }

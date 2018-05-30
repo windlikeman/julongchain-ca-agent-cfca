@@ -26,12 +26,12 @@ public class CommandException extends Exception {
     public static final int REASON_CODE_CONFIG_MISSING_CA_NAME = 0x1006;
 
     /**
-     * 配置文件没有指定 eroll 命令的 profile
+     * 配置文件没有指定 enroll 命令的 profile
      */
     public static final int REASON_CODE_CONFIG_MISSING_PROFILE = 0x1007;
 
     /**
-     * 配置文件没有指定 eroll 命令
+     * 配置文件没有指定 enroll 命令
      */
     public static final int REASON_CODE_CONFIG_MISSING_ENROLLMENT = 0x1008;
 

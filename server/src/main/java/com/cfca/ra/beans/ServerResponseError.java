@@ -8,6 +8,7 @@ package com.cfca.ra.beans;
  * @since v3.0.0
  */
 public class ServerResponseError {
+    public static final int RACLIENT_ERROR_CODE = 0x1002;
     /**
      * Integer code denoting the type of error.
      */

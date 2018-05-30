@@ -11,7 +11,7 @@ import java.security.PrivateKey;
  * @CodeReviewer
  * @since v3.0.0
  */
-class Signer {
+public class Signer {
     /**
      * 生成的密钥对的私钥
      */

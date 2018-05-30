@@ -6,6 +6,7 @@ import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +62,19 @@ public final class RevokeCommand extends BaseClientCommand {
     }
 
     @Override
-    public void execute() throws CommandException {
-        logger.info("Entered revoke");
+    public JsonObject execute() throws CommandException {
+        logger.info("execute<<<<<<Entered revoke");
         Identity id = client.loadMyIdentity();
 
         RevokeRequest revokeRequest = clientCfg.getRevokeRequest();
-        id.revoke(revokeRequest);
+        final RevokeResponse revoke = id.revoke(revokeRequest);
+        return buildResult(revoke.getResult());
+    }
+
+    private JsonObject buildResult(String s) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("result", s);
+        return jsonObject;
     }
 
     @Override

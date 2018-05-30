@@ -6,9 +6,10 @@ import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
-import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public final class EnrollCommand extends BaseClientCommand {
         super.prepare(args);
 
         processConfigFile();
-        if (!MyStringUtils.isBlank(content) && !"{}".equalsIgnoreCase(content)) {
+        if (!MyStringUtils.isBlank(content) && !EMPTY_JSON_STRING.equalsIgnoreCase(content)) {
             processContent();
         }
     }
@@ -75,7 +76,7 @@ public final class EnrollCommand extends BaseClientCommand {
     }
 
     @Override
-    public void execute() throws CommandException {
+    public JsonObject execute() throws CommandException {
         logger.info("Entered enroll");
         String url = clientCfg.getUrl();
         final EnrollmentResponse resp = enrollWithConfig(url);
@@ -83,7 +84,6 @@ public final class EnrollCommand extends BaseClientCommand {
         if (resp == null) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "failed to execute, but I do not know why");
         }
-
 
         Identity id = resp.getIdentity();
 
@@ -95,6 +95,14 @@ public final class EnrollCommand extends BaseClientCommand {
         final String enrollmentId = serverInfo.getEnrollmentId();
         replaceConfigCommonName(enrollmentId);
         enrollIdStore.updateEnrollIdStore(enrollmentId, clientCfg.getEnrollmentRequest().getUsername());
+        return buildResult(id);
+    }
+
+    private JsonObject buildResult(Identity identity) {
+        final byte[] cert = identity.getEcert().getCert();
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("cert", Base64.toBase64String(cert));
+        return jsonObject;
     }
 
     private EnrollmentRequest buildEnrollmentRequestfromConfig(ConfigBean configBean) throws CommandException {
