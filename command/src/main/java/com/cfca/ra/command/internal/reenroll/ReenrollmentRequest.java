@@ -33,6 +33,8 @@ public class ReenrollmentRequest {
      */
     private final String caName;
 
+    private final String request;
+
     private ReenrollmentRequest(ReenrollmentRequest.Builder builder) {
         this.label = builder.label;
         this.username = builder.username;
@@ -40,6 +42,7 @@ public class ReenrollmentRequest {
         this.profile = builder.profile;
         this.csrConfig = builder.csrConfig;
         this.caName = builder.caName;
+        this.request = builder.request;
     }
 
     public String getLabel() {
@@ -66,6 +69,10 @@ public class ReenrollmentRequest {
         return caName;
     }
 
+    public String getRequest() {
+        return request;
+    }
+
     @Override
     public String toString() {
         return "EnrollmentRequest{" +
@@ -75,6 +82,7 @@ public class ReenrollmentRequest {
                 ", profile='" + profile + '\'' +
                 ", csrConfig=" + csrConfig +
                 ", caName='" + caName + '\'' +
+                ", request='" + request + '\'' +
                 '}';
     }
 
@@ -88,9 +96,11 @@ public class ReenrollmentRequest {
          * Optional:The label used in HSM operations
          */
         private String label = "";
+        public final String request;
 
 
-        public Builder(String username, String password, String profile, CsrConfig csrConfig, String caName) {
+        public Builder(String request, String username, String password, String profile, CsrConfig csrConfig, String caName) {
+            this.request = request;
             this.username = username;
             this.password = password;
             this.profile = profile;

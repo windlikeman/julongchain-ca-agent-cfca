@@ -96,7 +96,7 @@ public class RegistrationRequest {
                 '}';
     }
 
-    static class Builder {
+    public static class Builder {
         private String name;
         private String type;
         private String secret;
@@ -105,42 +105,42 @@ public class RegistrationRequest {
         private List<UserAttrs> attributes;
         private String caName;
 
-        Builder name(String v) {
+        public Builder name(String v) {
             this.name = v;
             return this;
         }
 
-        Builder type(String v) {
+        public Builder type(String v) {
             this.type = v;
             return this;
         }
 
-        Builder secret(String v) {
+        public Builder secret(String v) {
             this.secret = v;
             return this;
         }
 
-        Builder maxEnrollments(int v) {
+        public Builder maxEnrollments(int v) {
             this.maxEnrollments = v;
             return this;
         }
 
-        Builder affiliation(String v) {
+        public Builder affiliation(String v) {
             this.affiliation = v;
             return this;
         }
 
-        Builder attributes(List<UserAttrs> v) {
+        public Builder attributes(List<UserAttrs> v) {
             this.attributes = v;
             return this;
         }
 
-        Builder caName(String v) {
+        public Builder caName(String v) {
             this.caName = v;
             return this;
         }
 
-        RegistrationRequest build() {
+        public RegistrationRequest build() {
             return new RegistrationRequest(this);
         }
     }

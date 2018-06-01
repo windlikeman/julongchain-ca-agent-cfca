@@ -36,6 +36,13 @@ public class EnrollmentRequest {
      */
     private final String caName;
 
+    /**
+     * 包含基于PKCS＃10的 CSR(证书签名请求) 的编码字符串。
+     */
+    private final String request;
+
+    private final static EnrollmentRequest NULL = new Builder(null, null,null,null,null,null).label(null).build();
+
     private EnrollmentRequest(Builder builder) {
         this.label = builder.label;
         this.username = builder.username;
@@ -43,6 +50,7 @@ public class EnrollmentRequest {
         this.profile = builder.profile;
         this.csrConfig = builder.csrConfig;
         this.caName = builder.caName;
+        this.request = builder.request;
     }
 
     public String getLabel() {
@@ -69,6 +77,14 @@ public class EnrollmentRequest {
         return caName;
     }
 
+    public String getRequest() {
+        return request;
+    }
+
+    public boolean isNull() {
+        return this.equals(NULL);
+    }
+
     @Override
     public String toString() {
         return "EnrollmentRequest{" +
@@ -78,6 +94,7 @@ public class EnrollmentRequest {
                 ", profile='" + profile + '\'' +
                 ", csrConfig=" + csrConfig +
                 ", caName='" + caName + '\'' +
+                ", request='" + request + '\'' +
                 '}';
     }
 
@@ -104,25 +121,21 @@ public class EnrollmentRequest {
         return Objects.hash(label, username, password, profile, csrConfig, caName);
     }
 
-    private final static EnrollmentRequest NULL = new Builder(null,null,null,null,null).label(null).build();
-
-    public boolean isNull() {
-        return this.equals(NULL);
-    }
-
     public static class Builder {
         private final String password;
         private final String username;
         private final String profile;
         private final CsrConfig csrConfig;
         private final String caName;
+        private final String request;
         /**
          * Optional:The label used in HSM operations
          */
         private String label = "";
 
 
-        public Builder(String username, String password, String profile, CsrConfig csrConfig, String caName) {
+        public Builder(String request, String username, String password, String profile, CsrConfig csrConfig, String caName) {
+            this.request = request;
             this.username = username;
             this.password = password;
             this.profile = profile;

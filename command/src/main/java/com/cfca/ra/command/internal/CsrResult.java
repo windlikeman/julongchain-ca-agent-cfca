@@ -9,12 +9,12 @@ import java.security.KeyPair;
  * @CodeReviewer
  * @since v3.0.0
  */
-class CsrResult {
+public class CsrResult {
     private final String csr;
 
     private final KeyPair keyPair;
 
-    CsrResult(String csr, KeyPair keyPair) {
+    public CsrResult(String csr, KeyPair keyPair) {
         this.csr = csr;
         this.keyPair = keyPair;
     }

@@ -49,6 +49,7 @@ public class OkHttpUtils {
                             .newBuilder()
                             .addHeader("Content-Type", "application/json;charset=utf-8")
                             .addHeader("Accept", "application/json")
+                            .addHeader("ca-protocol-version", "0.0.1")
                             .build();
                     return chain.proceed(request);
                 }

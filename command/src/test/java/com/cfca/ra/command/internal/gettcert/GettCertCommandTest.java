@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GettCertCommandTest {
-
+    private final static String MSPDIR = "D:\\R15\\P1552\\dev\\blockchain\\command\\ca-client\\config\\msp";
     @Before
     public void setUp() throws Exception {
     }

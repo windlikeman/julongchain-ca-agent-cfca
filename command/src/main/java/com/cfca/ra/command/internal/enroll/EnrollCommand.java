@@ -117,7 +117,7 @@ public final class EnrollCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_ENROLLMENT);
         }
         final String profile = configBean.getEnrollment().getProfile();
-        return new EnrollmentRequest.Builder(configBean.getAdmin(), configBean.getAdminpwd(), profile, csr, caName).build();
+        return new EnrollmentRequest.Builder(null, configBean.getAdmin(), configBean.getAdminpwd(), profile, csr, caName).build();
     }
 
     /**
@@ -148,20 +148,28 @@ public final class EnrollCommand extends BaseClientCommand {
         if (MyStringUtils.isEmpty(username) || MyStringUtils.isEmpty(password)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "missing the enrollment ID and secret");
         }
+        final EnrollmentRequest enrollmentRequest = clientCfg.getEnrollmentRequest();
+        if (null == enrollmentRequest) {
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT_REQUEST, "clientCfg missing enrollmentRequest");
+        }
 
-        final CsrConfig csrConfig = clientCfg.getCsrConfig();
-        final String caName = clientCfg.getCaName();
+        final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
+        final String caName = enrollmentRequest.getCaName();
         if (MyStringUtils.isEmpty(caName)) {
-            throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_CA_NAME, "clientCfg missing caName");
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_CA_NAME, "clientCfg missing caName");
         }
-        String profile = clientCfg.getEnrollmentRequest().getProfile();
+
+        String profile = enrollmentRequest.getProfile();
         if (MyStringUtils.isEmpty(profile)) {
-            throw new CommandException(CommandException.REASON_CODE_CONFIG_MISSING_PROFILE, "enrollmentRequest missing profile");
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_PROFILE, "enrollmentRequest missing profile");
         }
-        final EnrollmentRequest enrollmentRequest = new EnrollmentRequest.Builder(username, password, profile, csrConfig, caName).build();
+        final String request = enrollmentRequest.getRequest();
+        if (MyStringUtils.isEmpty(request)) {
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_REQUEST, "enrollmentRequest missing request");
+        }
 
-        return client.enroll(enrollmentRequest);
-
+        final EnrollmentRequest.Builder reqBuilder = new EnrollmentRequest.Builder(request, username, password, profile, csrConfig, caName);
+        return client.enroll(reqBuilder.build());
     }
 
     /**

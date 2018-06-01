@@ -66,7 +66,7 @@ public class ReenrollCommand extends BaseClientCommand {
             throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT);
         }
         final String profile = configBean.getEnrollment().getProfile();
-        clientCfg.setEnrollmentRequest(new EnrollmentRequest.Builder(null, null, profile, csr, caName).build());
+        clientCfg.setEnrollmentRequest(new EnrollmentRequest.Builder(null, null, null, profile, csr, caName).build());
         clientCfg.setEnrollmentId(csr.getCn());
     }
 
@@ -114,7 +114,8 @@ public class ReenrollCommand extends BaseClientCommand {
         final String profile = req.getProfile();
         final CsrConfig csrConfig = req.getCsrConfig();
         final String caName = req.getCaName();
-        return new ReenrollmentRequest.Builder(username, password, profile, csrConfig, caName).build();
+        final String request = req.getRequest();
+        return new ReenrollmentRequest.Builder(request, username, password, profile, csrConfig, caName).build();
     }
 
     @Override

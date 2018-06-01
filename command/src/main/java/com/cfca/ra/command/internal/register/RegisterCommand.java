@@ -83,7 +83,7 @@ public final class RegisterCommand extends BaseClientCommand {
 
     @Override
     public JsonObject execute() throws CommandException {
-        logger.info("execute<<<<<<Entered runRegister");
+        logger.info("RegisterCommand Running");
 
         RegistrationRequest registrationRequest = clientCfg.getRegistrationRequest();
 
@@ -97,7 +97,7 @@ public final class RegisterCommand extends BaseClientCommand {
         }
 
         final String name = registrationRequest.getName();
-        logger.info("execute<<<<<<new registered user : {}", name);
+        logger.info("RegisterCommand<<<<<<new registered user : {}", name);
         registered.put(name, secret);
         updateRegisterFile();
         mkNewUserDir(name);
@@ -117,7 +117,7 @@ public final class RegisterCommand extends BaseClientCommand {
         userDir = MyFileUtils.makeFileAbs(userDir);
         boolean mkdirs = new File(userDir).mkdirs();
         if (!mkdirs) {
-            logger.warn("mkNewUserDir<<<<<<failed to create new user directory");
+            logger.warn("RegisterCommand<<<<<<failed to create new user directory");
         }
 
     }
@@ -137,7 +137,7 @@ public final class RegisterCommand extends BaseClientCommand {
         }
         try {
             final String s = FileUtils.readFileToString(file);
-            logger.info("loadRegisterFile<<<<<< s:\n" + s);
+            logger.info("RegisterCommand<<<<<<loadRegisterFile file content:\n" + s);
             final Map map = new Gson().fromJson(s, Map.class);
             Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
             while (it.hasNext()) {
@@ -156,7 +156,7 @@ public final class RegisterCommand extends BaseClientCommand {
             File file = new File(String.join(File.separator, homeDir, registerFile));
             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
             final String s = gson.toJson(registered);
-            logger.info("updateRegisterFile<<<<<<s:\n" + s);
+            logger.info("RegisterCommand<<<<<<updateRegisterFile file content:\n" + s);
             FileUtils.writeStringToFile(file, s);
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_UPDATE_REGISTER_FILE, e);

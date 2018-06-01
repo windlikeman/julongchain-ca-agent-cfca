@@ -80,6 +80,22 @@ public class CommandException extends Exception {
      * ENROLL 命令更新用户与证书绑定关系失败
      */
     public static final int REASON_CODE_ENROLL_COMMAND_UPDATE_ENROLLID_FILE = 0x5006;
+    /**
+     * ENROLL 命令配置文件缺失 enrollment request
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT_REQUEST = 0x5007;
+    /**
+     * ENROLL 命令配置文件缺失 enrollment request 的 ca 名称
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_CA_NAME = 0x5008;
+    /**
+     * ENROLL 命令配置文件缺失 enrollment request 的 profile
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_PROFILE = 0x5009;
+    /**
+     * ENROLL 命令配置文件缺失 enrollment request 的 request
+     */
+    public static final int REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_REQUEST = 0x500a;
 
     /**
      * GETCAINFO 命令网络通信失败
@@ -218,6 +234,10 @@ public class CommandException extends Exception {
      * 内部客户端 register 后服务器回复空的密码
      */
     public static final int REASON_CODE_INTERNAL_CLIENT_REGISTER_RESPONSE_EMPTY_PASSWORD_FROM_SERVER = 0xb012;
+    /**
+     * 内部客户端 enroll 提取 私钥失败
+     */
+    public static final int REASON_CODE_INTERNAL_CLIENT_LOAD_PRIVATEKEY_FAILED = 0xb013;
 
     /**
      * 文件操作失败,检查文件是否存在失败
@@ -254,8 +274,12 @@ public class CommandException extends Exception {
             put(REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "the enrollment command failed to communicate with server");
             put(REASON_CODE_ENROLL_COMMAND_LOAD_CONFIG_FAILED, "the enrollment command failed to initiallize with config file");
             put(REASON_CODE_ENROLL_COMMAND_UPDATE_CONFIG_FAILED, "the enrollment command failed to update the config file with enrollmentId");
-            put(REASON_CODE_ENROLL_COMMAND_LOAD_ENROLLID_FILE , "the enrollment command failed to load enrollmentId user binding file");
+            put(REASON_CODE_ENROLL_COMMAND_LOAD_ENROLLID_FILE, "the enrollment command failed to load enrollmentId user binding file");
             put(REASON_CODE_ENROLL_COMMAND_UPDATE_ENROLLID_FILE, "the enrollment command failed to update enrollmentId user binding file");
+            put(REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_ENROLLMENT_REQUEST, "the enrollment command failed due to config file missing enroll request");
+            put(REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_CA_NAME, "the enrollment command failed due to config file missing the ca name of enroll request");
+            put(REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_PROFILE, "the enrollment command failed due to config file missing the profile of enroll request");
+            put(REASON_CODE_ENROLL_COMMAND_CONFIG_MISSING_REQUEST, "the enrollment command failed due to config file missing the request of enroll request");
 
             put(REASON_CODE_INTERNAL_CLIENT_LOAD_IDENTITY_EXCEPTION, "the internal client fail to load identity");
             put(REASON_CODE_INTERNAL_CLIENT_BUILD_CERTFILE_PATH, "the internal client fail to build cert file path");
@@ -271,6 +295,9 @@ public class CommandException extends Exception {
             put(REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "the internal client fail to build generate csr");
             put(REASON_CODE_INTERNAL_CLIENT_INIT_FAILED, "the internal client fail to initialize");
             put(REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION, "the internal client fail to check enrollment");
+            put(REASON_CODE_INTERNAL_CLIENT_REGISTER_RESPONSE_EMPTY_PASSWORD_FROM_SERVER, "the internal client receive empty password after register");
+            put(REASON_CODE_INTERNAL_CLIENT_LOAD_PRIVATEKEY_FAILED, "the internal client fail to load private key");
+            put(REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "the internal client fail to reenroll");
 
             put(REASON_CODE_GETCAINFO_COMMAND_COMMS_FAILED, "the getcainfo command fail to communicate with server");
             put(REASON_CODE_GETCAINFO_COMMAND_INIT_MISSING_MSPDIR, "the getcainfo command fail to init by missing mspdir");

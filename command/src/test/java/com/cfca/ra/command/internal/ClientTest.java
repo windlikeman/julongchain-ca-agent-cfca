@@ -18,7 +18,7 @@ public class ClientTest {
     public void test() throws Exception {
         String homedir = "./";
         final Client client = new Client(ClientConfig.INSTANCE, homedir);
-        System.out.println(client.genCSR("SM2", "CN=051@testName@Z1234567890@53,OU=Individual-3,OU=Local RA,O=CFCA TEST CA,C=CN").getCsr());
+//        System.out.println(client.genCSR("SM2", "CN=051@testName@Z1234567890@53,OU=Individual-3,OU=Local RA,O=CFCA TEST CA,C=CN").getCsr());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class ClientTest {
         Signer ecert = new Signer(null, cert, client);
         final Identity id = new Identity("hello", ecert, client);
         System.out.println(id);
-//        System.out.println(ecert);
+        System.out.println(ecert);
     }
 
 }

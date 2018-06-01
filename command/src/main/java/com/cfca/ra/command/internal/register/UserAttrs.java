@@ -6,11 +6,11 @@ package com.cfca.ra.command.internal.register;
  * @CodeReviewer
  * @since v3.0.0
  */
-class UserAttrs {
+public class UserAttrs {
     private final String name;
     private final String value;
 
-    UserAttrs(String name, String value) {
+    public UserAttrs(String name, String value) {
         this.name = name;
         this.value = value;
     }

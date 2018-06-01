@@ -15,8 +15,10 @@ import com.cfca.ra.command.utils.MyStringUtils;
 import com.cfca.ra.command.utils.PemUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -43,8 +45,7 @@ import java.util.List;
  */
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-    private static final String USER_ADMIN = "admin";
-    public static final String ADMIN = "admin";
+    private static final String ADMIN = "admin";
 
     /**
      * 客户端配置
@@ -105,18 +106,35 @@ public class Client {
         if (csrConfig == null || csrConfig.getKey() == null) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION, "enrollmentRequest missing csrConfig or missing key info");
         }
-        final String algo = csrConfig.getKey().getAlgo();
         final String password = enrollmentRequest.getPassword();
         final String username = enrollmentRequest.getUsername();
         String basicAuth = buildBasicAuth(username, password);
-        final String names = csrConfig.getNames();
-        final CsrResult result = genCSR(algo, names);
-        storeMyPrivateKey(result);
-        EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, result.getCsr());
+//        final String algo = csrConfig.getKey().getAlgo();
+//        final String names = csrConfig.getNames();
+//        final CsrResult result = genCSR(algo, names);
+//        storeMyPrivateKey(result);
+        EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, enrollmentRequest.getRequest());
 
         final EnrollmentResponseNet responseNet = enrollmentComms.request(enrollmentRequestNet, basicAuth);
 
-        return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
+        PrivateKey privateKey = getPrivateKey(keyFile);
+        logger.info("enroll  <<<<<< get private Key at {}",keyFile);
+        return buildEnrollmentResponse(responseNet, username, privateKey);
+    }
+
+    /**
+     * 用户必须先提供私钥,将私钥放置与命令行工具包指定的目录下,这个私钥将用于以后的身份签名,保证安全性
+     *
+     * @param keyFile
+     * @return
+     * @throws CommandException
+     */
+    private PrivateKey getPrivateKey(String keyFile) throws CommandException {
+        try {
+            return PemUtils.loadPrivateKey(keyFile);
+        } catch (Exception e) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_LOAD_PRIVATEKEY_FAILED, e);
+        }
     }
 
     public EnrollmentResponse reenroll(ReenrollmentRequest reenrollmentRequest, String token, String username) throws CommandException {
@@ -125,16 +143,17 @@ public class Client {
         if (csrConfig == null || csrConfig.getKey() == null) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLL_EXCEPTION, "reenrollmentRequest missing csrConfig or missing key info");
         }
-        final String algo = csrConfig.getKey().getAlgo();
-        final String names = csrConfig.getNames();
-        final CsrResult result = genCSR(algo, names);
+//        final String algo = csrConfig.getKey().getAlgo();
+//        final String names = csrConfig.getNames();
+//        final CsrResult result = genCSR(algo, names);
+//        storeMyPrivateKey(result);
 
-        storeMyPrivateKey(result);
-
-        ReenrollmentRequestNet reenrollmentRequestNet = buildEnrollmentRequestNet(reenrollmentRequest, result.getCsr());
+        ReenrollmentRequestNet reenrollmentRequestNet = buildEnrollmentRequestNet(reenrollmentRequest, reenrollmentRequest.getRequest());
         final EnrollmentResponseNet responseNet = reenrollmentComms.request(reenrollmentRequestNet, token);
 
-        return buildEnrollmentResponse(responseNet, username, result.getKeyPair().getPrivate());
+        final PrivateKey privateKey = getPrivateKey(keyFile);
+        logger.info("reenroll  <<<<<< get private Key at {}",keyFile);
+        return buildEnrollmentResponse(responseNet, username, privateKey);
     }
 
     public ServerInfo getCAInfo(GetCAInfoRequest getCAInfoRequest) throws CommandException {
@@ -292,88 +311,27 @@ public class Client {
         }
     }
 
-    /**
-     * @param keyAlg      签名算法名称
-     * @param distictName 证书使用者 DN
-     * @return CsrResult
-     * @throws CommandException 失败时报错
-     */
-    public CsrResult genCSR(String keyAlg, String distictName) throws CommandException {
-        if (MyStringUtils.isEmpty(keyAlg) || MyStringUtils.isEmpty(distictName)) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "keyAlg or distictName is empty");
-        }
-
-        CsrResult result;
-        switch (keyAlg.toUpperCase()) {
-            case "SM2":
-                result = getSM2CsrResult(distictName);
-                break;
-            default:
-                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GENCSR_FAILED, "Unsupport keyAlg type[" + keyAlg + "]");
-        }
-
-        return result;
-    }
-
-    private CsrResult getSM2CsrResult(String distictName) throws CommandException {
-        final AlgorithmParameterSpec sm2p256v1 = new ECNamedCurveGenParameterSpec("sm2p256v1");
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", provider);
-            generator.initialize(sm2p256v1);
-            KeyPair keypair = generator.generateKeyPair();
-            logger.info("getSM2CsrResult>>>>>>publicKey : " + keypair.getPublic());
-            logger.info("getSM2CsrResult>>>>>>privateKey : " + keypair.getPrivate());
-            String csr = genSM2CSR(distictName, keypair);
-            return new CsrResult(csr, keypair);
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, e);
-        }
-    }
-
-    private String genSM2CSR(String distictName, KeyPair keypair) throws CommandException {
-
-        try {
-            if (MyStringUtils.isEmpty(distictName)) {
-                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, "distictName is empty");
-            }
-
-            PKCS10CertificationRequestBuilder pkcs10Builder = new JcaPKCS10CertificationRequestBuilder(
-                    new X500Name(distictName),
-                    keypair.getPublic());
-
-            ContentSigner contentSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(keypair.getPrivate());
-            PKCS10CertificationRequest csr = pkcs10Builder.build(contentSigner);
-            final byte[] base64Encoded = Base64.encode(csr.getEncoded());
-            return new String(base64Encoded);
-        } catch (CommandException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_GEN_SM2_CSR_FAILED, e);
-        }
-    }
-
     public void storeMyIdentity(byte[] cert) throws CommandException {
         try {
             initializeIfNeeded(null);
             PemUtils.storeCert(certFile, cert);
+            logger.info("storeMyIdentity  <<<<<< store certificate at {} ", certFile);
+
+            if (logger.isDebugEnabled()) {
+                final Certificate certificate = PemUtils.loadCert(certFile);
+                final SubjectPublicKeyInfo subjectPublicKeyInfo = certificate.getSubjectPublicKeyInfo();
+                JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+                PublicKey publicKey = converter.getPublicKey(subjectPublicKeyInfo);
+                logger.info("storeMyIdentity  <<<<<< publicKey :{}", publicKey);
+            }
 
             Certificate c = PemUtils.loadCert(cert);
             clientCfg.setEnrollmentId(c.getSubject().toString());
 
-            logger.info("storeMyIdentity  <<<<<<store certificate at {} , enrollmentId is {}", certFile, clientCfg.getEnrollmentId());
+
+            logger.info("storeMyIdentity  <<<<<< enrollmentId is {}", clientCfg.getEnrollmentId());
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_IDENTITY_FAILED, e);
-        }
-    }
-
-    private void storeMyPrivateKey(CsrResult result) throws CommandException {
-        try {
-            initializeIfNeeded(null);
-            final PrivateKey privateKey = result.getKeyPair().getPrivate();
-            PemUtils.storePrivateKey(keyFile, privateKey);
-            logger.info("storeMyPrivateKey<<<<<<store private key at {}", keyFile);
-        } catch (Exception e) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
         }
     }
 
@@ -394,7 +352,7 @@ public class Client {
     private void initializeIfNeeded(String userName) throws CommandException {
         if (!initialized) {
             try {
-                logger.info("initializeIfNeeded<<<<<<Initializing client with config: {}", clientCfg);
+                logger.info("initializeIfNeeded<<<<<<Initializing client with config: {},userName{}", clientCfg, userName);
                 String mspDir = clientCfg.getMspDir();
                 if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
                     clientCfg.setMspDir("msp");
@@ -402,7 +360,7 @@ public class Client {
                 mspDir = MyFileUtils.makeFileAbs(clientCfg.getMspDir(), homedir);
                 clientCfg.setMspDir(mspDir);
                 // 密钥目录和文件
-                if (MyStringUtils.isBlank(userName) || USER_ADMIN.equalsIgnoreCase(userName)) {
+                if (MyStringUtils.isBlank(userName) || ADMIN.equalsIgnoreCase(userName)) {
                     this.keyDir = String.join(File.separator, mspDir, "keystore");
                 } else {
                     this.keyDir = String.join(File.separator, mspDir, userName, "keystore");
@@ -476,10 +434,9 @@ public class Client {
     }
 
     /**
-     *
      * @param name 用户名
      * @param cert 通过b64解码得到的证书的原始字节
-     * @param key 私钥
+     * @param key  私钥
      * @return 用户标识
      */
     private Identity buildIdentity(String name, byte[] cert, PrivateKey key) {
