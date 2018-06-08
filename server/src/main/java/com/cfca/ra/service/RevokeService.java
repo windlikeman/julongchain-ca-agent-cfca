@@ -1,5 +1,6 @@
 package com.cfca.ra.service;
 
+import com.cfca.ra.Identity;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.ServerResponseError;
@@ -11,6 +12,7 @@ import com.cfca.ra.repository.MessageStore;
 import com.cfca.ra.revoke.RevokeRequest;
 import com.cfca.ra.revoke.RevokeRequestNet;
 import com.cfca.ra.revoke.RevokeResponseNet;
+import com.cfca.ra.utils.AuthUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
@@ -48,10 +50,14 @@ public class RevokeService {
         MessageStore.REVOKE_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
-    public RevokeResponseNet revoke(RevokeRequest request, String auth) {
+    private RevokeRequest buildRevokeRequest(RevokeRequestNet data) {
+        return new RevokeRequest(data, System.currentTimeMillis());
+    }
+
+    public RevokeResponseNet revoke(RevokeRequestNet data, String auth) {
         try {
-            logger.info("revoke >>>>>> request : " + request + ", auth=" + auth);
-            final RevokeRequestNet data = request.getRevokeRequestNet();
+            logger.info("revoke >>>>>> RevokeRequestNet : " + data + ", auth=" + auth);
+
             final int messageId = data.hashCode();
             if (messageStore.containsMessage(messageId)){
                 throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
@@ -59,8 +65,10 @@ public class RevokeService {
 
             final String caName = data.getCaname();
             final String id = data.getId();
-            String enrollmentId = getEnrollmentIdFromToken(caName, id, auth);
-            logger.info("revoke >>>>>> enrollmentId : " + enrollmentId);
+
+            final Identity i = new Identity(server, caName, auth);
+            final byte[] body = AuthUtils.marshal(data);
+            i.verify(body);
 
             server.attributeIsTrue(caName, id, "hf.Revoker");
             if (StringUtils.isEmpty(data.getSerial()) && StringUtils.isEmpty(data.getAki()) && StringUtils.isEmpty(data.getId())) {
@@ -76,7 +84,8 @@ public class RevokeService {
 
             final String result = raClient.revoke(data);
             removeCert(caName, data.getSerial());
-            updateMessageId(messageId, request);
+
+            updateMessageId(messageId, buildRevokeRequest(data));
             return new RevokeResponseNet(true, result, null, null);
         } catch (RAServerException e) {
             logger.error("revoke >>>>>> Failure : " + e.getMessage(), e);
@@ -119,54 +128,5 @@ public class RevokeService {
         ServerResponseError elem = new ServerResponseError(e.getReasonCode(), e.getMessage());
         errors.add(elem);
         return new RevokeResponseNet(false, null, errors, null);
-    }
-
-    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
-        final String[] split = auth.split("\\.");
-        if (split.length != 2) {
-            throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
-        }
-        final String b64EnrollmentId = split[0];
-
-        return new String(Base64.decode(b64EnrollmentId));
-    }
-
-    private String getEnrollmentIdFromToken(String caName, String id, String auth) throws RAServerException {
-        logger.info("getEnrollmentIdFromToken>>>>>>id : " + id + ",caName=" + caName + ",auth=" + auth);
-        String enrollmentId = getEnrollmentIdFromAuth(auth);
-        PublicKey publicKey = server.getKey(caName, enrollmentId);
-        if (publicKey == null) {
-            throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");
-        }
-
-        verify(auth, publicKey);
-        return enrollmentId;
-    }
-
-    private void verify(String auth, PublicKey publicKey) throws RAServerException {
-        try {
-            final String[] split = auth.split("\\.");
-            if (split.length != 2) {
-                throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
-            }
-            final String b64EnrollmentId = split[0];
-            final String b64Sig = split[1];
-            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
-            if (logger.isInfoEnabled()) {
-                logger.info("verify>>>>>>publicKey    : " + publicKey);
-                logger.info("verify>>>>>>enrollmentId : " + new String(enrollmentId));
-            }
-            Signature signature = Signature.getInstance("SM3withSM2", "BC");
-            signature.initVerify(publicKey);
-            signature.update(enrollmentId);
-
-            final byte[] sign = Base64.decode(b64Sig);
-            final boolean verify = signature.verify(sign);
-            if (!verify) {
-                throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_VERIFY_TOKEN);
-            }
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_REVOKE_SERVICE_VERIFY_TOKEN, e);
-        }
     }
 }

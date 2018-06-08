@@ -52,7 +52,7 @@ public class ReenrollmentRequestNet {
 
     @Override
     public String toString() {
-        return "EnrollmentRequestNet{" +
+        return "ReenrollmentRequestNet{" +
                 "request='" + request + '\'' +
                 ", profile='" + profile + '\'' +
                 ", label='" + label + '\'' +

@@ -48,7 +48,7 @@ public class PemUtils {
         final PemObject certObject = loadFile(fileName);
         final byte[] certDecoded = certObject.getContent();
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(certDecoded);
-        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
+//        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         return Certificate.getInstance(asn1Primitive);
     }
 
@@ -57,7 +57,7 @@ public class PemUtils {
             throw new IOException();
         }
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(content);
-        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
+//        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         return Certificate.getInstance(asn1Primitive);
     }
 

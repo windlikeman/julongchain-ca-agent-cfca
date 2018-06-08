@@ -1,9 +1,7 @@
-package demo;
+package com.cfca.ra.command.utils;
 
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.internal.CsrResult;
-import com.cfca.ra.command.utils.MyStringUtils;
-import com.cfca.ra.command.utils.PemUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
@@ -25,7 +23,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * @create 2018/5/31
  * @Description CSR生成工具
  * @CodeReviewer
- * @since
+ * @since v3.0.0.0
  */
 public class CsrUtils {
     private static final Logger logger = LoggerFactory.getLogger(CsrUtils.class);
@@ -67,8 +65,8 @@ public class CsrUtils {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", provider);
             generator.initialize(sm2p256v1);
             KeyPair keypair = generator.generateKeyPair();
-            logger.debug("getSM2CsrResult>>>>>>publicKey : " + keypair.getPublic());
-            logger.debug("getSM2CsrResult>>>>>>privateKey : " + keypair.getPrivate());
+            logger.info("getSM2CsrResult>>>>>>publicKey : " + keypair.getPublic());
+            logger.info("getSM2CsrResult>>>>>>privateKey : " + keypair.getPrivate());
             String csr = genSM2CSR(distictName, keypair);
             return new CsrResult(csr, keypair);
         } catch (Exception e) {
@@ -98,31 +96,37 @@ public class CsrUtils {
         }
     }
 
-    private static String initializeIfNeeded() throws CommandException {
+    private static String initializeIfNeeded(String userName) throws CommandException {
         try {
             // 密钥目录和文件
-            String keyDir = String.join(File.separator, MSPDIR, "keystore");
+            String keyDir;
+            if (MyStringUtils.isBlank(userName) || "admin".equalsIgnoreCase(userName)) {
+                keyDir = String.join(File.separator, MSPDIR, "keystore");
+            } else {
+                keyDir = String.join(File.separator, MSPDIR, userName, "keystore");
+            }
+
             boolean mkdirs = new File(keyDir).mkdirs();
             if (!mkdirs) {
-                logger.debug("initializeIfNeeded<<<<<<failed to create keystore directory");
+                logger.info("initializeIfNeeded<<<<<<failed to create keystore directory");
             }
             String keyFile = String.join(File.separator, keyDir, "key.pem");
-            logger.debug("initializeIfNeeded<<<<<<use keyFile at "+ keyFile);
+            logger.info("initializeIfNeeded<<<<<<use keyFile at " + keyFile);
             return keyFile;
         } catch (Exception e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_INIT_FAILED, "failed to init client", e);
         }
     }
 
-    static void storeMyPrivateKey(CsrResult result) throws CommandException {
+    public static void storeMyPrivateKey(CsrResult result, String username) throws CommandException {
         try {
-            String keyFile = initializeIfNeeded();
-            final PublicKey publicKey = result.getKeyPair().getPublic();
+            String keyFile = initializeIfNeeded(username);
+//            final PublicKey publicKey = result.getKeyPair().getPublic();
             final PrivateKey privateKey = result.getKeyPair().getPrivate();
             PemUtils.storePrivateKey(keyFile, privateKey);
-            logger.debug("storeMyPrivateKey<<<<<<store private key at {"+keyFile+"}");
-            logger.debug("storeMyPrivateKey<<<<<<publicKey :"+publicKey);
-            logger.debug("storeMyPrivateKey<<<<<<privateKey :"+privateKey);
+            logger.info("storeMyPrivateKey  <<<<<< keyFile =>[{}] ", keyFile);
+//            logger.info("storeMyPrivateKey  <<<<<< publicKey :" + publicKey);
+            logger.info("storeMyPrivateKey  <<<<<< privateKey :" + privateKey);
 
         } catch (Exception e) {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);

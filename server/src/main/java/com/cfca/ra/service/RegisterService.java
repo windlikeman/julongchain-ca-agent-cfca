@@ -1,5 +1,6 @@
 package com.cfca.ra.service;
 
+import com.cfca.ra.Identity;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.*;
@@ -9,7 +10,11 @@ import com.cfca.ra.ca.IUserRegistry;
 import com.cfca.ra.register.*;
 import com.cfca.ra.repository.IMessageStore;
 import com.cfca.ra.repository.MessageStore;
+import com.cfca.ra.utils.AuthUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +36,6 @@ import java.util.List;
 @Service
 public class RegisterService {
     private static final Logger logger = LoggerFactory.getLogger(RAServiceImpl.class);
-    private static final int AUTH_ELEMENT_NUM = 2;
     private final RAServer server;
 
     @Autowired
@@ -80,43 +84,16 @@ public class RegisterService {
         }
     }
 
-    private String getEnrollmentIdFromAuth(String auth) throws RAServerException {
-        final String[] split = auth.split("\\.");
-        if (split.length != AUTH_ELEMENT_NUM) {
-            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<enrollmentId.sig>,but invalid auth:" + auth);
-        }
-        final String b64EnrollmentId = split[0];
 
-        return new String(Base64.decode(b64EnrollmentId));
+    private RegistrationRequest buildRegistrationRequest(RegistrationRequestNet data) {
+        return new RegistrationRequest(data);
     }
 
-    public RegistrationResponseNet registerUser(RegistrationRequest req, String auth) {
+    public RegistrationResponseNet registerUser(final RegistrationRequestNet requestNet, final String auth) {
         try {
-            final String caname = req.getCaName();
-            final String id = req.getName();
-            checkIdRegistered(caname, id);
-
-            final String enrollmentId = getEnrollmentIdFromAuth(auth);
-            PublicKey publicKey = server.getKey(caname, enrollmentId);
-            if (publicKey == null) {
-                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "This user not enroll first. Please execute enroll command first.");
-            }
-
-            verify(auth, publicKey);
-
-            final CA ca = server.getCA(caname);
-//            IUser user = ca.getRegistry().getUser(enrollmentId, null);
-            //FIXME: 将待注册权限磨平或者继承到注册者一致的权限 :
-//            normalizeRegistrationRequest(data, user);
-            //FIXME: 是否允许注册
-//            canRegister(user, data);
-            String pass = req.getName() + ":" + req.getSecret();
-            pass = Base64.toBase64String(pass.getBytes("UTF-8"));
-
-            final UserInfo insert = new UserInfo(req, pass, 1);
-            final String secret = registerUserID(req, ca, insert);
-            final RegistrationResponseNet registrationResponseNet = buildRegistrationResponseNet(secret);
-            return registrationResponseNet;
+            final RegistrationRequest req = buildRegistrationRequest(requestNet);
+            final byte[] body = AuthUtils.marshal(requestNet);
+            return registerUser(req, auth, body);
         } catch (RAServerException e) {
             logger.error("registerUser >>>>>> Failure : " + e.getMessage(), e);
             return buildRegisterErrorResponse(e);
@@ -124,6 +101,30 @@ public class RegisterService {
             logger.error("registerUser >>>>>> Failure : " + e.getMessage(), e);
             return buildRegisterErrorResponse(new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_UPDATE_REGISTER_STORE, e));
         }
+    }
+
+    private RegistrationResponseNet registerUser(RegistrationRequest req, String auth, byte[] body) throws RAServerException,UnsupportedEncodingException {
+
+        final String caname = req.getCaName();
+        final Identity i = new Identity(server, caname, auth);
+        i.verify(body);
+
+        final String id = req.getName();
+        checkIdRegistered(caname, id);
+
+        final CA ca = server.getCA(caname);
+//            IUser user = ca.getRegistry().getUser(enrollmentId, null);
+        //FIXME: 将待注册权限磨平或者继承到注册者一致的权限 :
+//            normalizeRegistrationRequest(data, user);
+        //FIXME: 是否允许注册
+//            canRegister(user, data);
+        String pass = req.getName() + ":" + req.getSecret();
+        pass = Base64.toBase64String(pass.getBytes("UTF-8"));
+
+        final UserInfo insert = new UserInfo(req, pass, 1);
+        final String secret = registerUserID(req, ca, insert);
+        final RegistrationResponseNet registrationResponseNet = buildRegistrationResponseNet(secret);
+        return registrationResponseNet;
     }
 
     private void canRegister(IUser user, RegistrationRequestNet data) throws RAServerException {
@@ -182,29 +183,29 @@ public class RegisterService {
         return (maxEnrollments > maxEnrollments1) ? maxEnrollments1 : maxEnrollments;
     }
 
-    private void verify(String auth, PublicKey publicKey) throws RAServerException {
-        try {
-            final String[] split = auth.split("\\.");
-            if (split.length != AUTH_ELEMENT_NUM) {
-                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
-            }
-            final String b64EnrollmentId = split[0];
-            final String b64Sig = split[1];
-            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
-            logger.info("verify>>>>>> enrollmentId : " + new String(enrollmentId));
-            logger.info("verify>>>>>> publicKey    : " + publicKey);
-            Signature signature = Signature.getInstance("SM3withSM2", "BC");
-            signature.initVerify(publicKey);
-            signature.update(enrollmentId);
-
-            final byte[] sign = Base64.decode(b64Sig);
-            final boolean verify = signature.verify(sign);
-            if (!verify) {
-                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_VERIFY_TOKEN);
-            }
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_VERIFY_TOKEN, e);
-        }
-    }
+//    private void verify(String auth, PublicKey publicKey) throws RAServerException {
+//        try {
+//            final String[] split = auth.split("\\.");
+//            if (split.length != AUTH_ELEMENT_NUM) {
+//                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
+//            }
+//            final String b64EnrollmentId = split[0];
+//            final String b64Sig = split[1];
+//            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
+//            logger.info("verify>>>>>> enrollmentId : " + new String(enrollmentId));
+//            logger.info("verify>>>>>> publicKey    : " + publicKey);
+//            Signature signature = Signature.getInstance("SM3withSM2", "BC");
+//            signature.initVerify(publicKey);
+//            signature.update(enrollmentId);
+//
+//            final byte[] sign = Base64.decode(b64Sig);
+//            final boolean verify = signature.verify(sign);
+//            if (!verify) {
+//                throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_VERIFY_TOKEN);
+//            }
+//        } catch (Exception e) {
+//            throw new RAServerException(RAServerException.REASON_CODE_REGISTER_SERVICE_VERIFY_TOKEN, e);
+//        }
+//    }
 
 }

@@ -8,12 +8,14 @@ import com.cfca.ra.getcainfo.GetCAInfoRequestNet;
 import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
 import com.cfca.ra.gettcert.GettCertRequestNet;
 import com.cfca.ra.gettcert.GettCertResponseNet;
-import com.cfca.ra.reenroll.ReenrollmentRequest;
-import com.cfca.ra.register.RegistrationRequest;
+import com.cfca.ra.reenroll.ReenrollmentRequestNet;
+import com.cfca.ra.register.RegistrationRequestNet;
 import com.cfca.ra.register.RegistrationResponseNet;
-import com.cfca.ra.revoke.RevokeRequest;
+import com.cfca.ra.revoke.RevokeRequestNet;
 import com.cfca.ra.revoke.RevokeResponseNet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RAServiceImpl implements IRAService {
+    private static final Logger logger = LoggerFactory.getLogger(RAServiceImpl.class);
     private final RAServer raServer;
     private final RegisterService registerService;
     private final EnrollService enrollService;
@@ -56,17 +59,17 @@ public class RAServiceImpl implements IRAService {
     }
 
     @Override
-    public EnrollmentResponseNet reenroll(ReenrollmentRequest data, String auth) {
+    public EnrollmentResponseNet reenroll(ReenrollmentRequestNet data, String auth) {
         return reenrollService.reenroll(data, auth);
     }
 
     @Override
-    public RegistrationResponseNet register(RegistrationRequest data, String auth) {
+    public RegistrationResponseNet register(RegistrationRequestNet data, String auth) {
         return registerService.registerUser(data, auth);
     }
 
     @Override
-    public RevokeResponseNet revoke(RevokeRequest data, String auth) {
+    public RevokeResponseNet revoke(RevokeRequestNet data, String auth) {
         return revokeService.revoke(data, auth);
     }
 
@@ -79,5 +82,4 @@ public class RAServiceImpl implements IRAService {
     public GetCAInfoResponseNet getCaInfo(GetCAInfoRequestNet data) {
         return getCaInfoService.getCaInfo(data.getCaname());
     }
-
 }

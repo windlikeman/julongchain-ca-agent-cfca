@@ -14,12 +14,11 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
+import java.security.*;
 
 /**
  * @author zhangchong
@@ -34,6 +33,7 @@ public class Identity {
     private final String name;
     private Signer ecert;
     private final Client client;
+    private final boolean needToVerify = true;
 
     Identity(String name, Signer ecert, Client client) {
         this.name = name;
@@ -62,30 +62,30 @@ public class Identity {
     }
 
     public EnrollmentResponse reenroll(ReenrollmentRequest request) throws CommandException {
-        String token = addTokenAuthHdr();
-        return client.reenroll(request, token, name);
+        return client.reenroll(request, name, this);
     }
 
     /**
      * 根据ecert的cert和key 算出token
      *
+     * @param body
      * @return
      */
-    private String addTokenAuthHdr() throws CommandException {
+    public String addTokenAuthHdr(byte[] body) throws CommandException {
         logger.info("addTokenAuthHdr<<<<<<Adding token-based authorization header");
         byte[] cert = ecert.getCert();
         PrivateKey key = ecert.getKey();
-        return createToken(cert, key);
+        return createToken(cert, key, body);
     }
 
     /**
      * @param cert       经过B64解码后的证书字节数组
      * @param privateKey 私钥
+     * @param body
      * @return
      */
-    private String createToken(byte[] cert, PrivateKey privateKey) throws CommandException {
+    private String createToken(byte[] cert, PrivateKey privateKey, byte[] body) throws CommandException {
         try {
-
             byte[] newCert = new byte[cert.length];
             System.arraycopy(cert, 0, newCert, 0, cert.length);
 
@@ -102,38 +102,43 @@ public class Identity {
 
             Signature signature = Signature.getInstance("SM3withSM2", "BC");
             signature.initSign(privateKey);
-            signature.update(enrollmentIdBytes);
+            signature.update(body);
             final byte[] sign = signature.sign();
             String b64Sig = new String(Base64.encode(sign));
-            final String s = b64EnrollmentId + "." + b64Sig;
-            logger.info("createToken<<<<<<token : " + s);
 
-            Signature signature1 = Signature.getInstance("SM3withSM2", "BC");
-            signature1.initVerify(publicKey);
-            signature1.update(enrollmentIdBytes);
-            final boolean verify = signature1.verify(sign);
-            if (!verify) {
-                throw new CommandException(CommandException.REASON_CODE_IDENTITY_CREATE_TOKEN, "verify failed");
+            final String token = b64EnrollmentId + "." + b64Sig;
+            logger.info("createToken<<<<<<token : {}", token);
+            logger.info("createToken<<<<<<body  : {}", Hex.toHexString(body));
+
+            if (needToVerify) {
+                verifyAfterSign(body, publicKey, sign);
             }
-            return s;
+            return token;
         } catch (Exception e) {
             throw new CommandException(CommandException.REASON_CODE_IDENTITY_CREATE_TOKEN, e);
         }
     }
 
+    private void verifyAfterSign(byte[] body, PublicKey publicKey, byte[] sign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, CommandException {
+        Signature verifySignature = Signature.getInstance("SM3withSM2", "BC");
+        verifySignature.initVerify(publicKey);
+        verifySignature.update(body);
+        final boolean verify = verifySignature.verify(sign);
+        if (!verify) {
+            throw new CommandException(CommandException.REASON_CODE_IDENTITY_CREATE_TOKEN, "verify failed due to public and private keys do not match");
+        }
+    }
+
     public RegistrationResponse register(RegistrationRequest registrationRequest) throws CommandException {
-        final String token = addTokenAuthHdr();
-        return client.register(registrationRequest, token);
+        return client.register(registrationRequest, this);
     }
 
-    public RevokeResponse revoke(RevokeRequest registrationRequest) throws CommandException {
-        final String token = addTokenAuthHdr();
-        return client.revoke(registrationRequest, token);
+    public RevokeResponse revoke(RevokeRequest revokeRequest) throws CommandException {
+        return client.revoke(revokeRequest, this);
     }
 
-    public GettCertResponse gettcert(GettCertRequest request) throws CommandException {
-        final String token = addTokenAuthHdr();
-        return client.gettcert(request, token);
+    public GettCertResponse gettcert(GettCertRequest gettCertRequest) throws CommandException {
+        return client.gettcert(gettCertRequest, this);
     }
 
     @Override

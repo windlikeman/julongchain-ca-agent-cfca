@@ -85,6 +85,8 @@ public enum CertCertStore implements ICACertStore {
         }
 
         private String buildCertFile(String homeDir, String enrollmentId) {
+            logger.info("buildCertFile<<<<<< homeDir        : {}", homeDir);
+            logger.info("buildCertFile<<<<<< enrollmentId   : {}", enrollmentId);
             final String certDir = String.join(File.separator, homeDir, "certs");
             final String certFile = String.format("%s-cert.pem", enrollmentId);
             return String.join(File.separator, certDir, certFile);

@@ -1,6 +1,6 @@
 package com.cfca.ra.command.internal.reenroll;
 
-import com.cfca.ra.command.config.CsrConfig;
+import java.util.Objects;
 
 /**
  * @author zhangchong
@@ -27,14 +27,11 @@ public class ReenrollmentRequestNet {
      */
     private final String caname;
 
-    private final CsrConfig csrInfo;
-
     private ReenrollmentRequestNet(Builder builder) {
         this.request = builder.request;
         this.profile = builder.profile;
         this.label = builder.label;
         this.caname = builder.caname;
-        this.csrInfo = builder.csrInfo;
     }
 
     String getRequest() {
@@ -53,18 +50,33 @@ public class ReenrollmentRequestNet {
         return caname;
     }
 
-    public CsrConfig getCsrInfo() {
-        return csrInfo;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ReenrollmentRequestNet that = (ReenrollmentRequestNet) o;
+        return Objects.equals(request, that.request) &&
+                Objects.equals(profile, that.profile) &&
+                Objects.equals(label, that.label) &&
+                Objects.equals(caname, that.caname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(request, profile, label, caname);
     }
 
     @Override
     public String toString() {
-        return "EnrollmentRequestNet{" +
+        return "ReenrollmentRequestNet{" +
                 "request='" + request + '\'' +
                 ", profile='" + profile + '\'' +
                 ", label='" + label + '\'' +
                 ", caname='" + caname + '\'' +
-                ", csrInfo=" + csrInfo +
                 '}';
     }
 
@@ -82,18 +94,16 @@ public class ReenrollmentRequestNet {
          * Name of the CA to direct traffic to within server.
          */
         private final String caname;
-        private final CsrConfig csrInfo;
 
         /**
          * Optional:The label used in HSM operations
          */
         private String label = "";
 
-        public Builder(String request, String profile, String caname, CsrConfig csrInfo) {
+        public Builder(String request, String profile, String caname) {
             this.request = request;
             this.profile = profile;
             this.caname = caname;
-            this.csrInfo = csrInfo;
         }
 
         Builder label(String label) {

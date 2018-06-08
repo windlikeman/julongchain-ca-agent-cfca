@@ -1,5 +1,6 @@
 package com.cfca.ra.controller;
 
+import com.cfca.ra.RAServerException;
 import com.cfca.ra.enroll.EnrollmentRequest;
 import com.cfca.ra.enroll.EnrollmentRequestNet;
 import com.cfca.ra.enroll.EnrollmentResponseNet;
@@ -16,7 +17,11 @@ import com.cfca.ra.revoke.RevokeRequest;
 import com.cfca.ra.revoke.RevokeRequestNet;
 import com.cfca.ra.revoke.RevokeResponseNet;
 import com.cfca.ra.service.RAServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,40 +85,25 @@ public class RAController {
     @RequestMapping(value = "/reenroll", method = RequestMethod.POST)
     public EnrollmentResponseNet reenroll(@RequestBody(required = false) ReenrollmentRequestNet data, @RequestHeader("Authorization") String auth) {
         logger.info("/reenroll >>>>>> Runnning : ReenrollmentRequestNet=" + data + ",auth=" + auth);
-        final ReenrollmentRequest reenrollmentRequest = buildReenrollmentRequest(data);
-        EnrollmentResponseNet response = raService.reenroll(reenrollmentRequest, auth);
+        EnrollmentResponseNet response = raService.reenroll(data, auth);
         logger.info("/reenroll <<<<<< Finished");
         return response;
-    }
-
-    private ReenrollmentRequest buildReenrollmentRequest(ReenrollmentRequestNet data) {
-        return new ReenrollmentRequest(data, System.currentTimeMillis());
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public RegistrationResponseNet register(@RequestBody(required = false) RegistrationRequestNet data, @RequestHeader("Authorization") String auth) {
         logger.info("/register >>>>>> Runnning : " + data + " ,auth=" + auth);
-        RegistrationRequest req = buildRegistrationRequest(data);
-        RegistrationResponseNet response = raService.register(req, auth);
+        RegistrationResponseNet response = raService.register(data, auth);
         logger.info("/register <<<<<< Finished");
         return response;
-    }
-
-    private RegistrationRequest buildRegistrationRequest(@RequestBody(required = false) RegistrationRequestNet data) {
-        return new RegistrationRequest(data);
     }
 
     @RequestMapping(value = "/revoke", method = RequestMethod.POST)
     public RevokeResponseNet revoke(@RequestBody(required = false) RevokeRequestNet data, @RequestHeader("Authorization") String auth) {
         logger.info("/revoke >>>>>> Runnning : RevokeRequestNet=" + data + ",auth=" + auth);
-        RevokeRequest req = buildRevokeRequest(data);
-        RevokeResponseNet response = raService.revoke(req, auth);
+        RevokeResponseNet response = raService.revoke(data, auth);
         logger.info("/revoke <<<<<< Finished");
         return response;
-    }
-
-    private RevokeRequest buildRevokeRequest(RevokeRequestNet data) {
-        return new RevokeRequest(data, System.currentTimeMillis());
     }
 
     @RequestMapping(value = "/tcert", method = RequestMethod.POST)

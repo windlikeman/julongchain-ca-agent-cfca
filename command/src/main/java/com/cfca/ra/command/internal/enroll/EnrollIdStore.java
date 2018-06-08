@@ -89,7 +89,7 @@ public enum EnrollIdStore implements IEnrollIdStore {
                 final String homeDir = ClientConfig.INSTANCE.getMspDir();
                 File file = new File(String.join(File.separator, homeDir, "enroll-id.dat"));
 
-                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().create();
+                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().disableHtmlEscaping().setPrettyPrinting().create();
                 final String s = gson.toJson(enrollIdStore);
                 if (logger.isInfoEnabled()) {
                     logger.info("updateEnrollIdFile<<<<<<" + s);

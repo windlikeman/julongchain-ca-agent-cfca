@@ -1,5 +1,7 @@
 package com.cfca.ra.command.internal.gettcert;
 
+import java.util.Objects;
+
 /**
  * @author zhangchong
  * @create 2018/5/24
@@ -7,13 +9,17 @@ package com.cfca.ra.command.internal.gettcert;
  * @CodeReviewer
  * @since
  */
-class Attribute {
+public class Attribute {
 
     private final String name;
     private final String value;
     private final boolean eCert;
 
-    Attribute(String name, String value, boolean eCert) {
+    public Attribute(String name, String value) {
+        this(name,value,false);
+    }
+
+    public Attribute(String name, String value, boolean eCert) {
         this.name = name;
         this.value = value;
         this.eCert = eCert;
@@ -29,5 +35,33 @@ class Attribute {
 
     public boolean iseCert() {
         return eCert;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
+        Attribute attribute = (Attribute) o;
+        return eCert == attribute.eCert &&
+                Objects.equals(name, attribute.name) &&
+                Objects.equals(value, attribute.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value, eCert);
+    }
+
+    @Override
+    public String toString() {
+        return "Attribute{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                ", eCert=" + eCert +
+                '}';
     }
 }

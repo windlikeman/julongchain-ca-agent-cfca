@@ -58,7 +58,7 @@ public class RAServerException extends Exception {
     /**
      * REGISTER 命令失败:没有在证书库中找到该用户的公钥
      */
-    public static final int REASON_CODE_REGISTER_SERVICE_NOT_ENROLL = 0x6004;
+    public static final int REASON_CODE_IDENTITY_VERIFY_TOKEN = 0x6004;
     /**
      * REGISTER 命令失败:LOAD注册用户数据文件失败
      */
@@ -268,11 +268,9 @@ public class RAServerException extends Exception {
      */
     public static final int REASON_CODE_MESSAGE_STORE_LOAD = 0xf001;
 
-
-
     private String message;
 
-    private int reasonCode;
+    private final int reasonCode;
     private Throwable cause;
     private Map<Integer, String> messageCatalog = new HashMap<Integer, String>(10) {
         {
@@ -286,7 +284,7 @@ public class RAServerException extends Exception {
             put(REASON_CODE_REGISTER_SERVICE_ALREADY_REGISTERED, "register service failed to register by already registered");
             put(REASON_CODE_REGISTER_SERVICE_INVALID_TOKEN, "register service failed with invalid token");
             put(REASON_CODE_REGISTER_SERVICE_VERIFY_TOKEN, "register service failed with verify token");
-            put(REASON_CODE_REGISTER_SERVICE_NOT_ENROLL, "register service failed with must enroll first");
+            put(REASON_CODE_IDENTITY_VERIFY_TOKEN, "register service failed with must enroll first");
             put(REASON_CODE_REGISTER_SERVICE_LOAD_REGISTER_STORE, "register service failed to load register store");
             put(REASON_CODE_REGISTER_SERVICE_UPDATE_REGISTER_STORE, "register service failed to update register store");
             put(REASON_CODE_REGISTER_SERVICE_INSERT_USER, "register service failed to insert user into register store");
@@ -347,7 +345,6 @@ public class RAServerException extends Exception {
         }
     };
 
-
     public RAServerException(final int reasonCode) {
         super();
         this.reasonCode = reasonCode;
@@ -357,12 +354,14 @@ public class RAServerException extends Exception {
         super();
         this.reasonCode = REASON_CODE_SERVER_EXCEPTION;
         this.cause = cause;
+        this.message = cause.getMessage();
     }
 
     public RAServerException(final int reason, final Throwable cause) {
         super();
         this.reasonCode = reason;
         this.cause = cause;
+        this.message = cause.getMessage();
     }
 
     public RAServerException(final int reason, final String message, final Throwable cause) {
@@ -391,8 +390,8 @@ public class RAServerException extends Exception {
 
     @Override
     public String getMessage() {
-        if (!StringUtils.isBlank(message)) {
-            return message;
+        if (!StringUtils.isBlank(this.message)) {
+            return this.message;
         }
         return messageCatalog.getOrDefault(reasonCode, "Unknown error message");
     }

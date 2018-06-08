@@ -39,7 +39,7 @@
 
     </appender>
 
-    <root level="debug">
+    <root level="INFO">
         <appender-ref ref="consoleAppender" />
         <appender-ref ref="sizeFileRollingBackup" />
     </root>

@@ -157,7 +157,6 @@ public abstract class BaseClientCommand implements IClientCommand {
                 throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "failed to check config file ", e);
             }
         }
-        logger.info("initializeConfig<<<<<<Initializing client with config: {}", clientCfg);
         String mspDir = clientCfg.getMspDir();
         if (MyStringUtils.isEmpty(mspDir) || ClientConfig.DEFAULT_CONFIG_MSPDIR_VAL.equalsIgnoreCase(mspDir)) {
             clientCfg.setMspDir("msp");
@@ -268,7 +267,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     }
 
     private String requireCAChainFileName(ClientConfig clientCfg) {
-        logger.info("requireCAChainFileName>>>>>>Running: clientCfg=" + clientCfg);
+//        logger.info("requireCAChainFileName>>>>>>Running: clientCfg=" + clientCfg);
         String fileName = host + "-" + port;
         final String caName = clientCfg.getCaName();
         if (!MyStringUtils.isEmpty(caName)) {

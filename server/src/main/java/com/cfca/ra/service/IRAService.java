@@ -7,10 +7,10 @@ import com.cfca.ra.getcainfo.GetCAInfoRequestNet;
 import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
 import com.cfca.ra.gettcert.GettCertRequestNet;
 import com.cfca.ra.gettcert.GettCertResponseNet;
-import com.cfca.ra.reenroll.ReenrollmentRequest;
-import com.cfca.ra.register.RegistrationRequest;
+import com.cfca.ra.reenroll.ReenrollmentRequestNet;
+import com.cfca.ra.register.RegistrationRequestNet;
 import com.cfca.ra.register.RegistrationResponseNet;
-import com.cfca.ra.revoke.RevokeRequest;
+import com.cfca.ra.revoke.RevokeRequestNet;
 import com.cfca.ra.revoke.RevokeResponseNet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public interface IRAService {
      * @param auth
      * @return
      */
-    EnrollmentResponseNet reenroll(ReenrollmentRequest data, String auth);
+    EnrollmentResponseNet reenroll(ReenrollmentRequestNet data, String auth);
 
 
     /**
@@ -50,7 +50,7 @@ public interface IRAService {
      * @param auth
      * @return RegistrationResponseNet
      */
-    RegistrationResponseNet register(RegistrationRequest data, String auth) throws RAServerException;
+    RegistrationResponseNet register(RegistrationRequestNet data, String auth) throws RAServerException;
 
     /**
      * 吊销证书接口
@@ -58,7 +58,7 @@ public interface IRAService {
      * @param data
      * @return RevokeResponseNet
      */
-    RevokeResponseNet revoke(RevokeRequest data, String auth);
+    RevokeResponseNet revoke(RevokeRequestNet data, String auth);
 
     /**
      * 批量查询证书接口

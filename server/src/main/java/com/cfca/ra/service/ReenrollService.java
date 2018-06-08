@@ -2,6 +2,7 @@ package com.cfca.ra.service;
 
 import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
+import com.cfca.ra.Identity;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
 import com.cfca.ra.beans.ServerResponseError;
@@ -12,8 +13,12 @@ import com.cfca.ra.reenroll.ReenrollmentRequest;
 import com.cfca.ra.reenroll.ReenrollmentRequestNet;
 import com.cfca.ra.repository.IMessageStore;
 import com.cfca.ra.repository.MessageStore;
+import com.cfca.ra.utils.AuthUtils;
 import com.cfca.ra.utils.CertUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,52 +53,22 @@ public class ReenrollService {
         MessageStore.REENROLL_DEFAULT.setServerHomeDir(server.getServerHomeDir());
     }
 
-    private void verifyTokenByEnrollmentId(String caName, String enrollmentId, String auth) throws RAServerException {
-        PublicKey publicKey = server.getKey(caName, enrollmentId);
-        if (publicKey == null) {
-            throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_NOT_ENROLL, "not found the pubkey file, this user may not enroll first. Please execute enroll command first.");
-        }
-
-        verify(auth, publicKey);
+    private ReenrollmentRequest buildReenrollmentRequest(ReenrollmentRequestNet data) {
+        return new ReenrollmentRequest(data, System.currentTimeMillis());
     }
 
-    private void verify(String auth, PublicKey publicKey) throws RAServerException {
+    public EnrollmentResponseNet reenroll(ReenrollmentRequestNet data, String auth) {
         try {
-            final String[] split = auth.split("\\.");
-            if (split.length != 2) {
-                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_INVALID_TOKEN, "expected:<b64EnrollmentId.b64sig>,but invalid auth:" + auth);
-            }
-            final String b64EnrollmentId = split[0];
-            final String b64Sig = split[1];
-            final byte[] enrollmentId = Base64.decode(b64EnrollmentId);
-            if (logger.isInfoEnabled()) {
-                logger.info("verify>>>>>>publicKey    : " + publicKey);
-                logger.info("verify>>>>>>enrollmentId : " + new String(enrollmentId));
-            }
-            Signature signature = Signature.getInstance("SM3withSM2", "BC");
-            signature.initVerify(publicKey);
-            signature.update(enrollmentId);
-
-            final byte[] sign = Base64.decode(b64Sig);
-            final boolean verify = signature.verify(sign);
-            if (!verify) {
-                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_VERIFY_TOKEN);
-            }
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_VERIFY_TOKEN, e);
-        }
-    }
-
-    public EnrollmentResponseNet reenroll(ReenrollmentRequest request, String auth) {
-        try {
-            final ReenrollmentRequestNet data = request.getReenrollmentRequestNet();
+            final ReenrollmentRequest request = buildReenrollmentRequest(data);
             final int messageId = data.hashCode();
             if (messageStore.containsMessage(messageId)) {
                 throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
             }
+
+            final byte[] body = AuthUtils.marshal(data);
             final String caname = data.getCaname();
-            String enrollmentId = getEnrollmentIdFromAuth(auth);
-            verifyTokenByEnrollmentId(caname, enrollmentId, auth);
+            final Identity i = new Identity(server, caname, auth);
+            i.verify(body);
 
             final CertServiceResponseVO reenrollResponseFromRA = raClient.reenroll(data);
 
@@ -107,16 +82,13 @@ public class ReenrollService {
                     logger.info(reenrollResponseFromRA.toString());
                     String b64cert = reenrollResponseFromRA.getSignatureCert();
                     response = new EnrollmentResponseNet(true, b64cert, null, null);
-
-                    enrollmentId = CertUtils.getSubjectName(b64cert);
-
+                    String enrollmentId = CertUtils.getSubjectName(b64cert);
                     server.fillCAInfo(caname, response, enrollmentId);
-                    //FIXME:enrollmentID
                     server.storeCert(caname, enrollmentId, b64cert);
                     break;
                 default:
                     List<ServerResponseError> errors = new ArrayList<>();
-                    ServerResponseError error = new ServerResponseError(1002, resultMessage);
+                    ServerResponseError error = new ServerResponseError(ServerResponseError.RACLIENT_ERROR_CODE, resultMessage);
                     errors.add(error);
                     response = new EnrollmentResponseNet(false, null, errors, null);
                     break;

@@ -154,9 +154,9 @@ public final class RegisterCommand extends BaseClientCommand {
         try {
             final String homeDir = clientCfg.getMspDir();
             File file = new File(String.join(File.separator, homeDir, registerFile));
-            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
             final String s = gson.toJson(registered);
-            logger.info("RegisterCommand<<<<<<updateRegisterFile file content:\n" + s);
+            logger.info("RegisterCommand<<<<<<updateRegisterFile file content:{}", s);
             FileUtils.writeStringToFile(file, s);
         } catch (IOException e) {
             throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_UPDATE_REGISTER_FILE, e);

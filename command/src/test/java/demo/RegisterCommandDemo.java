@@ -20,7 +20,7 @@ public class RegisterCommandDemo {
         final ArrayList<UserAttrs> v = new ArrayList<>();
         v.add(new UserAttrs("hf.Revoker", "true"));
         v.add(new UserAttrs("hf.Registrar.Roles", "client,user,peer,validator,auditor"));
-        builder.name("test5").caName("CFCA").affiliation("org.department.c").attributes(v).maxEnrollments(2).secret("1234").type("user");
+        builder.name("test9").caName("CFCA").affiliation("org.department.c").attributes(v).maxEnrollments(2).secret("1234").type("user");
         final RegistrationRequest registrationRequest = builder.build();
         final RegisterCommand registerCommand = new RegisterCommand();
         String[] args = new String[]{"register", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(registrationRequest)};
