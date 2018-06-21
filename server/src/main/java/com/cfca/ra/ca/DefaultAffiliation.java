@@ -4,7 +4,7 @@ package com.cfca.ra.ca;
  * @author zhangchong
  * @create 2018/5/22
  * @Description Affiliation 接口的默认实现
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 class DefaultAffiliation implements  Affiliation{

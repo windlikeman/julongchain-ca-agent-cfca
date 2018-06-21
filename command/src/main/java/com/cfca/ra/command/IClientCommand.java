@@ -1,6 +1,5 @@
 package com.cfca.ra.command;
 
-
 import com.google.gson.JsonObject;
 
 /**
@@ -13,15 +12,19 @@ import com.google.gson.JsonObject;
 public interface IClientCommand {
     /**
      * 执行命令接口
-     * @throws CommandException 命令执行遇到错误则抛出异常
+     * 
+     * @throws CommandException
+     *             命令执行遇到错误则抛出异常
      */
     JsonObject execute() throws CommandException;
 
     /**
      * 准备命令接口
+     * 
      * @param args
-     * @throws CommandException 命令执行遇到错误则抛出异常
+     * @throws CommandException
+     *             命令执行遇到错误则抛出异常
      */
-    void prepare(String[] args)throws CommandException;
+    void prepare(String[] args) throws CommandException;
 
 }

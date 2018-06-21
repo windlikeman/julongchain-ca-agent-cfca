@@ -10,7 +10,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/11
  * @Description enroll接口网络响应请求参数,用于调用服务器Restful接口
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class EnrollmentResponseNet {

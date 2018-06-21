@@ -63,11 +63,6 @@ public class RevokeResponseNet {
 
     @Override
     public String toString() {
-        return "RevokeResponseNet{" +
-                "success=" + success +
-                ", result='" + result + '\'' +
-                ", errors=" + errors +
-                ", messages=" + messages +
-                '}';
+        return "RevokeResponseNet{" + "success=" + success + ", result='" + result + '\'' + ", errors=" + errors + ", messages=" + messages + '}';
     }
 }

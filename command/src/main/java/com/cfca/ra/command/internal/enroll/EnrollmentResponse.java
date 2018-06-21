@@ -14,7 +14,7 @@ public class EnrollmentResponse {
     private final Identity identity;
     private final ServerInfo serverInfo;
 
-    public EnrollmentResponse(Identity identity, ServerInfo serverInfo){
+    public EnrollmentResponse(Identity identity, ServerInfo serverInfo) {
         this.identity = identity;
         this.serverInfo = serverInfo;
     }
@@ -29,9 +29,6 @@ public class EnrollmentResponse {
 
     @Override
     public String toString() {
-        return "EnrollmentResponse{" +
-                "identity=" + identity +
-                ", serverInfo=" + serverInfo +
-                '}';
+        return "EnrollmentResponse{" + "identity=" + identity + ", serverInfo=" + serverInfo + '}';
     }
 }

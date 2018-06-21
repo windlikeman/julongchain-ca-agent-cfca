@@ -22,19 +22,16 @@ public class CsrConfig {
     private String serialnumber;
 
     /**
-     * 证书的一组name. 至少包含下列一个的值:
-     *   "C", "L", "O", or "ST" 他们代表:
-     *       "C": country
-     *       "L": locality or municipality (such as city or town name)
-     *       "O": organization
-     *       "OU": organizational unit, such as the department responsible for owning the key;
-     *       it can also be used for a "Doing Business As" (DBS) name
-     *       "ST": the state or province
+     * 证书的一组name. 至少包含下列一个的值: "C", "L", "O", or "ST" 他们代表: "C": country "L":
+     * locality or municipality (such as city or town name) "O": organization
+     * "OU": organizational unit, such as the department responsible for owning
+     * the key; it can also be used for a "Doing Business As" (DBS) name "ST":
+     * the state or province
      *
-     *  请注意,ECert的"OU"或组织单位总是根据身份类型和隶属关系的值进行设置
-     *  OU的计算方式为 OU = <type>, OU = <affiliationRoot>,...,OU = <affiliationLeaf>
-     *  例如,具有"org1.dept2.team3"属性的"client"类型的标识将具有以下组织单位:
-     *  OU = client,OU = org1,OU = dept2,OU = team3
+     * 请注意,ECert的"OU"或组织单位总是根据身份类型和隶属关系的值进行设置 OU的计算方式为 OU = <type>, OU =
+     * <affiliationRoot>,...,OU = <affiliationLeaf>
+     * 例如,具有"org1.dept2.team3"属性的"client"类型的标识将具有以下组织单位: OU = client,OU =
+     * org1,OU = dept2,OU = team3
      */
     private String names;
 
@@ -103,14 +100,8 @@ public class CsrConfig {
 
     @Override
     public String toString() {
-        return "CsrConfig{" +
-                "cn='" + cn + '\'' +
-                ", serialnumber='" + serialnumber + '\'' +
-                ", names=" + names +
-                ", hosts=" + hosts +
-                ", key=" + key +
-                ", ca=" + ca +
-                '}';
+        return "CsrConfig{" + "cn='" + cn + '\'' + ", serialnumber='" + serialnumber + '\'' + ", names=" + names + ", hosts=" + hosts + ", key=" + key
+                + ", ca=" + ca + '}';
     }
 
     @Override
@@ -122,12 +113,8 @@ public class CsrConfig {
             return false;
         }
         CsrConfig csrConfig = (CsrConfig) o;
-        return Objects.equals(cn, csrConfig.cn) &&
-                Objects.equals(serialnumber, csrConfig.serialnumber) &&
-                Objects.equals(names, csrConfig.names) &&
-                Objects.equals(hosts, csrConfig.hosts) &&
-                Objects.equals(key, csrConfig.key) &&
-                Objects.equals(ca, csrConfig.ca);
+        return Objects.equals(cn, csrConfig.cn) && Objects.equals(serialnumber, csrConfig.serialnumber) && Objects.equals(names, csrConfig.names)
+                && Objects.equals(hosts, csrConfig.hosts) && Objects.equals(key, csrConfig.key) && Objects.equals(ca, csrConfig.ca);
     }
 
     @Override

@@ -27,8 +27,6 @@ public class GettCertResponse {
 
     @Override
     public String toString() {
-        return "GettCertResponse{" +
-                "certificates=" + tCerts +
-                '}';
+        return "GettCertResponse{" + "certificates=" + tCerts + '}';
     }
 }

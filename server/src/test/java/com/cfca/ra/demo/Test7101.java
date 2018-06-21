@@ -12,10 +12,10 @@ import cfca.ra.toolkit.exception.RATKException;
 public class Test7101 {
     public static void main(String[] args) {
         // String locale = "zh_CN";
-		//String caName = "OCA1";
+        // String caName = "OCA1";
         String certType = "1";
         String customerType = "2";
-         String userName = "银企直联用户";
+        String userName = "银企直联用户";
         // String userNameInDn = "testName";
         // String userIdent = "Z1234567890";
         // String identType = "Z";
@@ -25,7 +25,7 @@ public class Test7101 {
         // String dn =
         // "cn=041@7102030@1000000747$000001_20130106085359@00000001,ou=Enterprises,ou=ZJRCU,o=CFCA TEST CA,c=cn";
         // String serialNo = "2000631640";
-         String certStatus = "3;6";//多个状态件用;分隔
+        String certStatus = "3;6";// 多个状态件用;分隔
         // String branchCode = "678";
         // String email = "test@test.test";
         // String startTimeFrom = "20130101000000";
@@ -40,10 +40,10 @@ public class Test7101 {
             QueryRequestVO queryRequestVO = new QueryRequestVO();
             queryRequestVO.setTxCode("7101");
             // queryRequestVO.setLocale(locale);
-			//queryRequestVO.setCaName(caName);
+            // queryRequestVO.setCaName(caName);
             queryRequestVO.setCertType(certType);
             queryRequestVO.setCustomerType(customerType);
-             queryRequestVO.setUserName(userName);
+            queryRequestVO.setUserName(userName);
             // queryRequestVO.setUserNameInDn(userNameInDn);
             // queryRequestVO.setUserIdent(userIdent);
             // queryRequestVO.setIdentType(identType);
@@ -52,7 +52,7 @@ public class Test7101 {
             // queryRequestVO.setKeyLength(keyLength);
             // queryRequestVO.setDn(dn);
             // queryRequestVO.setSerialNo(serialNo);
-             queryRequestVO.setCertStatus(certStatus);
+            queryRequestVO.setCertStatus(certStatus);
             // queryRequestVO.setBranchCode(branchCode);
             // queryRequestVO.setEmail(email);
             // queryRequestVO.setStartTimeFrom(startTimeFrom);
@@ -71,7 +71,7 @@ public class Test7101 {
 
                 // 字段值不存在时为null
                 QueryResponseVO queryResponseVO = queryResponseVOList.get(0);
-				System.out.println(queryResponseVO.getCaName());
+                System.out.println(queryResponseVO.getCaName());
                 System.out.println(queryResponseVO.getCertType());
                 System.out.println(queryResponseVO.getCustomerType());
                 System.out.println(queryResponseVO.getUserName());

@@ -10,7 +10,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/11
  * @Description GettCert命令服务器返回给客户端的对象
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GettCertResponseNet {

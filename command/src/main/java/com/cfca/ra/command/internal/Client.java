@@ -2,14 +2,37 @@ package com.cfca.ra.command.internal;
 
 import com.cfca.ra.command.CommandException;
 import com.cfca.ra.command.config.CsrConfig;
-import com.cfca.ra.command.internal.enroll.*;
-import com.cfca.ra.command.internal.getcainfo.*;
-import com.cfca.ra.command.internal.gettcert.*;
+import com.cfca.ra.command.internal.enroll.EnrollIdStore;
+import com.cfca.ra.command.internal.enroll.EnrollmentComms;
+import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
+import com.cfca.ra.command.internal.enroll.EnrollmentRequestNet;
+import com.cfca.ra.command.internal.enroll.EnrollmentResponse;
+import com.cfca.ra.command.internal.enroll.EnrollmentResponseNet;
+import com.cfca.ra.command.internal.enroll.IEnrollIdStore;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoComms;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoRequest;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoRequestNet;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoResponseNet;
+import com.cfca.ra.command.internal.getcainfo.GetCAInfoResponseResult;
+import com.cfca.ra.command.internal.gettcert.GettCertComms;
+import com.cfca.ra.command.internal.gettcert.GettCertRequest;
+import com.cfca.ra.command.internal.gettcert.GettCertRequestNet;
+import com.cfca.ra.command.internal.gettcert.GettCertResponse;
+import com.cfca.ra.command.internal.gettcert.GettcertResponseNet;
+import com.cfca.ra.command.internal.gettcert.TCert;
 import com.cfca.ra.command.internal.reenroll.ReenrollmentComms;
 import com.cfca.ra.command.internal.reenroll.ReenrollmentRequest;
 import com.cfca.ra.command.internal.reenroll.ReenrollmentRequestNet;
-import com.cfca.ra.command.internal.register.*;
-import com.cfca.ra.command.internal.revoke.*;
+import com.cfca.ra.command.internal.register.RegisterComms;
+import com.cfca.ra.command.internal.register.RegistrationRequest;
+import com.cfca.ra.command.internal.register.RegistrationRequestNet;
+import com.cfca.ra.command.internal.register.RegistrationResponse;
+import com.cfca.ra.command.internal.register.RegistrationResponseNet;
+import com.cfca.ra.command.internal.revoke.RevokeComms;
+import com.cfca.ra.command.internal.revoke.RevokeRequest;
+import com.cfca.ra.command.internal.revoke.RevokeRequestNet;
+import com.cfca.ra.command.internal.revoke.RevokeResponse;
+import com.cfca.ra.command.internal.revoke.RevokeResponseNet;
 import com.cfca.ra.command.utils.MyFileUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.cfca.ra.command.utils.PemUtils;
@@ -62,7 +85,6 @@ public class Client {
 
     private final GettCertComms gettCertComms;
 
-
     private boolean initialized;
 
     private final IEnrollIdStore enrollIdStore;
@@ -100,15 +122,12 @@ public class Client {
         initializeIfNeeded(enrollmentRequest.getUsername());
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null || csrConfig.getKey() == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION, "enrollmentRequest missing csrConfig or missing key info");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_ENROLL_CSRCONFIG_EXCEPTION,
+                    "enrollmentRequest missing csrConfig or missing key info");
         }
         final String password = enrollmentRequest.getPassword();
         final String username = enrollmentRequest.getUsername();
         String basicAuth = buildBasicAuth(username, password);
-//        final String algo = csrConfig.getKey().getAlgo();
-//        final String names = csrConfig.getNames();
-//        final CsrResult result = genCSR(algo, names);
-//        storeMyPrivateKey(result);
         EnrollmentRequestNet enrollmentRequestNet = buildEnrollmentRequestNet(enrollmentRequest, enrollmentRequest.getRequest());
 
         final EnrollmentResponseNet responseNet = enrollmentComms.request(enrollmentRequestNet, basicAuth);
@@ -234,7 +253,8 @@ public class Client {
             }
             return serverInfo.build();
         } catch (UnsupportedEncodingException e) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_LOCAL_SERVERINFO_EXCEPTION, "caChain getBytes unsupport encoding :UTF-8", e);
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_LOCAL_SERVERINFO_EXCEPTION,
+                    "caChain getBytes unsupport encoding :UTF-8", e);
         }
     }
 
@@ -250,10 +270,11 @@ public class Client {
     private Identity buildIdentity(String username, String certB64Encoded, PrivateKey key) throws CommandException {
         try {
             if (MyStringUtils.isEmpty(certB64Encoded)) {
-                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED, "failed to build identity by empty certB64Encoded");
+                throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_BUILD_IDENTITY_FAILED,
+                        "failed to build identity by empty certB64Encoded");
             }
 
-            //这里certB64Encoded只是证书公钥
+            // 这里certB64Encoded只是证书公钥
             final byte[] certDecode = Base64.decode(certB64Encoded);
             return buildIdentity(username, certDecode, key);
         } catch (Exception e) {
@@ -265,7 +286,8 @@ public class Client {
     private EnrollmentRequestNet buildEnrollmentRequestNet(EnrollmentRequest enrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = enrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "enrollmentRequest missing csrConfig ");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED,
+                    "enrollmentRequest missing csrConfig ");
         }
 
         final String username = enrollmentRequest.getUsername();
@@ -288,21 +310,25 @@ public class Client {
     private ReenrollmentRequestNet buildReenrollmentRequestNet(ReenrollmentRequest reenrollmentRequest, String p10) throws CommandException {
         final CsrConfig csrConfig = reenrollmentRequest.getCsrConfig();
         if (csrConfig == null) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing csrConfig ");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED,
+                    "reenrollmentRequest missing csrConfig ");
         }
 
         final String username = reenrollmentRequest.getUsername();
         if (MyStringUtils.isEmpty(username)) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing username");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED,
+                    "reenrollmentRequest missing username");
         }
 
         final String profile = reenrollmentRequest.getProfile();
         if (MyStringUtils.isEmpty(profile)) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing profile");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED,
+                    "reenrollmentRequest missing profile");
         }
         final String caName = reenrollmentRequest.getCaName();
         if (MyStringUtils.isEmpty(caName)) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED, "reenrollmentRequest missing CA Name");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_REENROLLMENT_BUILD_NET_REQUEST_FAILED,
+                    "reenrollmentRequest missing CA Name");
         }
         return new ReenrollmentRequestNet.Builder(p10, profile, caName).build();
     }
@@ -335,7 +361,6 @@ public class Client {
 
             Certificate c = PemUtils.loadCert(cert);
             clientCfg.setEnrollmentId(c.getSubject().toString());
-
 
             logger.info("storeMyIdentity  <<<<<< enrollmentId is {}", clientCfg.getEnrollmentId());
         } catch (IOException e) {
@@ -412,7 +437,8 @@ public class Client {
         boolean keyFileExists = MyFileUtils.fileExists(keyFile);
         boolean certFileExists = MyFileUtils.fileExists(certFile);
         if (!keyFileExists || !certFileExists) {
-            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION, "Enrollment information does not exist. Please execute enroll command first.");
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_CHECK_ENROLLMENT_EXCEPTION,
+                    "Enrollment information does not exist. Please execute enroll command first.");
         }
     }
 
@@ -444,9 +470,12 @@ public class Client {
     }
 
     /**
-     * @param name       用户名
-     * @param cert       通过b64解码得到的证书的原始字节
-     * @param privateKey 私钥
+     * @param name
+     *            用户名
+     * @param cert
+     *            通过b64解码得到的证书的原始字节
+     * @param key
+     *            私钥
      * @return 用户标识
      */
     private Identity buildIdentity(String name, byte[] cert, PrivateKey privateKey) throws CommandException {
@@ -531,6 +560,9 @@ public class Client {
         return new RegistrationRequestNet(registrationRequest);
     }
 
+    public String getKeyFile() {
+        return keyFile;
+    }
 
     @Override
     public String toString() {
@@ -539,6 +571,4 @@ public class Client {
                 ", homedir='" + homedir + '\'' +
                 '}';
     }
-
-
 }

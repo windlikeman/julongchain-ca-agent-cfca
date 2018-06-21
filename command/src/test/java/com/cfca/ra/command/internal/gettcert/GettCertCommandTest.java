@@ -9,8 +9,16 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author zhangchong
+ * @create 2018/5/11
+ * @Description 测试gettcert命令 暂不支持
+ * @CodeReviewer helonglong
+ * @since v3.0.0
+ * @deprecated
+ */
 public class GettCertCommandTest {
-    private final static String MSPDIR = "D:\\R15\\P1552\\dev\\blockchain\\command\\ca-client\\config\\msp";
+
     @Before
     public void setUp() throws Exception {
     }

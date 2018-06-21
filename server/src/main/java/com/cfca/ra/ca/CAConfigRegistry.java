@@ -10,7 +10,7 @@ import java.util.Objects;
  * CAConfigRegistry 控制 fabric-ca-server 如何做两件事:
  *  1) 验证包含用户名和密码的注册请求(也被称为enrollment ID 和 secret).
  *  2) 一旦通过身份验证,就会检索 ca-server 可选择放入 TCerts 的身份属性名称和值,它将在区块链上进行交易. 这些属性对链码中的访问控制决策很有用.
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class CAConfigRegistry {

@@ -30,8 +30,8 @@ public class RegistrationRequest {
     private final int maxEnrollments;
 
     /**
-     * 在 response 中返回 identity 的从属关系.
-     * 例如,"org1.department1"的隶属关系将该身份与 "org1" 中的 "department1" 相关联
+     * 在 response 中返回 identity 的从属关系. 例如,"org1.department1"的隶属关系将该身份与 "org1" 中的
+     * "department1" 相关联
      */
     private final String affiliation;
 
@@ -85,15 +85,9 @@ public class RegistrationRequest {
 
     @Override
     public String toString() {
-        return "RegistrationRequest{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", secret='" + secret + '\'' +
-                ", maxEnrollments=" + maxEnrollments +
-                ", affiliation='" + affiliation + '\'' +
-                ", attributes=" + Arrays.toString(attributes.toArray(new UserAttrs[attributes.size()])) + '\'' +
-                ", caName='" + caName + '\'' +
-                '}';
+        return "RegistrationRequest{" + "name='" + name + '\'' + ", type='" + type + '\'' + ", secret='" + secret + '\'' + ", maxEnrollments=" + maxEnrollments
+                + ", affiliation='" + affiliation + '\'' + ", attributes=" + Arrays.toString(attributes.toArray(new UserAttrs[attributes.size()])) + '\''
+                + ", caName='" + caName + '\'' + '}';
     }
 
     public static class Builder {

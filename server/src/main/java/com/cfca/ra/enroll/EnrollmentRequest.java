@@ -8,7 +8,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/11
  * @Description enroll接口内部使用对象,对 EnrollmentRequestNet 进行封装
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class EnrollmentRequest extends BaseRequest {

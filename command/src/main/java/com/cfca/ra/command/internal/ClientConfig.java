@@ -4,10 +4,8 @@ import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
 import com.cfca.ra.command.internal.getcainfo.GetCAInfoRequest;
 import com.cfca.ra.command.internal.gettcert.GettCertRequest;
-import com.cfca.ra.command.internal.reenroll.ReenrollmentRequest;
 import com.cfca.ra.command.internal.register.RegistrationRequest;
 import com.cfca.ra.command.internal.revoke.RevokeRequest;
-
 
 /**
  * @author zhangchong
@@ -172,19 +170,9 @@ public enum ClientConfig {
 
     @Override
     public String toString() {
-        return "ClientConfig{" +
-                "url='" + url + '\'' +
-                ", mspDir='" + mspDir + '\'' +
-                ", caName='" + caName + '\'' +
-                ", csrConfig=" + csrConfig +
-                ", admin='" + admin + '\'' +
-                ", adminpwd='" + adminpwd + '\'' +
-                ", enrollmentRequest=" + enrollmentRequest +
-                ", registrationRequest=" + registrationRequest +
-                ", getCAInfoRequest=" + getCAInfoRequest +
-                ", revokeRequest=" + revokeRequest +
-                ", enrollmentId=" + enrollmentId +
-                '}';
+        return "ClientConfig{" + "url='" + url + '\'' + ", mspDir='" + mspDir + '\'' + ", caName='" + caName + '\'' + ", csrConfig=" + csrConfig + ", admin='"
+                + admin + '\'' + ", adminpwd='" + adminpwd + '\'' + ", enrollmentRequest=" + enrollmentRequest + ", registrationRequest=" + registrationRequest
+                + ", getCAInfoRequest=" + getCAInfoRequest + ", revokeRequest=" + revokeRequest + ", enrollmentId=" + enrollmentId + '}';
     }
 
 }

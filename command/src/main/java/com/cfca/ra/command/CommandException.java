@@ -334,7 +334,6 @@ public class CommandException extends Exception {
         }
     };
 
-
     public CommandException(int reasonCode) {
         super();
         this.reasonCode = reasonCode;
@@ -365,7 +364,6 @@ public class CommandException extends Exception {
         this.message = message;
     }
 
-
     public int getReasonCode() {
         return reasonCode;
     }
@@ -374,7 +372,6 @@ public class CommandException extends Exception {
     public Throwable getCause() {
         return cause;
     }
-
 
     @Override
     public String getMessage() {

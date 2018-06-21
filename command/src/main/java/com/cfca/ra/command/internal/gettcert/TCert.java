@@ -27,9 +27,6 @@ public class TCert {
 
     @Override
     public String toString() {
-        return "TCert{" +
-                "cert='" + cert + '\'' +
-                ", keys=" + keys +
-                '}';
+        return "TCert{" + "cert='" + cert + '\'' + ", keys=" + keys + '}';
     }
 }

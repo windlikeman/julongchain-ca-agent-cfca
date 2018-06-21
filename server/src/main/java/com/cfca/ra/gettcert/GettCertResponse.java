@@ -6,7 +6,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/22
  * @Description 处理 GettCert 命令,供服务器内部使用
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GettCertResponse {

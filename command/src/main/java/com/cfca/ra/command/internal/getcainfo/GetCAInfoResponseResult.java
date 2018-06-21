@@ -14,7 +14,8 @@ public class GetCAInfoResponseResult {
     private final String caname;
 
     /**
-     * Base 64 encoded PEM-encoded certificate chain of the server's signing certificate.
+     * Base 64 encoded PEM-encoded certificate chain of the server's signing
+     * certificate.
      */
     private final String cachain;
 
@@ -33,9 +34,6 @@ public class GetCAInfoResponseResult {
 
     @Override
     public String toString() {
-        return "GetCAInfoResponseResult{" +
-                "caname='" + caname + '\'' +
-                ", cachain='" + cachain + '\'' +
-                '}';
+        return "GetCAInfoResponseResult{" + "caname='" + caname + '\'' + ", cachain='" + cachain + '\'' + '}';
     }
 }

@@ -1,6 +1,12 @@
 package com.cfca.ra.api;
 
-import com.cfca.ra.command.internal.*;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.enroll.EnrollCommand;
 import com.cfca.ra.command.internal.getcainfo.GetCAInfoCommand;
 import com.cfca.ra.command.internal.gettcert.GettCertCommand;
@@ -50,7 +56,6 @@ public class Client {
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_REVOKE, revokeCommand);
         commandHashMap.put(BaseClientCommand.COMMAND_NAME_GETTCERT, gettCertCommand);
     }
-
 
     private int runMain(String[] args) {
         logger.info("runMain>>>>>>Running:" + Arrays.toString(args));

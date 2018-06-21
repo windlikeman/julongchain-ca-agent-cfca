@@ -32,68 +32,54 @@ public class OkHttpUtils {
 
     public static OkHttpClient getUnsafeOkHttpsClient() {
         try {
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                @Override
-                public void log(String message) {
-                    //打印retrofit日志
-                    logger.info("HttpLoggingInterceptor<<<<<<retrofitBack = " + message);
-                }
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message -> {
+                //打印retrofit日志
+                logger.info("OkHttpUtils@HttpLoggingInterceptor<<<<<<retrofitBack:\n{}", message);
             });
 
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-            final Interceptor headerInterceptor = new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request()
-                            .newBuilder()
-                            .addHeader("Content-Type", "application/json;charset=utf-8")
-                            .addHeader("Accept", "application/json")
-                            .addHeader("ca-protocol-version", "0.0.1")
-                            .build();
-                    return chain.proceed(request);
-                }
+            final Interceptor headerInterceptor = chain -> {
+                Request request = chain.request()
+                        .newBuilder()
+                        .addHeader("Content-Type", "application/json;charset=utf-8")
+                        .addHeader("Accept", "application/json")
+                        .addHeader("ca-protocol-version", "0.0.1")
+                        .build();
+                return chain.proceed(request);
             };
 
             // Create a trust manager that does not validate certificate chains
             final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
                 @Override
-                public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] chain,
-                        String authType) throws CertificateException {
+                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                 }
 
                 @Override
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] chain,
-                        String authType) throws CertificateException {
+                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
                 }
 
                 @Override
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return new java.security.cert.X509Certificate[0];
                 }
-            }};
+            } };
 
             // Install the all-trusting trust manager
             final SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts,
-                    new java.security.SecureRandom());
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             // Create an ssl socket factory with our all-trusting manager
-            final SSLSocketFactory sslSocketFactory = sslContext
-                    .getSocketFactory();
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient okHttpClient = new OkHttpClient();
 
-            okHttpClient = okHttpClient.newBuilder()
-                    .sslSocketFactory(sslSocketFactory)
+            okHttpClient = okHttpClient.newBuilder().sslSocketFactory(sslSocketFactory)
                     .hostnameVerifier(ALLOW_ALL_HOSTNAME_VERIFIER)
                     .addInterceptor(loggingInterceptor)
                     .addInterceptor(headerInterceptor)
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .readTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
-                    .build();
+                    .writeTimeout(5, TimeUnit.SECONDS).build();
 
             return okHttpClient;
         } catch (Exception e) {

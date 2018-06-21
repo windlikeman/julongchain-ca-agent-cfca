@@ -7,7 +7,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/16
  * @Description 用于标识 CA 中注册信息
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class CAConfigIdentity {

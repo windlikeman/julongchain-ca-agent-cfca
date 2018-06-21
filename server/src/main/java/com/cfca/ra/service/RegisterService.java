@@ -3,26 +3,19 @@ package com.cfca.ra.service;
 import com.cfca.ra.Identity;
 import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import com.cfca.ra.beans.*;
+import com.cfca.ra.beans.ServerResponseError;
 import com.cfca.ra.ca.Attribute;
 import com.cfca.ra.ca.CA;
 import com.cfca.ra.ca.IUserRegistry;
 import com.cfca.ra.register.*;
-import com.cfca.ra.repository.IMessageStore;
-import com.cfca.ra.repository.MessageStore;
 import com.cfca.ra.utils.AuthUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.security.PublicKey;
-import java.security.Signature;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +23,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/18
  * @Description 注册服务
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 @Service
@@ -83,7 +76,6 @@ public class RegisterService {
             return name;
         }
     }
-
 
     private RegistrationRequest buildRegistrationRequest(RegistrationRequestNet data) {
         return new RegistrationRequest(data);
@@ -143,7 +135,6 @@ public class RegisterService {
     private void checkIdRegistered(String caname, String id) throws RAServerException {
         server.checkIdRegistered(caname, id);
     }
-
 
     private RegistrationResponseNet buildRegisterErrorResponse(RAServerException e) {
         List<ServerResponseError> errors = new ArrayList<>();

@@ -41,7 +41,8 @@ public class TestConfig {
             client = new RAClient(url, connectTimeout, readTimeout);
             client.initSSL(keyStorePath, keyStorePassword, trustStorePath, trustStorePassword);
             // 如需指定ssl协议、算法、证书库类型，使用如下方式
-            // client.initSSL(keyStorePath, keyStorePassword, trustStorePath, trustStorePassword, "SSL", "IbmX509", "IbmX509", "JKS", "JKS");
+            // client.initSSL(keyStorePath, keyStorePassword, trustStorePath,
+            // trustStorePassword, "SSL", "IbmX509", "IbmX509", "JKS", "JKS");
             break;
         case 3:
             // 初始化为socket 连接方式，指定ip和端口
@@ -52,7 +53,8 @@ public class TestConfig {
             client = new RAClient(ip, port, connectTimeout, readTimeout);
             client.initSSL(keyStorePath, keyStorePassword, trustStorePath, trustStorePassword);
             // 如需指定ssl协议、算法、证书库类型，使用如下方式
-            // client.initSSL(keyStorePath, keyStorePassword, trustStorePath, trustStorePassword, "SSL", "IbmX509", "IbmX509", "JKS", "JKS");
+            // client.initSSL(keyStorePath, keyStorePassword, trustStorePath,
+            // trustStorePassword, "SSL", "IbmX509", "IbmX509", "JKS", "JKS");
             break;
         default:
             break;

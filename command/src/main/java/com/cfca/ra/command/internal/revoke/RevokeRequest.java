@@ -1,4 +1,5 @@
 package com.cfca.ra.command.internal.revoke;
+
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -47,12 +48,7 @@ public class RevokeRequest {
 
     @Override
     public String toString() {
-        return "RevokeRequest{" +
-                "id='" + id + '\'' +
-                ", aki='" + aki + '\'' +
-                ", serial='" + serial + '\'' +
-                ", reason='" + reason + '\'' +
-                ", caname='" + caname + '\'' +
-                '}';
+        return "RevokeRequest{" + "id='" + id + '\'' + ", aki='" + aki + '\'' + ", serial='" + serial + '\'' + ", reason='" + reason + '\'' + ", caname='"
+                + caname + '\'' + '}';
     }
 }

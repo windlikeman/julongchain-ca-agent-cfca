@@ -13,7 +13,7 @@ import java.security.Security;
  * @author zhangchong
  * @create 2018/5/24
  * @Description HMAC 工具类
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class HMAC {

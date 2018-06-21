@@ -26,7 +26,7 @@ import java.util.Map;
  * @author zhangchong
  * @create 2018/5/16
  * @Description CA 对应注册命令的注册信息库
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public enum RegistryStore implements IRegistryStore {

@@ -1,6 +1,10 @@
 package com.cfca.ra.controller;
 
-import com.cfca.ra.RAServerApplication;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.cfca.ra.RAServerApplication;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -33,57 +34,58 @@ public class WebControllerWebTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
-
     @After
     public void tearDown() throws Exception {
     }
 
     @Test
     public void testWelcome() throws Exception {
-        this.mockMvc.perform(get("/")).andExpect(status().isOk())
-                .andExpect(content().string(containsString("<title>Submit Device Info")));
+        this.mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(containsString("<title>Submit Device Info")));
     }
 
-//    @Test
-//    public void testCreate() throws Exception {
-//        this.mockMvc.perform(post("/").param("text", "FOO text").param("summary", "FOO"))
-//                .andExpect(status().isFound())
-//                .andExpect(header().string("location", RegexMatcher.matches("/[0-9]+")));
-//    }
-//
-//    @Test
-//    public void testCreateValidation() throws Exception {
-//        this.mockMvc.perform(post("/").param("text", "").param("summary", ""))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(containsString("is required")));
-//    }
-//
-//    private static class RegexMatcher extends TypeSafeMatcher<String> {
-//        private final String regex;
-//
-//        public RegexMatcher(String regex) {
-//            this.regex = regex;
-//        }
-//
-//        public static org.hamcrest.Matcher<java.lang.String> matches(String regex) {
-//            return new RegexMatcher(regex);
-//        }
-//
-//        @Override
-//        public boolean matchesSafely(String item) {
-//            return Pattern.compile(this.regex).matcher(item).find();
-//        }
-//
-//        @Override
-//        public void describeMismatchSafely(String item, Description mismatchDescription) {
-//            mismatchDescription.appendText("was \"").appendText(item).appendText("\"");
-//        }
-//
-//        @Override
-//        public void describeTo(Description description) {
-//            description.appendText("a string that matches regex: ")
-//                    .appendText(this.regex);
-//        }
-//    }
+    // @Test
+    // public void testCreate() throws Exception {
+    // this.mockMvc.perform(post("/").param("text", "FOO text").param("summary",
+    // "FOO"))
+    // .andExpect(status().isFound())
+    // .andExpect(header().string("location", RegexMatcher.matches("/[0-9]+")));
+    // }
+    //
+    // @Test
+    // public void testCreateValidation() throws Exception {
+    // this.mockMvc.perform(post("/").param("text", "").param("summary", ""))
+    // .andExpect(status().isOk())
+    // .andExpect(content().string(containsString("is required")));
+    // }
+    //
+    // private static class RegexMatcher extends TypeSafeMatcher<String> {
+    // private final String regex;
+    //
+    // public RegexMatcher(String regex) {
+    // this.regex = regex;
+    // }
+    //
+    // public static org.hamcrest.Matcher<java.lang.String> matches(String
+    // regex) {
+    // return new RegexMatcher(regex);
+    // }
+    //
+    // @Override
+    // public boolean matchesSafely(String item) {
+    // return Pattern.compile(this.regex).matcher(item).find();
+    // }
+    //
+    // @Override
+    // public void describeMismatchSafely(String item, Description
+    // mismatchDescription) {
+    // mismatchDescription.appendText("was \"").appendText(item).appendText("\"");
+    // }
+    //
+    // @Override
+    // public void describeTo(Description description) {
+    // description.appendText("a string that matches regex: ")
+    // .appendText(this.regex);
+    // }
+    // }
 
 }

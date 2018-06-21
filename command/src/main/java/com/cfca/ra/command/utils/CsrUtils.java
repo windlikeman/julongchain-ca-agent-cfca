@@ -132,4 +132,31 @@ public class CsrUtils {
             throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
         }
     }
+
+    public static void storePrivateKey(final PrivateKey privateKey, String keyFile) throws CommandException {
+        try {
+            PemUtils.storePrivateKey(keyFile, privateKey);
+            logger.info("storePrivateKey  <<<<<< keyFile =>[{}] ", keyFile);
+            logger.info("storePrivateKey  <<<<<< privateKey :" + privateKey);
+
+        } catch (Exception e) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
+        }
+    }
+
+    public static void storePrivateKey(CsrResult result, String keyDir, String keyFile) throws CommandException {
+        try {
+            boolean mkdirs = new File(keyDir).mkdirs();
+            if (!mkdirs) {
+                logger.info("storePrivateKey<<<<<<failed to create keystore directory");
+            }
+            final PrivateKey privateKey = result.getKeyPair().getPrivate();
+            PemUtils.storePrivateKey(String.join(File.separator,keyDir, keyFile), privateKey);
+            logger.info("storePrivateKey  <<<<<< keyFile =>[{}] ", keyFile);
+            logger.info("storePrivateKey  <<<<<< privateKey :" + privateKey);
+
+        } catch (Exception e) {
+            throw new CommandException(CommandException.REASON_CODE_INTERNAL_CLIENT_STORE_PRIVATEKEY_FAILED, e);
+        }
+    }
 }

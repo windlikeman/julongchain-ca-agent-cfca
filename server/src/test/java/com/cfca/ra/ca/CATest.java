@@ -1,5 +1,35 @@
 package com.cfca.ra.ca;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertPathBuilderResult;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreParameters;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
@@ -17,13 +47,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.*;
-import java.util.*;
-
-import static org.junit.Assert.*;
 
 public class CATest {
 
@@ -47,7 +70,7 @@ public class CATest {
         static {
             try {
                 kpg = KeyPairGenerator.getInstance("EC");
-                //Key size doesn't matter, smaller == Faster
+                // Key size doesn't matter, smaller == Faster
                 kpg.initialize(256);
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
@@ -92,47 +115,45 @@ public class CATest {
          * Constructor
          */
         public CA() throws Exception {
-            //Init both keypairs
+            // Init both keypairs
             caCertKp = kpg.generateKeyPair();
             caCrlKp = kpg.generateKeyPair();
-            //subject
+            // subject
             acSubject = new X500Name("CN=AC_0");
-            //validity
+            // validity
             GregorianCalendar gc = new GregorianCalendar();
             Date notBefore = gc.getTime();
             gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
             Date notAfter = gc.getTime();
-            //first signer
+            // first signer
             caCertSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(caCertKp.getPrivate());
-            //top level : issuer is self
+            // top level : issuer is self
             X500Name issuer = acSubject;
-            //reserved for future use (another test case)
+            // reserved for future use (another test case)
             ContentSigner thisAcSigner = caCertSigner;
-            //reserved for future use (another test case)
-            //First certificate: Certificate authority (BasicConstraints=true) but not CRLSigner
-            X509CertificateHolder certH = new X509v3CertificateBuilder(
-                    issuer, BigInteger.valueOf(counter++), notBefore, notAfter, acSubject, getPublicKeyInfo(caCertKp.getPublic()))
-                    .addExtension(Extension.basicConstraints, true, new BasicConstraints(true))
-                    .addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign))
-                    .build(thisAcSigner);
-            //lets convert to X509Certificate
+            // reserved for future use (another test case)
+            // First certificate: Certificate authority (BasicConstraints=true)
+            // but not CRLSigner
+            X509CertificateHolder certH = new X509v3CertificateBuilder(issuer, BigInteger.valueOf(counter++), notBefore, notAfter, acSubject,
+                    getPublicKeyInfo(caCertKp.getPublic())).addExtension(Extension.basicConstraints, true, new BasicConstraints(true))
+                    .addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign)).build(thisAcSigner);
+            // lets convert to X509Certificate
             acCertAc = convert(certH);
-            //and build a trust Anchor
+            // and build a trust Anchor
             ta = new TrustAnchor(acCertAc, null);
 
-            //Second signer
+            // Second signer
             caCrlSigner = new JcaContentSignerBuilder("SM3WITHSM2").build(caCrlKp.getPrivate());
-            //second certificate: CRLSigner but not Certificate authority (BasicConstraints=false)
-            certH = new X509v3CertificateBuilder(
-                    issuer, BigInteger.valueOf(counter++), notBefore, notAfter, acSubject, getPublicKeyInfo(caCrlKp.getPublic()))
+            // second certificate: CRLSigner but not Certificate authority
+            // (BasicConstraints=false)
+            certH = new X509v3CertificateBuilder(issuer, BigInteger.valueOf(counter++), notBefore, notAfter, acSubject, getPublicKeyInfo(caCrlKp.getPublic()))
                     .addExtension(Extension.basicConstraints, false, new BasicConstraints(false))
-                    .addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.cRLSign))
-                    .build(thisAcSigner);
-            //lets convert to X509Certificate
+                    .addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.cRLSign)).build(thisAcSigner);
+            // lets convert to X509Certificate
             acCertCrl = convert(certH);
-            //And create the CRL
+            // And create the CRL
             X509CRLHolder crlH = new X509v2CRLBuilder(acSubject, notBefore).setNextUpdate(notAfter).build(caCrlSigner);
-            //lets convert to X509CRL
+            // lets convert to X509CRL
             crl = convert(crlH);
         }
 
@@ -140,28 +161,25 @@ public class CATest {
          * Creates a child certificate
          */
         public X509Certificate makeNewCert() throws Exception {
-            //private key doesn't matter for the test
+            // private key doesn't matter for the test
             PublicKey publicKey = kpg.generateKeyPair().getPublic();
-            //Validity
+            // Validity
             GregorianCalendar gc = new GregorianCalendar();
             Date notBefore = gc.getTime();
             gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
             Date notAfter = gc.getTime();
-            //serial
+            // serial
             BigInteger certSerial = BigInteger.valueOf(counter++);
-            //Distinct name based on the serial
+            // Distinct name based on the serial
             X500Name subject = new X500Name("CN=EU_" + certSerial.toString());
-            //End user certificate, not allowed to do anything
-            X509CertificateHolder enUserCertH = new X509v3CertificateBuilder(
-                    acSubject, certSerial, notBefore, notAfter, subject, getPublicKeyInfo(publicKey))
-                    .addExtension(Extension.basicConstraints, false, new BasicConstraints(false))
-                    .addExtension(Extension.keyUsage, true, new KeyUsage(0))
+            // End user certificate, not allowed to do anything
+            X509CertificateHolder enUserCertH = new X509v3CertificateBuilder(acSubject, certSerial, notBefore, notAfter, subject, getPublicKeyInfo(publicKey))
+                    .addExtension(Extension.basicConstraints, false, new BasicConstraints(false)).addExtension(Extension.keyUsage, true, new KeyUsage(0))
                     .build(caCertSigner);
 
-            //lets convert to X509Certificate
+            // lets convert to X509Certificate
             return convert(enUserCertH);
         }
-
 
         /**
          * convert to X509Certificate
@@ -201,13 +219,13 @@ public class CATest {
      * @param caB
      */
     private static void checkUseDistinctCAs(CA caA, CA caB) {
-        //Standard configuration : everything in caA
+        // Standard configuration : everything in caA
         taSet = new HashSet<TrustAnchor>();
         taSet.add(caA.ta);
         otherList = new ArrayList<Object>();
         otherList.add(caA.acCertCrl);
         otherList.add(caA.crl);
-        //User specified configuration : parts of caB
+        // User specified configuration : parts of caB
 
         taSet.add(caB.ta);
         otherList.add(caB.acCertCrl);
@@ -224,25 +242,25 @@ public class CATest {
 
     @Test
     public void performTest() throws Exception {
-        //Add the provider
+        // Add the provider
         Security.addProvider(new BouncyCastleProvider());
-        //Generate two Cert authorities
+        // Generate two Cert authorities
         CA caA = new CA();
         CA caB = new CA();
-        //Ask the user the conf he want's to test
+        // Ask the user the conf he want's to test
         checkUseDistinctCAs(caA, caB);
 
-        //Let's create a target cert under caA
+        // Let's create a target cert under caA
         X509CertSelector target = new X509CertSelector();
         target.setCertificate(caA.makeNewCert());
-        //create control parameters
+        // create control parameters
         PKIXBuilderParameters params = new PKIXBuilderParameters(taSet, target);
         params.addCertStore(getStore(Collections.singleton(target.getCertificate())));
         params.addCertStore(getStore(otherList));
-        //enable revocation check
+        // enable revocation check
         params.setRevocationEnabled(true);
 
-        //Lets Build the path
+        // Lets Build the path
         try {
             CertPathBuilderResult cpbr = CertPathBuilder.getInstance("PKIX", "BC").build(params);
 

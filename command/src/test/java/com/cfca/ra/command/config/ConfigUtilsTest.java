@@ -17,7 +17,7 @@ public class ConfigUtilsTest {
 
     @Test
     public void testInit() throws Exception {
-        ConfigBean configBean=ConfigUtils.load("config/ca-client-config.yaml");
+        ConfigBean configBean = ConfigUtils.load("config/ca-client-config.yaml");
         System.out.println(configBean);
     }
 }

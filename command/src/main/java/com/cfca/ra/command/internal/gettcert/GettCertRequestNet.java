@@ -29,7 +29,7 @@ public class GettCertRequestNet {
     private final boolean encryptAttrs;
 
     /**
-     * 有效期	不可空
+     * 有效期 不可空
      */
     @SerializedName("validity_period")
     private final int validityPeriod;

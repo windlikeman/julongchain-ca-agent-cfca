@@ -1,21 +1,18 @@
 package com.cfca.ra.ca;
 
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.util.ASN1Dump;
+import java.security.Key;
+import java.security.Security;
+import java.security.spec.KeySpec;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
-import java.security.Security;
-import java.security.spec.KeySpec;
-
-import static org.junit.Assert.*;
 
 public class TcertKeyTreeTest {
 
@@ -29,12 +26,12 @@ public class TcertKeyTreeTest {
         Security.removeProvider("BC");
     }
 
-    private final static byte[] keybytes = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
-            0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38};
+    private final static byte[] keybytes = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 };
+
     @Test
-    public void getKey() throws Exception{
+    public void getKey() throws Exception {
         String childName = "zc";
-        Key parentKey =  new SecretKeySpec(keybytes, "AES256");
+        Key parentKey = new SecretKeySpec(keybytes, "AES256");
         KeySpec keyspecbc = new PBEKeySpec(childName.toCharArray(), parentKey.getEncoded(), 1000, 128);
 
         SecretKeyFactory factorybc = SecretKeyFactory.getInstance("PBEWITHHMACSHA256", "BC");

@@ -14,38 +14,33 @@ public class RAClientImplTest {
     public void tearDown() throws Exception {
     }
 
-    class A{
+    class A {
         String name1;
         String name2;
 
         @Override
         public String toString() {
-            return "A{" +
-                    "name1='" + name1 + '\'' +
-                    ", name2='" + name2 + '\'' +
-                    '}';
+            return "A{" + "name1='" + name1 + '\'' + ", name2='" + name2 + '\'' + '}';
         }
     }
 
-    class B{
+    class B {
 
         private final A a;
 
-        B(A a){
-           this.a = a;
+        B(A a) {
+            this.a = a;
         }
 
         @Override
         public String toString() {
-            return "B{" +
-                    "a=" + a +
-                    '}';
+            return "B{" + "a=" + a + '}';
         }
     }
 
     @Test
     public void enroll() {
-//        FileUtils.readFileToByteArray()
+        // FileUtils.readFileToByteArray()
         final A a = new A();
         a.name1 = "A1";
         System.out.println(a);

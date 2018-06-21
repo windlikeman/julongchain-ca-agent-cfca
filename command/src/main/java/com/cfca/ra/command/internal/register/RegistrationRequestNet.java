@@ -12,37 +12,37 @@ import java.util.List;
  */
 public class RegistrationRequestNet {
     /**
-     * 用户id	不可空
+     * 用户id 不可空
      */
     private final String id;
     /**
-     * 类型	不可空
+     * 类型 不可空
      */
     private final String type;
     /**
-     * 密码	不可空
+     * 密码 不可空
      */
     private final String secret;
 
     /**
-     * 最大证书数量	不可空
+     * 最大证书数量 不可空
      */
     @SerializedName("max_enrollments")
     private final int maxEnrollments;
 
     /**
-     * 路径	不可空
+     * 路径 不可空
      */
     @SerializedName("affiliation_path")
     private final String affiliationPath;
 
     /**
-     * 用数组传入多个属性值	不可空
+     * 用数组传入多个属性值 不可空
      */
     private final List<UserAttrs> attrs;
 
     /**
-     * ca名称	不可空
+     * ca名称 不可空
      */
     private final String caname;
 

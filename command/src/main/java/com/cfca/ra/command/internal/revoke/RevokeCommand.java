@@ -6,6 +6,7 @@ import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import java.util.Arrays;
 public final class RevokeCommand extends BaseClientCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(RevokeCommand.class);
-
 
     public RevokeCommand() {
         this.name = COMMAND_NAME_REVOKE;
@@ -45,19 +45,25 @@ public final class RevokeCommand extends BaseClientCommand {
     }
 
     private void processContent() {
-        final RevokeRequest revokeRequest = new Gson().fromJson(content, RevokeRequest.class);
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final RevokeRequest revokeRequest = gson.fromJson(content, RevokeRequest.class);
         clientCfg.setRevokeRequest(revokeRequest);
+//        clientCfg.setEnrollmentId(revokeRequest.getId());
     }
 
     private void processConfigFile() throws CommandException {
         final ConfigBean configBean = loadConfigFile();
+        clientCfg.setCaName(configBean.getCaname());
+        clientCfg.setAdmin(configBean.getAdmin());
+        clientCfg.setAdminpwd(configBean.getAdminpwd());
     }
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
             logger.error("Usage : " + getUsage());
-            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_ARGS_INVALID, "fail to build revoke command ,because args is invalid : args=" + Arrays.toString(args));
+            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_ARGS_INVALID,
+                    "fail to build revoke command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
 

@@ -4,7 +4,7 @@ package com.cfca.ra.beans;
  * @author zhangchong
  * @create 2018/5/16
  * @Description 鉴权信息
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class AuthInfo {

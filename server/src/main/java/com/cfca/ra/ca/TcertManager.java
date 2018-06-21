@@ -44,9 +44,10 @@ import java.util.*;
  * @author zhangchong
  * @create 2018/5/24
  * @Description 交易证书管理类
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
+@Deprecated
 public class TcertManager {
 
     private static final Logger logger = LoggerFactory.getLogger(TcertManager.class);

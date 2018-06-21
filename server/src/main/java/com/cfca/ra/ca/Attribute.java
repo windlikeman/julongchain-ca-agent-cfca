@@ -6,7 +6,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/24
  * @Description 属性, 名称和值的键值对
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class Attribute {

@@ -1,6 +1,5 @@
 package com.cfca.ra.controller;
 
-import com.cfca.ra.RAServerException;
 import com.cfca.ra.enroll.EnrollmentRequest;
 import com.cfca.ra.enroll.EnrollmentRequestNet;
 import com.cfca.ra.enroll.EnrollmentResponseNet;
@@ -8,25 +7,22 @@ import com.cfca.ra.getcainfo.GetCAInfoRequestNet;
 import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
 import com.cfca.ra.gettcert.GettCertRequestNet;
 import com.cfca.ra.gettcert.GettCertResponseNet;
-import com.cfca.ra.reenroll.ReenrollmentRequest;
 import com.cfca.ra.reenroll.ReenrollmentRequestNet;
-import com.cfca.ra.register.RegistrationRequest;
 import com.cfca.ra.register.RegistrationRequestNet;
 import com.cfca.ra.register.RegistrationResponseNet;
-import com.cfca.ra.revoke.RevokeRequest;
 import com.cfca.ra.revoke.RevokeRequestNet;
 import com.cfca.ra.revoke.RevokeResponseNet;
 import com.cfca.ra.service.RAServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Security;
 
@@ -34,7 +30,7 @@ import java.security.Security;
  * @author zhangchong
  * @create 2018/5/14
  * @Description Restful 接口控制类,目前定义了 enroll reenroll register gettcert getcainfo revoke等接口的处理
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 @RestController

@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/11
  * @Description 命令行内部使用的GettCert 命令请求,用于适配网络Restful接口请求
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GettCertRequest extends BaseRequest{

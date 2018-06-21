@@ -58,8 +58,6 @@ public class ClientIdentity {
 
     @Override
     public String toString() {
-        return "ClientIdentity{" +
-                "name='" + name + '\'' +
-                '}';
+        return "ClientIdentity{" + "name='" + name + '\'' + '}';
     }
 }

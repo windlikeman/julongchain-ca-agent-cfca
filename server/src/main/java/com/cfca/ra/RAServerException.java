@@ -10,7 +10,7 @@ import java.util.Map;
  * @author zhangchong
  * @create 2018/5/11
  * @Description 命令异常类
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class RAServerException extends Exception {
@@ -377,7 +377,6 @@ public class RAServerException extends Exception {
         this.message = message;
     }
 
-
     public int getReasonCode() {
         return reasonCode;
     }
@@ -386,7 +385,6 @@ public class RAServerException extends Exception {
     public Throwable getCause() {
         return cause;
     }
-
 
     @Override
     public String getMessage() {

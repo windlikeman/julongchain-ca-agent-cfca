@@ -19,8 +19,6 @@ public class GetCAInfoRequestNet {
 
     @Override
     public String toString() {
-        return "GetCAInfoRequestNet{" +
-                "caname='" + caname + '\'' +
-                '}';
+        return "GetCAInfoRequestNet{" + "caname='" + caname + '\'' + '}';
     }
 }

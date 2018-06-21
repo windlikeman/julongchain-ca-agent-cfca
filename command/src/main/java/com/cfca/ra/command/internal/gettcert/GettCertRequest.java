@@ -94,16 +94,11 @@ public class GettCertRequest {
 
     @Override
     public String toString() {
-        return "GettCertRequest{" +
-                "count=" + count +
-                ", attrNames=" + attrNames +
-                ", encryptAttrs=" + encryptAttrs +
-                ", validityPeriod=" + validityPeriod +
-                ", caname='" + caname + '\'' +
-                '}';
+        return "GettCertRequest{" + "count=" + count + ", attrNames=" + attrNames + ", encryptAttrs=" + encryptAttrs + ", validityPeriod=" + validityPeriod
+                + ", caname='" + caname + '\'' + '}';
     }
 
-    static class Builder{
+    static class Builder {
         private final boolean encryptAttrs;
         private final String caname;
         private final String preKey;
@@ -122,22 +117,22 @@ public class GettCertRequest {
             this.preKey = preKey;
         }
 
-        Builder count(int v){
+        Builder count(int v) {
             this.count = v;
             return this;
         }
 
-        Builder validityPeriod(int v){
+        Builder validityPeriod(int v) {
             this.validityPeriod = v;
             return this;
         }
 
-        Builder attrNames(List<String>  v){
+        Builder attrNames(List<String> v) {
             this.attrNames = v;
             return this;
         }
 
-        GettCertRequest build(){
+        GettCertRequest build() {
             return new GettCertRequest(this);
         }
     }

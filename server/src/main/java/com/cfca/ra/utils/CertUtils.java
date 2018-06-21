@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
  * @author zhangchong
  * @create 2018/5/28
  * @Description 证书工具类, 用于提取证书相关信息
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
 public class CertUtils {
     private static final Logger logger = LoggerFactory.getLogger(CertUtils.class);

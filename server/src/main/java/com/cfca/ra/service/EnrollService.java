@@ -30,12 +30,12 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/18
  * @Description 签发证书的服务
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 @Service
 public class EnrollService {
-    private static final Logger logger = LoggerFactory.getLogger(EnrollService.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int AUTH_ELEMENT_NUM = 2;
     private final RAServer server;
 
@@ -52,12 +52,11 @@ public class EnrollService {
 
     public EnrollmentResponseNet enroll(EnrollmentRequest request, String auth) {
         try {
-
             EnrollmentRequestNet data = request.getEnrollmentRequestNet();
             final int messageId = data.hashCode();
-            if (messageStore.containsMessage(messageId)) {
-                throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
-            }
+//            if (messageStore.containsMessage(messageId)) {
+//                throw new RAServerException(RAServerException.REASON_CODE_ENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
+//            }
 
             final String caName = data.getCaname();
             AuthInfo authInfo = getUserNameFromAuth(auth);

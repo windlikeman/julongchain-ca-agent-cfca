@@ -27,7 +27,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/16
  * @Description CA 对象,用于支持多CA配置管理
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class CA {

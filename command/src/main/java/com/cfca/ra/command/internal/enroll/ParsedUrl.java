@@ -38,11 +38,6 @@ class ParsedUrl {
 
     @Override
     public String toString() {
-        return "ParsedUrl{" +
-                "scheme='" + scheme + '\'' +
-                ", host='" + host + '\'' +
-                ", username='" + username + '\'' +
-                ", password='hide'"+
-                '}';
+        return "ParsedUrl{" + "scheme='" + scheme + '\'' + ", host='" + host + '\'' + ", username='" + username + '\'' + ", password='hide'" + '}';
     }
 }

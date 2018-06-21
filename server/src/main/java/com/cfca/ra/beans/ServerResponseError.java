@@ -4,7 +4,7 @@ package com.cfca.ra.beans;
  * @author zhangchong
  * @create 2018/5/15
  * @Description 服务器Restful接口返回给客户端的错误信息
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class ServerResponseError {

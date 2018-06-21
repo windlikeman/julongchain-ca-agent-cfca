@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/15
- * @Description  Tls 的相关配置信息
+ * @Description Tls 的相关配置信息
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -44,10 +44,6 @@ public class TlsConfig {
 
     @Override
     public String toString() {
-        return "TlsConfig{" +
-                "enabled=" + enabled +
-                ", certfiles=" + certfiles +
-                ", client=" + client +
-                '}';
+        return "TlsConfig{" + "enabled=" + enabled + ", certfiles=" + certfiles + ", client=" + client + '}';
     }
 }

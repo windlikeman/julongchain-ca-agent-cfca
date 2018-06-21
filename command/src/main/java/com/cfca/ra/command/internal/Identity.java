@@ -18,7 +18,13 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 
 /**
  * @author zhangchong
@@ -141,12 +147,12 @@ public class Identity {
         return client.gettcert(gettCertRequest, this);
     }
 
+    public String getKeyFile(){
+        return client.getKeyFile();
+    }
+
     @Override
     public String toString() {
-        return "Identity{" +
-                "name='" + name + '\'' +
-                ", ecert=" + ecert +
-                ", client=" + client +
-                '}';
+        return "Identity{" + "name='" + name + '\'' + ", ecert=" + ecert + ", client=" + client + '}';
     }
 }

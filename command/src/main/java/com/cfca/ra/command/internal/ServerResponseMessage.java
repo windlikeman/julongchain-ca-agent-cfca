@@ -1,4 +1,5 @@
 package com.cfca.ra.command.internal;
+
 /**
  * @author zhangchong
  * @create 2018/5/11
@@ -35,9 +36,6 @@ public class ServerResponseMessage {
 
     @Override
     public String toString() {
-        return "ServerResponseMessage{" +
-                "code=" + code +
-                ", message='" + message + '\'' +
-                '}';
+        return "ServerResponseMessage{" + "code=" + code + ", message='" + message + '\'' + '}';
     }
 }

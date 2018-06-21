@@ -12,7 +12,7 @@ import java.util.Map;
  * @author zhangchong
  * @create 2018/5/16
  * @Description DefaultUserRegistry 是用于检索用户和组的接口的默认实现
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class DefaultUserRegistry implements IUserRegistry {

@@ -1,12 +1,13 @@
 package com.cfca.ra;
 
+import java.security.Key;
+import java.security.Security;
+
+import com.cfca.ra.ca.CAInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.security.Key;
-import java.security.Security;
 
 public class RAServerTest {
 
@@ -14,7 +15,7 @@ public class RAServerTest {
 
     @Before
     public void setUp() throws Exception {
-        raServer = new RAServer();
+        raServer = new RAServer(new CAInfo());
         Security.addProvider(new BouncyCastleProvider());
     }
 

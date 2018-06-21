@@ -4,7 +4,6 @@ import cfca.ra.common.vo.request.CertServiceRequestVO;
 import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
 import cfca.ra.toolkit.exception.RATKException;
-import com.cfca.ra.demo.TestConfig;
 
 // 证书更新并下载
 public class Test1201 {
@@ -14,7 +13,8 @@ public class Test1201 {
         // String keyAlg = "RSA";
         // String keyLength = "2048";
         // String duration = "24";
-        // String endTime = "20150101000000"; // endTime与duration同时非空时，证书截止时间以endTime为准，duration作为证书默认有效期记入数据库
+        // String endTime = "20150101000000"; //
+        // endTime与duration同时非空时，证书截止时间以endTime为准，duration作为证书默认有效期记入数据库
         // String useOldKey = "true";
         String p10 = "MIGJAoGBALL/T8cvxMkdrmhmACA2IVC5GjKbEpy9WeuEcxjACJf0ue+sJhVOPSdoPnGnz9+aRnSMAEfJITDu8lHOXskfb80DhODHxxmqfvLT8kpTOB4RG6jSmmARrhjFPNaX90bMdkOCwwkkMnjmwRFfgeazyLdbMFcaF2kA1U3bGzaVrs/tAgMBAAE=";
         String p10Sub = "ALQAAAABAADGitN5jEQ1wOHs+T2+On065n4Nzj81IG4IKZwjUZEMcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV3YWO/1+JZ+OiX0EYDood9uublsm9nixLZBhkLN1BQoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";

@@ -82,7 +82,8 @@ public class GetCAInfoComms {
             }
             return decodedResponse;
         } catch (IOException e) {
-            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : " + e.getMessage(), e);
+            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : "
+                    + e.getMessage(), e);
         }
     }
 }

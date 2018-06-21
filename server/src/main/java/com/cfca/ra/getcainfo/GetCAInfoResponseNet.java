@@ -10,10 +10,9 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/17
  * @Description GetCAInfo命令的网络响应对象
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
-
 public class GetCAInfoResponseNet {
     /**
      * Boolean indicating if the request was successful.

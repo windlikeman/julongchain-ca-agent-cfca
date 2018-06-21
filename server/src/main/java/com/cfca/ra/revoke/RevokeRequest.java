@@ -8,7 +8,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/14
  * @Description 吊销接口内部使用的请求对象,用于封装 RevokeRequestNet 对象
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class RevokeRequest  extends BaseRequest {

@@ -11,7 +11,7 @@ public class ClientAttribute {
     private final String name;
     private final String val;
 
-    public ClientAttribute(String name,String val) {
+    public ClientAttribute(String name, String val) {
         this.name = name;
         this.val = val;
     }
@@ -26,9 +26,6 @@ public class ClientAttribute {
 
     @Override
     public String toString() {
-        return "ClientAttribute{" +
-                "name='" + name + '\'' +
-                ", val='" + val + '\'' +
-                '}';
+        return "ClientAttribute{" + "name='" + name + '\'' + ", val='" + val + '\'' + '}';
     }
 }

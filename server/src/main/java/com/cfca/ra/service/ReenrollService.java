@@ -33,7 +33,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/18
  * @Description 重新签发证书的服务
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 @Service
@@ -61,9 +61,9 @@ public class ReenrollService {
         try {
             final ReenrollmentRequest request = buildReenrollmentRequest(data);
             final int messageId = data.hashCode();
-            if (messageStore.containsMessage(messageId)) {
-                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
-            }
+//            if (messageStore.containsMessage(messageId)) {
+//                throw new RAServerException(RAServerException.REASON_CODE_REENROLL_SERVICE_MESSAGE_DUPLICATE, "messageId[" + messageId + "] is duplicate");
+//            }
 
             final byte[] body = AuthUtils.marshal(data);
             final String caname = data.getCaname();

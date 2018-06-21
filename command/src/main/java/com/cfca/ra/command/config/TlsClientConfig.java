@@ -36,9 +36,6 @@ public class TlsClientConfig {
 
     @Override
     public String toString() {
-        return "TlsClientConfig{" +
-                "certfile='" + certfile + '\'' +
-                ", keyfile='" + keyfile + '\'' +
-                '}';
+        return "TlsClientConfig{" + "certfile='" + certfile + '\'' + ", keyfile='" + keyfile + '\'' + '}';
     }
 }

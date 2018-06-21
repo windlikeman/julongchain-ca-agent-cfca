@@ -4,7 +4,7 @@ package com.cfca.ra.getcainfo;
  * @author zhangchong
  * @create 2018/5/17
  * @Description  GetCAInfo命令的返回的CA信息
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GetCAInfoResponseResult {

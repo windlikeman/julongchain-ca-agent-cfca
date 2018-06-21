@@ -5,6 +5,7 @@ import com.cfca.ra.command.config.ConfigBean;
 import com.cfca.ra.command.internal.BaseClientCommand;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -33,14 +34,16 @@ public class GetCAInfoCommand extends BaseClientCommand {
         ConfigBean configBean = loadConfigFile();
         clientCfg.setMspDir(configBean.getMspdir());
 
-        final GetCAInfoRequest getCAInfoRequest = new Gson().fromJson(content, GetCAInfoRequest.class);
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final GetCAInfoRequest getCAInfoRequest = gson.fromJson(content, GetCAInfoRequest.class);
         logger.error("prepare<<<<<<" + getCAInfoRequest.toString());
         clientCfg.setGetCAInfoRequest(getCAInfoRequest);
         clientCfg.setCaName(getCAInfoRequest.getCaName());
 
         mspDir = clientCfg.getMspDir();
         if (mspDir.isEmpty()) {
-            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_INIT_MISSING_MSPDIR, "fail to prepare getcainfo command ,because mspDir is empty");
+            throw new CommandException(CommandException.REASON_CODE_GETCAINFO_COMMAND_INIT_MISSING_MSPDIR,
+                    "fail to prepare getcainfo command ,because mspDir is empty");
         }
     }
 
@@ -54,7 +57,7 @@ public class GetCAInfoCommand extends BaseClientCommand {
 
     @Override
     public JsonObject execute() throws CommandException {
-        logger.info("Entered getcainfo <<<<<< clientCfg:"+clientCfg.toString());
+        logger.info("Entered getcainfo <<<<<< clientCfg:" + clientCfg.toString());
         GetCAInfoRequest req = clientCfg.getGetCAInfoRequest();
 
         ServerInfo si = client.getCAInfo(req);

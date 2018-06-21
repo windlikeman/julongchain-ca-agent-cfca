@@ -6,8 +6,8 @@ import com.cfca.ra.RAServerException;
  * @author zhangchong
  * @create 2018/5/22
  * @Description EnrollID数据库接口
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
 public interface IEnrollIdStore {
 

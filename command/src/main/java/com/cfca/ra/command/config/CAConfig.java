@@ -40,11 +40,7 @@ public class CAConfig {
 
     @Override
     public String toString() {
-        return "CAConfig{" +
-                "pathlen=" + pathlen +
-                ", pathlenzero=" + pathlenzero +
-                ", expiry=" + expiry +
-                '}';
+        return "CAConfig{" + "pathlen=" + pathlen + ", pathlenzero=" + pathlenzero + ", expiry=" + expiry + '}';
     }
 
     @Override
@@ -56,9 +52,7 @@ public class CAConfig {
             return false;
         }
         CAConfig caConfig = (CAConfig) o;
-        return pathlen == caConfig.pathlen &&
-                pathlenzero == caConfig.pathlenzero &&
-                expiry == caConfig.expiry;
+        return pathlen == caConfig.pathlen && pathlenzero == caConfig.pathlenzero && expiry == caConfig.expiry;
     }
 
     @Override

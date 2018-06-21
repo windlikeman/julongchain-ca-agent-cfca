@@ -6,7 +6,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/11
  * @Description enroll接口网络请求参数, 用于调用服务器Restful接口
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class EnrollmentRequestNet {
@@ -26,7 +26,6 @@ public class EnrollmentRequestNet {
      * Name of the CA to direct traffic to within server.
      */
     private final String caname;
-
 
     public EnrollmentRequestNet(final String request, final String profile, final String label, final String caname) {
         this.request = request;
@@ -50,7 +49,6 @@ public class EnrollmentRequestNet {
     public String getCaname() {
         return caname;
     }
-
 
     @Override
     public boolean equals(Object o) {

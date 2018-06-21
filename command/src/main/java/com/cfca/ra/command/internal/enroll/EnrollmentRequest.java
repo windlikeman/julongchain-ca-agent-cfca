@@ -22,7 +22,8 @@ public class EnrollmentRequest {
     private final String password;
 
     /**
-     * Profile is the name of the signing profile to use in issuing the certificate
+     * Profile is the name of the signing profile to use in issuing the
+     * certificate
      */
     private final String profile;
 
@@ -41,7 +42,7 @@ public class EnrollmentRequest {
      */
     private final String request;
 
-    private final static EnrollmentRequest NULL = new Builder(null, null,null,null,null,null).label(null).build();
+    private final static EnrollmentRequest NULL = new Builder(null, null, null, null, null, null).label(null).build();
 
     private EnrollmentRequest(Builder builder) {
         this.label = builder.label;
@@ -133,7 +134,6 @@ public class EnrollmentRequest {
          */
         private String label = "";
 
-
         public Builder(String request, String username, String password, String profile, CsrConfig csrConfig, String caName) {
             this.request = request;
             this.username = username;
@@ -143,7 +143,7 @@ public class EnrollmentRequest {
             this.caName = caName;
         }
 
-        public Builder label(String v){
+        public Builder label(String v) {
             this.label = v;
             return this;
         }

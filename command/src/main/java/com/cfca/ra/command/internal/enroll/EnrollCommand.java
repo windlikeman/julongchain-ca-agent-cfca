@@ -8,7 +8,9 @@ import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,8 @@ public final class EnrollCommand extends BaseClientCommand {
     }
 
     private void processContent() {
-        final EnrollmentRequest overrideEnrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final EnrollmentRequest overrideEnrollmentRequest = gson.fromJson(content, EnrollmentRequest.class);
         clientCfg.setCaName(overrideEnrollmentRequest.getCaName());
         clientCfg.setAdmin(overrideEnrollmentRequest.getUsername());
         clientCfg.setAdminpwd(overrideEnrollmentRequest.getPassword());
@@ -70,8 +73,12 @@ public final class EnrollCommand extends BaseClientCommand {
     @Override
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
-            logger.error("ca-client enroll -h serverAddr -p serverPort -a <json string>");
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
+            for (int i = 0; i < args.length; i++) {
+                logger.error("args[{}]={}", i, args[i]);
+            }
+            logger.error("Usage : " + getUsage());
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID,
+                    "fail to build enroll command ,because args is invalid : args[" + args.length + "]=" + Arrays.toString(args));
         }
     }
 
@@ -136,8 +143,7 @@ public final class EnrollCommand extends BaseClientCommand {
 
         final String scheme = purl.getScheme();
         if (MyStringUtils.isEmpty(host)) {
-            String expecting = String.format(
-                    "%s://<host>", scheme);
+            String expecting = String.format("%s://<host>", scheme);
             String message = String.format("The URL of the server is missing the host; found '%s' but expecting '%s'", rawurl, expecting);
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_ARGS_INVALID, message);
         }
@@ -188,7 +194,7 @@ public final class EnrollCommand extends BaseClientCommand {
             scheme = "https";
         }
 
-        //remaining => localhost:7054
+        // remaining => localhost:7054
         try {
             String host = rawurl.substring(startIndex);
             final String username = clientCfg.getAdmin();

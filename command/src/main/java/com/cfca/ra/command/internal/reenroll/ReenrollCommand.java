@@ -9,13 +9,20 @@ import com.cfca.ra.command.internal.Identity;
 import com.cfca.ra.command.internal.ServerInfo;
 import com.cfca.ra.command.internal.enroll.EnrollmentRequest;
 import com.cfca.ra.command.internal.enroll.EnrollmentResponse;
+import com.cfca.ra.command.utils.CsrUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
+import com.cfca.ra.command.utils.PemUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.PrivateKey;
 import java.util.Arrays;
 
 /**
@@ -27,6 +34,7 @@ import java.util.Arrays;
  */
 public class ReenrollCommand extends BaseClientCommand {
     private static final Logger logger = LoggerFactory.getLogger(ReenrollCommand.class);
+    private String tmpKeyFile;
 
     public ReenrollCommand() {
         this.name = COMMAND_NAME_REENROLL;
@@ -48,8 +56,70 @@ public class ReenrollCommand extends BaseClientCommand {
         }
     }
 
+    @Override
+    protected void parseArgs(String[] args) throws CommandException {
+        String filename;
+        final String expecting = "-h host -p port -a <json string>  -key <newkeyfile>";
+        for (int i = 0, size = args.length; i < size; i++) {
+            switch (args[i]) {
+                case "-h":
+                    if (i + 1 < size) {
+                        host = args[i + 1];
+                    }
+                    break;
+                case "-p":
+                    if (i + 1 < size) {
+                        port = args[i + 1];
+                    }
+                    break;
+                case "-a":
+                    if (i + 1 < size) {
+                        filename = args[i + 1];
+                        try {
+                            content = FileUtils.readFileToString(new File(filename), "UTF-8");
+                        } catch (IOException e) {
+                            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, "fail to read file[" + filename + "] to string", e);
+                        }
+                    }
+                    break;
+                case "-key":
+                    if (i + 1 < size) {
+                        tmpKeyFile = args[i + 1];
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (MyStringUtils.isEmpty(host)) {
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args),
+                    expecting);
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_HOST, message);
+        }
+        if (MyStringUtils.isEmpty(port)) {
+
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args),
+                    expecting);
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, message);
+        }
+        if (MyStringUtils.isEmpty(content)) {
+            String message = String.format("The args of the command[" + name + "] is missing the content; found '%s' but expecting '%s'",
+                    Arrays.toString(args), expecting);
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, message);
+        }
+        if (MyStringUtils.isEmpty(tmpKeyFile)) {
+            String message = String.format("The args of the command[" + name + "] is missing the tmpKeyFile; found '%s' but expecting '%s'",
+                    Arrays.toString(args), expecting);
+            throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, message);
+        }
+
+
+        clientCfg.setUrl("http://" + host + ":" + port);
+    }
+
     private void processContent() {
-        final EnrollmentRequest enrollmentRequest = new Gson().fromJson(content, EnrollmentRequest.class);
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final EnrollmentRequest enrollmentRequest = gson.fromJson(content, EnrollmentRequest.class);
         logger.info(enrollmentRequest.toString());
         clientCfg.setEnrollmentRequest(enrollmentRequest);
     }
@@ -72,9 +142,13 @@ public class ReenrollCommand extends BaseClientCommand {
 
     @Override
     public void checkArgs(String[] args) throws CommandException {
-        if (args.length != COMMAND_LINE_ARGS_NUM) {
+        if (args.length != COMMAND_LINE_ARGS_NUM + 2) {
+            for (int i = 0; i < args.length; i++) {
+                logger.error("args[{}]={}", i, args[i]);
+            }
             logger.error("Usage : " + getUsage());
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_ARGS_INVALID, "fail to build reenroll command ,because args is invalid : args=" + Arrays.toString(args));
+            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_ARGS_INVALID,
+                    "fail to build reenroll command ,because args is invalid : args["+args.length+"]=" + Arrays.toString(args));
         }
     }
 
@@ -97,6 +171,14 @@ public class ReenrollCommand extends BaseClientCommand {
         final String enrollmentId = serverInfo.getEnrollmentId();
         replaceConfigCommonName(enrollmentId);
         enrollIdStore.updateEnrollIdStore(enrollmentId, clientCfg.getEnrollmentRequest().getUsername());
+
+        try {
+            final PrivateKey privateKey = PemUtils.loadPrivateKey(tmpKeyFile);
+            CsrUtils.storePrivateKey(privateKey, id.getKeyFile());
+        } catch (IOException e) {
+            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_COMMS_FAILED, "reenroll command failed to store PrivateKey due to " + e.getMessage(), e);
+        }
+
         return buildResult(identity);
     }
 
@@ -120,7 +202,7 @@ public class ReenrollCommand extends BaseClientCommand {
 
     @Override
     public String getUsage() {
-        return "ca-client reenroll -h serverAddr -p serverPort -a <json string>";
+        return "ca-client reenroll -h serverAddr -p serverPort -a <json string> -key <newkeyfile>";
 
     }
 }

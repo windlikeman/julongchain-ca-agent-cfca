@@ -42,10 +42,6 @@ public class Signer {
 
     @Override
     public String toString() {
-        return "Signer{" +
-                "key=" + key + "\n" +
-                "cert=" + Hex.toHexString(cert) + "\n" +
-                ", client=" + client +
-                '}';
+        return "Signer{" + "key=" + key + "\n" + "cert=" + Hex.toHexString(cert) + "\n" + ", client=" + client + '}';
     }
 }

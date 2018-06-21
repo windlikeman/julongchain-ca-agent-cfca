@@ -16,7 +16,8 @@ public class MyFileUtilsTest {
 
     @Test
     public void makeFileAbs() {
-        String name = MyFileUtils.makeFileAbs("F:\\zc\\Block Chain Cipher Innovation Alliance\\code\\1.txt", "F:\\zc\\Block Chain Cipher Innovation Alliance\\code");
+        String name = MyFileUtils.makeFileAbs("F:\\zc\\Block Chain Cipher Innovation Alliance\\code\\1.txt",
+                "F:\\zc\\Block Chain Cipher Innovation Alliance\\code");
         System.out.println(name);
     }
 }

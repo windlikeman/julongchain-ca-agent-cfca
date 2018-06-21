@@ -6,7 +6,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/22
  * @Description GettCert命令服务器返回给客户端的 tcert 对象
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GettCertResponseResult {

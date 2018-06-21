@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/11
  * @Description GettCert命令的网络请求对象,用于调用服务器Restful接口
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class GettCertRequestNet {

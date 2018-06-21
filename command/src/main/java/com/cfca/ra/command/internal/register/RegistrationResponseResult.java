@@ -20,8 +20,6 @@ public class RegistrationResponseResult {
 
     @Override
     public String toString() {
-        return "RegistrationResponseResult{" +
-                "redentials='" + redentials + '\'' +
-                '}';
+        return "RegistrationResponseResult{" + "redentials='" + redentials + '\'' + '}';
     }
 }

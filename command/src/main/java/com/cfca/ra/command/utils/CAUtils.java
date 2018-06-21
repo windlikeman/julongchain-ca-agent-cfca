@@ -9,5 +9,4 @@ package com.cfca.ra.command.utils;
  */
 public class CAUtils {
 
-
 }

@@ -44,16 +44,15 @@ public class RevokeComms {
          * @return EnrollmentResponseNet
          */
         @POST("revoke")
-        Call<RevokeResponseNet> postWithRevokeRequestNet(
-                @Body RevokeRequestNet request,
-                @Header("Authorization") String auth
-        );
+        Call<RevokeResponseNet> postWithRevokeRequestNet(@Body RevokeRequestNet request, @Header("Authorization") String auth);
     }
 
     /**
-     * @param registrationRequestNet 申请证书的数据
+     * @param registrationRequestNet
+     *            申请证书的数据
      * @return EnrollmentResponseNet
-     * @throws IOException 网络请求失败
+     * @throws IOException
+     *             网络请求失败
      */
     public RevokeResponseNet request(RevokeRequestNet registrationRequestNet, String auth) throws CommandException {
         final String baseurl = clientConfig.getUrl();
@@ -95,7 +94,8 @@ public class RevokeComms {
             }
             return decodedResponse;
         } catch (IOException e) {
-            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : " + e.getMessage(), e);
+            throw new CommandException(CommandException.REASON_CODE_REVOKE_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : "
+                    + e.getMessage(), e);
         }
     }
 

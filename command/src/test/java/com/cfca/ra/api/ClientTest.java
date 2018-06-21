@@ -16,7 +16,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.OutputStream;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -33,8 +39,6 @@ public class ClientTest {
 
     @Test
     public void enroll() throws Exception {
-//        final Client client = new Client();
-//        client.enroll();
         final Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
 
@@ -49,9 +53,7 @@ public class ClientTest {
         final PublicKey publickey = keypair.getPublic();
         System.out.println("privateKey=" + privateKey);
         System.out.println("publickey=" + publickey);
-        PKCS10CertificationRequestBuilder pkcs10Builder = new JcaPKCS10CertificationRequestBuilder(
-                new X500Name("CN=TEST,C=CN"),
-                keypair.getPublic());
+        PKCS10CertificationRequestBuilder pkcs10Builder = new JcaPKCS10CertificationRequestBuilder(new X500Name("CN=TEST,C=CN"), keypair.getPublic());
 
         ContentSigner contentSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(keypair.getPrivate());
         PKCS10CertificationRequest csr = pkcs10Builder.build(contentSigner);
@@ -60,15 +62,5 @@ public class ClientTest {
         System.out.println(new String(base64Encoded));
         System.out.println(HexBin.encode(encoded));
         System.out.println(ASN1Dump.dumpAsString(csr.toASN1Structure(), true));
-
-
-//        KeyStore ks = KeyStore.getInstance("BKS", provider);
-//        ks.load(null, null);
-//        String user = "zc";
-//        Certificate[] chain = null;
-//        char[] password = null;
-//        ks.setKeyEntry(user, privateKey, password, chain);
-//        OutputStream stream = null;
-//        ks.store(stream, password);
     }
 }

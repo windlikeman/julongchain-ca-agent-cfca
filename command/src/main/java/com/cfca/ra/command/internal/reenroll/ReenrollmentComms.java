@@ -45,17 +45,16 @@ public class ReenrollmentComms {
          * @return EnrollmentResponseNet
          */
         @POST("reenroll")
-        Call<EnrollmentResponseNet> postWithEnrollData(
-                @Body ReenrollmentRequestNet request,
-                @Header("Authorization") String auth
-        );
+        Call<EnrollmentResponseNet> postWithEnrollData(@Body ReenrollmentRequestNet request, @Header("Authorization") String auth);
 
     }
 
     /**
-     * @param enrollmentRequest 申请证书的数据
+     * @param enrollmentRequest
+     *            申请证书的数据
      * @return EnrollmentResponseNet
-     * @throws IOException 网络请求失败
+     * @throws IOException
+     *             网络请求失败
      */
     public EnrollmentResponseNet request(ReenrollmentRequestNet enrollmentRequest, String auth) throws CommandException {
         final String baseUrl = clientConfig.getUrl();
@@ -101,7 +100,8 @@ public class ReenrollmentComms {
             }
             return decodedResponse;
         } catch (IOException e) {
-            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : " + e.getMessage(), e);
+            throw new CommandException(CommandException.REASON_CODE_REENROLL_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : "
+                    + e.getMessage(), e);
         }
     }
 

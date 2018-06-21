@@ -27,7 +27,7 @@ import java.util.List;
  * @author zhangchong
  * @create 2018/5/15
  * @Description 调用RATK接口的客户端实现类
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class RAClientImpl implements IRAClient {
@@ -125,11 +125,11 @@ public class RAClientImpl implements IRAClient {
 
         //20180531235959
         final long start = tCertReq.getNotBefore().getTime();
-//        certServiceRequestVO.setStartTime(start);
-//        certServiceRequestVO.setEndTime(endTime);
-//        certServiceRequestVO.setAddIdentNoExt(addIdentNoExt);
-//        certServiceRequestVO.setSelfExtValue(selfExtValue);
-//        certServiceRequestVO.setP10(p10);
+        // certServiceRequestVO.setStartTime(start);
+        // certServiceRequestVO.setEndTime(endTime);
+        // certServiceRequestVO.setAddIdentNoExt(addIdentNoExt);
+        // certServiceRequestVO.setSelfExtValue(selfExtValue);
+        // certServiceRequestVO.setP10(p10);
 
         return null;
     }
@@ -159,7 +159,7 @@ public class RAClientImpl implements IRAClient {
             // 普通证书 普通：1 高级：2
             // 复合证书 单单1-1 单双1-2 双单2-1 双双2-2
             String certType = "1";
-            // 个人证书：1 企业证书：2 设备证书：6  场景证书：7  个人生物识别证书：8  企业生物识别证书:9
+            // 个人证书：1 企业证书：2 设备证书：6 场景证书：7 个人生物识别证书：8 企业生物识别证书:9
             String customerType = "1";
             String identType = "Z";
             String identNo = data.getProfile();
@@ -184,7 +184,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
             certServiceRequestVO.setKeyAlg(keyAlg);
             certServiceRequestVO.setBranchCode(branchCode);
-//            certServiceRequestVO.setEmail(email);
+            // certServiceRequestVO.setEmail(email);
             certServiceRequestVO.setP10(p10);
             return certServiceRequestVO;
         } catch (Exception e) {
@@ -197,12 +197,12 @@ public class RAClientImpl implements IRAClient {
             // 普通证书 普通：1 高级：2
             // 复合证书 单单1-1 单双1-2 双单2-1 双双2-2
             String certType = "1";
-            // 个人证书：1 企业证书：2 设备证书：6  场景证书：7  个人生物识别证书：8  企业生物识别证书:9
+            // 个人证书：1 企业证书：2 设备证书：6 场景证书：7 个人生物识别证书：8 企业生物识别证书:9
             String customerType = "1";
             String identType = "Z";
             String branchCode = "678";
-//            String email = "test@demo.com";
-            //密钥算法"SM2"
+            // String email = "test@demo.com";
+            // 密钥算法"SM2"
             String keyAlg = "SM2";
             //密钥长度"256"
             int keyLength = 256;
@@ -222,7 +222,7 @@ public class RAClientImpl implements IRAClient {
             certServiceRequestVO.setKeyLength(String.valueOf(keyLength));
             certServiceRequestVO.setKeyAlg(keyAlg);
             certServiceRequestVO.setBranchCode(branchCode);
-//            certServiceRequestVO.setEmail(email);
+            // certServiceRequestVO.setEmail(email);
             certServiceRequestVO.setUserNameInDn(enrollmentID);
             certServiceRequestVO.setP10(p10);
             return certServiceRequestVO;

@@ -62,11 +62,6 @@ public class RegistrationResponseNet {
 
     @Override
     public String toString() {
-        return "EnrollmentResponse{" +
-                "success=" + success +
-                ", result='" + result + '\'' +
-                ", errors=" + errors +
-                ", messages=" + messages +
-                '}';
+        return "EnrollmentResponse{" + "success=" + success + ", result='" + result + '\'' + ", errors=" + errors + ", messages=" + messages + '}';
     }
 }

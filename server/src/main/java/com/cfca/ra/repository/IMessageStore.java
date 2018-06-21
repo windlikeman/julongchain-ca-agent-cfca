@@ -7,7 +7,7 @@ import com.cfca.ra.beans.BaseRequest;
  * @author zhangchong
  * @create 2018/5/16
  * @Description 消息管理类
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public interface IMessageStore {

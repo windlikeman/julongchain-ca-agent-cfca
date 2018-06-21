@@ -15,8 +15,9 @@ public class MyStringUtils {
     /**
      * 检查一个 CharSequence 是否是空格, 空 ("") 或者 null.
      *
-     * @param cs  待检查的 CharSequence , 可能是 null
-     * @return {@code true}  如果 CharSequence 是 null, 空或者空格
+     * @param cs
+     *            待检查的 CharSequence , 可能是 null
+     * @return {@code true} 如果 CharSequence 是 null, 空或者空格
      */
     public static boolean isBlank(CharSequence cs) {
         int strLen;
@@ -34,7 +35,8 @@ public class MyStringUtils {
     /**
      * 检查一个 CharSequence 是否为空 (""), 是否为null 是否是空格.
      *
-     * @param cs  待检查的 CharSequence , 可能是 null
+     * @param cs
+     *            待检查的 CharSequence , 可能是 null
      * @return {@code true} 如果 cs 不会空 也不为null 也不为空格
      */
     public static boolean isNotBlank(CharSequence cs) {
@@ -42,19 +44,25 @@ public class MyStringUtils {
     }
 
     /**
-     * <p>判断字符串是否为空或者为空串</p>
+     * <p>
+     * 判断字符串是否为空或者为空串
+     * </p>
      *
-     * @param cs 待检查的CharSequence, 可能为 null
-     * @return {@code true} 如果  CharSequence is empty or null
+     * @param cs
+     *            待检查的CharSequence, 可能为 null
+     * @return {@code true} 如果 CharSequence is empty or null
      */
     public static boolean isEmpty(final CharSequence cs) {
         return cs == null || cs.length() == 0;
     }
 
     /**
-     * <p>检查 一个CharSequence 是否不会空 ("") 而且不为 null.</p>
+     * <p>
+     * 检查 一个CharSequence 是否不会空 ("") 而且不为 null.
+     * </p>
      *
-     * @param cs 待检查的 CharSequence, 可能为 null
+     * @param cs
+     *            待检查的 CharSequence, 可能为 null
      * @return {@code true} 如果 CharSequence 不为空或者不为 null
      */
     public static boolean isNotEmpty(final CharSequence cs) {
@@ -63,6 +71,7 @@ public class MyStringUtils {
 
     /**
      * 如果末尾是 cutset, 截取不包含它的剩余字符串
+     * 
      * @param str
      * @param cutset
      * @return

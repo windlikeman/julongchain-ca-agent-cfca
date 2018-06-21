@@ -13,9 +13,9 @@ public class ConfigBean {
     private String url;
 
     /**
-     * Membership Service Provider (MSP) directory
-     * This is useful when the client is used to enroll a peer or orderer, so
-     * that the enrollment artifacts are stored in the format expected by MSP.
+     * Membership Service Provider (MSP) directory This is useful when the
+     * client is used to enroll a peer or orderer, so that the enrollment
+     * artifacts are stored in the format expected by MSP.
      */
     private String mspdir;
 
@@ -31,7 +31,8 @@ public class ConfigBean {
     private CsrConfig csr;
 
     /**
-     * Registration section used to register a new identity with fabric-ca server
+     * Registration section used to register a new identity with fabric-ca
+     * server
      */
     private ClientIdentity id;
 
@@ -123,14 +124,7 @@ public class ConfigBean {
 
     @Override
     public String toString() {
-        return "ConfigBean{" +
-                "url='" + url + '\'' +
-                ", mspdir='" + mspdir + '\'' +
-                ", tls=" + tls +
-                ", csr=" + csr +
-                ", id=" + id +
-                ", enrollment=" + enrollment +
-                ", caname='" + caname + '\'' +
-                '}';
+        return "ConfigBean{" + "url='" + url + '\'' + ", mspdir='" + mspdir + '\'' + ", tls=" + tls + ", csr=" + csr + ", id=" + id + ", enrollment="
+                + enrollment + ", caname='" + caname + '\'' + '}';
     }
 }

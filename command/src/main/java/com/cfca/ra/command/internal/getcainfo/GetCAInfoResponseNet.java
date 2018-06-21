@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/17
- * * @Description GetCAInfo命令的网络响应对象
+ * @Description GetCAInfo命令的网络响应对象
  * @CodeReviewer
  * @since v3.0.0
  */
@@ -64,11 +64,6 @@ public class GetCAInfoResponseNet {
 
     @Override
     public String toString() {
-        return "GetCAInfoResponseNet{" +
-                "success=" + success +
-                ", result='" + result + '\'' +
-                ", errors=" + errors +
-                ", messages=" + messages +
-                '}';
+        return "GetCAInfoResponseNet{" + "success=" + success + ", result='" + result + '\'' + ", errors=" + errors + ", messages=" + messages + '}';
     }
 }

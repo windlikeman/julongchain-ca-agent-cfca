@@ -1,5 +1,13 @@
 package com.cfca.ra.command.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.security.PrivateKey;
+import java.util.Collections;
+
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -11,10 +19,6 @@ import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.security.PrivateKey;
-import java.util.Collections;
 
 /**
  * @author zhangchong
@@ -29,7 +33,7 @@ public class PemUtils {
     public static void storePrivateKey(String resource, PrivateKey privateKey) throws Exception {
         try (FileOutputStream bOut = new FileOutputStream(resource);
              PemWriter pWrt = new PemWriter(new OutputStreamWriter(bOut));) {
-            pWrt.writeObject(new PemObject("EC PRIVATE KEY", Collections.EMPTY_LIST, privateKey.getEncoded()));
+             pWrt.writeObject(new PemObject("EC PRIVATE KEY", Collections.EMPTY_LIST, privateKey.getEncoded()));
         }
     }
 

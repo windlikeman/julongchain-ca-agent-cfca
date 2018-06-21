@@ -1,6 +1,11 @@
 package com.cfca.ra;
 
-import com.cfca.ra.ca.*;
+import com.cfca.ra.ca.CA;
+import com.cfca.ra.ca.CAConfig;
+import com.cfca.ra.ca.CAInfo;
+import com.cfca.ra.ca.DefaultUserRegistry;
+import com.cfca.ra.ca.TcertKeyTree;
+import com.cfca.ra.ca.TcertManager;
 import com.cfca.ra.enroll.EnrollmentResponseNet;
 import com.cfca.ra.getcainfo.GetCAInfoResponseNet;
 import com.cfca.ra.gettcert.GettCertResponse;
@@ -13,6 +18,7 @@ import com.cfca.ra.utils.PemUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -27,6 +33,7 @@ import java.io.File;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,7 +43,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/16
  * @Description 服务器的信息
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 @Configuration
@@ -47,11 +54,9 @@ public class RAServer {
     /**
      * 服务器的工作目录
      */
-    @Value("${server.homeDir}")
     private String serverHomeDir;
 
-    @Autowired
-    private CAInfo caInfo;
+    private final CAInfo caInfo;
 
     /**
      * RAServer's default CA
@@ -66,19 +71,34 @@ public class RAServer {
     private final static byte[] KEY_BYTES = {0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
             0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38};
 
+    @Autowired
+    public RAServer(CAInfo caInfo) throws RAServerException {
+        this.caInfo = caInfo;
+        initialize();
+    }
+
     public void initialize() throws RAServerException {
+        initServerHomeDir();
+
+        defaultCA = initCA(null);
+        addCA(defaultCA);
+    }
+
+    public synchronized void initServerHomeDir() {
         if (StringUtils.isEmpty(serverHomeDir)) {
             this.serverHomeDir = System.getProperty("user.dir");
         }
         this.serverHomeDir = MyFileUtils.getAbsFilePath(serverHomeDir);
         logger.info("Initializing server in directory {}", serverHomeDir);
-        final boolean mkdirs = new File(serverHomeDir).mkdirs();
+        final File file = new File(serverHomeDir);
+        if (file.exists()){
+            logger.warn("home directory already exist");
+            return;
+        }
+        final boolean mkdirs = file.mkdirs();
         if (!mkdirs) {
             logger.warn("failed to init server with create home directory");
         }
-
-        defaultCA = initCA(null);
-        addCA(defaultCA);
     }
 
     public String getServerHomeDir() {
@@ -135,24 +155,16 @@ public class RAServer {
                 logger.warn("failed to init CA with create CA home directory due to homeDir not dir type:{}", homeDir);
             }
 
-//            final CAInfo caInfo = new CAInfo.Builder(name, homeDir).build();
             local = new CAConfig.Builder(caInfo, homeDir).build();
         }
         DefaultUserRegistry registry = new DefaultUserRegistry();
 
-        // Initialize TCert handling
-        final String keyfile = String.join(File.separator, local.getHomeDir(), local.getCA().getKeyfile());
-        final String certfile = String.join(File.separator, local.getHomeDir(), local.getCA().getCertfile());
-        TcertManager tcertMgr = loadTcertMgr(keyfile, certfile);
-        // FIXME: root 前置密钥 需要序列化到数据库或者本地文件
-        Key rootKey = genRootKey();
-        final TcertKeyTree tcertKeyTree = new TcertKeyTree(rootKey);
-
+        // FIXME :Initialize TCert handling
         CA.Builder defaultCABuilder = new CA.Builder(this, local, registry)
                 .enrollIdStore(EnrollIdStore.CFCA)
                 .certStore(CertCertStore.CFCA)
-                .tcertKeyTree(tcertKeyTree)
-                .tcertMgr(tcertMgr);
+                .tcertKeyTree(null)
+                .tcertMgr(null);
         CA defaultCA = defaultCABuilder.build();
 
         logger.info("Init default CA with home {} and config {}", defaultCA.getHomeDir(), defaultCA.getConfig());
@@ -161,17 +173,6 @@ public class RAServer {
 
     Key genRootKey() {
         return new SecretKeySpec(KEY_BYTES, "AES256");
-    }
-
-    private TcertManager loadTcertMgr(String keyfile, String certfile) throws RAServerException {
-        try {
-            PrivateKey caKey = PemUtils.loadPrivateKey(keyfile);
-            Certificate caCert = PemUtils.loadCert(certfile);
-            ContentSigner caCertSigner = new JcaContentSignerBuilder("SM3WITHSM2").setProvider("BC").build(caKey);
-            return new TcertManager.Builder(caKey, caCert).caCertSigner(caCertSigner).builder();
-        } catch (Exception e) {
-            throw new RAServerException(RAServerException.REASON_CODE_RA_SERVER_LOAD_TCERT_MGR, e);
-        }
     }
 
     public CA getCA(final String caName) throws RAServerException {
@@ -228,26 +229,6 @@ public class RAServer {
         final CA ca = getCA(caname);
         IUser caller = ca.getRegistry().getUser(enrollmentID, null);
         return caller;
-    }
-
-    public TcertKeyTree getTcertKeyTree(String caname) throws RAServerException {
-        final CA ca = getCA(caname);
-        return ca.getTcertKeyTree();
-    }
-
-    public TcertManager getTcertMgr(String caname) throws RAServerException {
-        final CA ca = getCA(caname);
-        return ca.getTcertMgr();
-    }
-
-    public void fillGettcertInfo(String caname, GettCertResponseNet resp, GettCertResponse tcertResponse) throws RAServerException {
-        final CA ca = getCA(caname);
-        ca.fillGettcertInfo(resp, tcertResponse);
-    }
-
-    public Certificate getEnrollmentCert(String caname, String enrollmentID) throws RAServerException {
-        final CA ca = getCA(caname);
-        return ca.loadCert(enrollmentID);
     }
 
     public void attributeIsTrue(String caName, String id, String attr) throws RAServerException {

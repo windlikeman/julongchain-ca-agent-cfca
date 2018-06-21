@@ -16,8 +16,8 @@ import java.util.Date;
  * @author zhangchong
  * @create 2018/5/25
  * @Description
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
 public class TCertReq {
     private final Extension keyUsageExtension;

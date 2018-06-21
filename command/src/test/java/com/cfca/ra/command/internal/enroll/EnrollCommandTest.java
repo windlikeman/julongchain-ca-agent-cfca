@@ -9,7 +9,9 @@ import com.cfca.ra.command.utils.CsrUtils;
 import com.cfca.ra.command.utils.MyStringUtils;
 import com.cfca.ra.command.utils.PemUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
@@ -30,13 +32,17 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
-
+/**
+ * @author zhangchong
+ * @create 2018/5/11
+ * @Description 测试enroll命令
+ * @CodeReviewer helonglong
+ * @since v3.0.0
+ */
 public class EnrollCommandTest {
 
     private EnrollCommand enrollCommand;
     private BouncyCastleProvider provider;
-    private String keyFile;
-
 
     @Before
     public void setUp() throws Exception {
@@ -57,7 +63,7 @@ public class EnrollCommandTest {
     }
 
     @Test
-    public void testBuildEnrollment() throws Exception {
+    public void testBuildEnrollment() {
         String s = "{}";
         final EnrollmentRequest enrollmentRequest = new Gson().fromJson(s, EnrollmentRequest.class);
         System.out.println(enrollmentRequest.toString());
@@ -79,17 +85,24 @@ public class EnrollCommandTest {
         CsrConfig csrConfig = configBean.getCsr();
         String caName = configBean.getCaname();
 
-        final String username = "admin";
+//        final String username = "admin";
+//        final String password = "1234";
+        final String username = "test4";
+        final String password = "1234";
         final String algo = csrConfig.getKey().getAlgo();
         final String names = csrConfig.getNames();
         final CsrResult result = CsrUtils.genCSR(algo, names);
         CsrUtils.storeMyPrivateKey(result, username);
 
-        final EnrollmentRequest.Builder builder = new EnrollmentRequest.Builder(result.getCsr(), username, "1234", profile, csrConfig, caName);
+        final EnrollmentRequest.Builder builder = new EnrollmentRequest.Builder(result.getCsr(), username, password, profile, csrConfig, caName);
         final EnrollmentRequest enrollmentRequest = builder.build();
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final String jsonFile = "TestData/enroll.json";
+        FileUtils.writeStringToFile(new File(jsonFile), gson.toJson(enrollmentRequest));
+
         final EnrollCommand enrollCommand = new EnrollCommand();
-        String[] args = new String[]{"enroll", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(enrollmentRequest)};
-        enrollCommand.prepare(args);
+        String[] args1 = new String[]{"enroll", "-h", "localhost", "-p", "8089", "-a", jsonFile};
+        enrollCommand.prepare(args1);
         final JsonObject response = enrollCommand.execute();
         System.out.println(response);
     }

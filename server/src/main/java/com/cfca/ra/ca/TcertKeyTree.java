@@ -1,19 +1,10 @@
 package com.cfca.ra.ca;
 
-import com.cfca.ra.RAServer;
 import com.cfca.ra.RAServerException;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.pqc.jcajce.provider.util.KeyUtil;
-import org.bouncycastle.util.Strings;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.Key;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +14,10 @@ import java.util.Map;
  * @author zhangchong
  * @create 2018/5/24
  * @Description
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
+@Deprecated
 public class TcertKeyTree {
     private Key rootKey;
 

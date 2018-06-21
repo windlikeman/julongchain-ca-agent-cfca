@@ -1,6 +1,18 @@
 package com.cfca.ra;
 
-import com.cfca.ra.ca.TcertManager;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.spec.KeySpec;
+import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+
+import com.cfca.ra.ca.CAInfo;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
@@ -14,17 +26,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.spec.KeySpec;
-import java.util.Arrays;
-
 /**
  * @author zhangchong
  * @create 2018/5/25
@@ -34,12 +35,11 @@ import java.util.Arrays;
  */
 public class EncryptTest {
 
-
     private RAServer raServer;
 
     @Before
     public void setUp() throws Exception {
-        raServer = new RAServer();
+        raServer = new RAServer(new CAInfo());
         Security.addProvider(new BouncyCastleProvider());
     }
 
@@ -78,7 +78,7 @@ public class EncryptTest {
             String xiv = "1234567891234567";
             byte[] iv = xiv.getBytes("UTF-8");
             int length;
-            //Set up
+            // Set up
             AESEngine engine = new AESEngine();
             CBCBlockCipher blockCipher = new CBCBlockCipher(engine);
             PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher);
@@ -93,12 +93,12 @@ public class EncryptTest {
             String encryptedInput = new String(Base64.encode(outputBytes));
             System.out.println("Encrypted String:" + encryptedInput);
 
-            //Decrypt
+            // Decrypt
             cipher.init(false, keyParamWithIV);
             byte[] out2 = Base64.decode(encryptedInput);
             byte[] comparisonBytes = new byte[cipher.getOutputSize(out2.length)];
             length = cipher.processBytes(out2, 0, out2.length, comparisonBytes, 0);
-            cipher.doFinal(comparisonBytes, length); //Do the final block
+            cipher.doFinal(comparisonBytes, length); // Do the final block
             String s2 = new String(comparisonBytes);
             System.out.println("Decrypted String:" + s2);
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class EncryptTest {
     }
 
     @Test
-    public void testPBEKDF()throws Exception {
+    public void testPBEKDF() throws Exception {
         SecretKeyFactory factorybc = SecretKeyFactory.getInstance("PBEWITHHMACSHA256", "BC");
         KeySpec keyspecbc = new PBEKeySpec("password".toCharArray(), generateSalt(), 1000, 128);
         Key keybc = factorybc.generateSecret(keyspecbc);
@@ -128,13 +128,13 @@ public class EncryptTest {
         byte[] iv = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
-        //========================ENCRYPT===========================
+        // ========================ENCRYPT===========================
         in.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
         byte[] enc = in.doFinal(encode);
         System.out.println("Encrypted Content:");
         System.out.println(new String(Hex.encode(enc)));
 
-        //========================DECRYPT===========================
+        // ========================DECRYPT===========================
         Cipher out = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
         out.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         byte[] dec = out.doFinal(enc);

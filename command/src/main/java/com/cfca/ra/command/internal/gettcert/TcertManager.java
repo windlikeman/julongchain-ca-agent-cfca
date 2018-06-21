@@ -36,15 +36,12 @@ public class TcertManager {
     private final Certificate caCert;
 
     /**
-     * ValidityPeriod是颁发的证书有效的持续时间
-     * 除非用户请求更短的有效期.
-     * 默认是 1 年.
+     * ValidityPeriod是颁发的证书有效的持续时间 除非用户请求更短的有效期. 默认是 1 年.
      */
     private final long validityPeriod;
 
     /**
-     * MaxAllowedBatchSize是一次可以请求的TCerts的最大数量.
-     * 默认值是 1000.
+     * MaxAllowedBatchSize是一次可以请求的TCerts的最大数量. 默认值是 1000.
      */
     private final int maxAllowedBatchSize;
 
@@ -65,8 +62,7 @@ public class TcertManager {
             } else if (req.getCount() <= maxAllowedBatchSize) {
                 numTCertsInBatch = req.getCount();
             } else {
-                final String message = String.format("You may not request %d TCerts; the maximum is %d",
-                        req.getCount(), maxAllowedBatchSize);
+                final String message = String.format("You may not request %d TCerts; the maximum is %d", req.getCount(), maxAllowedBatchSize);
                 throw new CommandException(CommandException.REASON_CODE_GETTCERT_COMMAND_COMMS_FAILED, message);
             }
 

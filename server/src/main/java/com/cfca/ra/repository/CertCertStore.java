@@ -27,7 +27,7 @@ import java.util.Collection;
  * @author zhangchong
  * @create 2018/5/16
  * @Description CA 中的证书数据库管理类
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public enum CertCertStore implements ICACertStore {
@@ -133,7 +133,7 @@ public enum CertCertStore implements ICACertStore {
                         return absolutePath;
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("CertCertStore@getCertFilePath : failed to list cert file", e);
                 }
             }
             return null;

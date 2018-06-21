@@ -110,5 +110,4 @@ public enum EnrollIdStore implements IEnrollIdStore {
         this.caName = caName;
     }
 
-
 }

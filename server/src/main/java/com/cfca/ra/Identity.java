@@ -13,8 +13,8 @@ import java.security.Signature;
  * @author zhangchong
  * @create 2018/6/4
  * @Description 用户个体实例
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
 public class Identity {
 

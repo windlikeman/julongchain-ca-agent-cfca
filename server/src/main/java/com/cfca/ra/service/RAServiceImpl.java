@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RAServiceImpl implements IRAService {
-    private static final Logger logger = LoggerFactory.getLogger(RAServiceImpl.class);
     private final RAServer raServer;
     private final RegisterService registerService;
     private final EnrollService enrollService;

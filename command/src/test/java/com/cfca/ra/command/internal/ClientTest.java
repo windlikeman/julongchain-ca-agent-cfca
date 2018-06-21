@@ -18,12 +18,13 @@ public class ClientTest {
     public void test() throws Exception {
         String homedir = "./";
         final Client client = new Client(ClientConfig.INSTANCE, homedir);
-//        System.out.println(client.genCSR("SM2", "CN=051@testName@Z1234567890@53,OU=Individual-3,OU=Local RA,O=CFCA TEST CA,C=CN").getCsr());
+        // System.out.println(client.genCSR("SM2",
+        // "CN=051@testName@Z1234567890@53,OU=Individual-3,OU=Local RA,O=CFCA TEST CA,C=CN").getCsr());
     }
 
     @Test
     public void testbuildSigner() throws Exception {
-        byte[] cert = new byte[]{1, 2, 3, 3};
+        byte[] cert = new byte[] { 1, 2, 3, 3 };
         Client client = new Client(null, "homedir");
         Signer ecert = new Signer(null, cert, client);
         final Identity id = new Identity("hello", ecert, client);

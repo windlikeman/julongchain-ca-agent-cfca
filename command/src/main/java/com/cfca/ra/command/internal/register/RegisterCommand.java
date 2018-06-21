@@ -45,13 +45,14 @@ public final class RegisterCommand extends BaseClientCommand {
     /**
      * ca-client register -h host -p port -a <json string>
      *
-     * @param args 命令行参数
-     * @throws CommandException 失败则返回
+     * @param args
+     *            命令行参数
+     * @throws CommandException
+     *             失败则返回
      */
     @Override
     public void prepare(String[] args) throws CommandException {
         super.prepare(args);
-
 
         processConfigFile();
         if (!MyStringUtils.isBlank(content) && !EMPTY_JSON_STRING.equalsIgnoreCase(content)) {
@@ -60,7 +61,8 @@ public final class RegisterCommand extends BaseClientCommand {
     }
 
     private void processContent() {
-        final RegistrationRequest registrationRequest = new Gson().fromJson(content, RegistrationRequest.class);
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final RegistrationRequest registrationRequest = gson.fromJson(content, RegistrationRequest.class);
         logger.info(registrationRequest.toString());
         clientCfg.setRegistrationRequest(registrationRequest);
     }
@@ -77,7 +79,8 @@ public final class RegisterCommand extends BaseClientCommand {
     public void checkArgs(String[] args) throws CommandException {
         if (args.length != COMMAND_LINE_ARGS_NUM) {
             logger.error("Usage : " + getUsage());
-            throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_ARGS_INVALID, "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
+            throw new CommandException(CommandException.REASON_CODE_REGISTER_COMMAND_ARGS_INVALID,
+                    "fail to build enroll command ,because args is invalid : args=" + Arrays.toString(args));
         }
     }
 
@@ -103,7 +106,6 @@ public final class RegisterCommand extends BaseClientCommand {
         mkNewUserDir(name);
         return buildResult(secret);
     }
-
 
     private JsonObject buildResult(String s) {
         final JsonObject jsonObject = new JsonObject();

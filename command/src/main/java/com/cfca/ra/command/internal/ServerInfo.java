@@ -12,8 +12,7 @@ import java.util.Arrays;
 public class ServerInfo {
     private final String caName;
     /**
-     * CAChain 就是 CA 证书链.
-     * 链表中的第一个元素就是CA根证书
+     * CAChain 就是 CA 证书链. 链表中的第一个元素就是CA根证书
      */
     private final byte[] caChain;
 
@@ -24,18 +23,17 @@ public class ServerInfo {
 
     private final String enrollmentId;
 
-    private ServerInfo(Builder builder){
+    private ServerInfo(Builder builder) {
         this.caName = builder.caName;
         this.caChain = builder.caChain;
         this.version = builder.version;
         this.enrollmentId = builder.enrollmentId;
     }
 
-    public static class Builder{
+    public static class Builder {
         private String caName;
         /**
-         * CAChain 就是 CA 证书链.
-         * 链表中的第一个元素就是CA根证书
+         * CAChain 就是 CA 证书链. 链表中的第一个元素就是CA根证书
          */
         private byte[] caChain;
 
@@ -45,27 +43,27 @@ public class ServerInfo {
         private String version = "v3.0.0";
         private String enrollmentId;
 
-        public Builder enrollmentId(String enrollmentId){
+        public Builder enrollmentId(String enrollmentId) {
             this.enrollmentId = enrollmentId;
             return this;
         }
 
-        public Builder caName(String caName){
+        public Builder caName(String caName) {
             this.caName = caName;
             return this;
         }
 
-        public Builder caChain(byte[] caChain){
+        public Builder caChain(byte[] caChain) {
             this.caChain = caChain;
             return this;
         }
 
-        public Builder version(String version){
+        public Builder version(String version) {
             this.version = version;
             return this;
         }
 
-        public ServerInfo build(){
+        public ServerInfo build() {
             return new ServerInfo(this);
         }
     }
@@ -88,11 +86,7 @@ public class ServerInfo {
 
     @Override
     public String toString() {
-        return "ServerInfo{" +
-                "caName='" + caName + '\'' +
-                ", caChain=" + Arrays.toString(caChain) +
-                ", version='" + version + '\'' +
-                ", enrollmentId='" + enrollmentId + '\'' +
-                '}';
+        return "ServerInfo{" + "caName='" + caName + '\'' + ", caChain=" + Arrays.toString(caChain) + ", version='" + version + '\'' + ", enrollmentId='"
+                + enrollmentId + '\'' + '}';
     }
 }

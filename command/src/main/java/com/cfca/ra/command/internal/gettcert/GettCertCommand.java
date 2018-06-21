@@ -57,5 +57,4 @@ public class GettCertCommand extends BaseClientCommand {
         return "ca-client tcert -h host -p port -a <json>";
     }
 
-
 }

@@ -4,7 +4,6 @@ import cfca.ra.common.vo.request.CertServiceRequestVO;
 import cfca.ra.common.vo.response.CertServiceResponseVO;
 import cfca.ra.toolkit.RAClient;
 import cfca.ra.toolkit.exception.RATKException;
-import com.cfca.ra.demo.TestConfig;
 
 // 证书吊销
 public class Test2901 {

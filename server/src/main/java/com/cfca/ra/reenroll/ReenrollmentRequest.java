@@ -8,7 +8,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/11
  * @Description reenroll 命令服务器内部使用对象,用于封装 ReenrollmentRequestNet 对象
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class ReenrollmentRequest extends BaseRequest {

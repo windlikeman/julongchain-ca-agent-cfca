@@ -6,33 +6,27 @@ import com.cfca.ra.command.config.CsrConfig;
 import com.cfca.ra.command.internal.CsrResult;
 import com.cfca.ra.command.utils.ConfigUtils;
 import com.cfca.ra.command.utils.CsrUtils;
-import com.cfca.ra.command.utils.MyStringUtils;
-import com.cfca.ra.command.utils.PemUtils;
 import com.google.gson.Gson;
-import org.bouncycastle.asn1.x500.X500Name;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECNamedCurveGenParameterSpec;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
 import java.security.Security;
-import java.security.spec.AlgorithmParameterSpec;
 
+/**
+ * @author zhangchong
+ * @create 2018/5/11
+ * @Description 测试 reenroll 命令
+ * @CodeReviewer helonglong
+ * @since v3.0.0
+ */
 public class ReenrollCommandTest {
 
     private ReenrollCommand reenrollCommand;
-    private String keyFile;
     private BouncyCastleProvider provider;
 
     @Before
@@ -60,20 +54,29 @@ public class ReenrollCommandTest {
         String profile = configBean.getEnrollment().getProfile();
         CsrConfig csrConfig = configBean.getCsr();
         String caName = configBean.getCaname();
-        //"test", "dGVzdDoxMjM0"// "test2":"dGVzdDI6MTIzNA=="
-        final String username = "test4";
-        final String password = "dGVzdDQ6MTIzNA==";
 
         final String algo = csrConfig.getKey().getAlgo();
         final String names = csrConfig.getNames();
         final CsrResult result = CsrUtils.genCSR(algo, names);
+        final String keyDir = "D:\\R15\\P1552\\dev\\blockchain\\command\\ca-client\\config\\msp\\tmp\\keystore";
+        final String keyFile = "key.pem";
 
-        final ReenrollmentRequest.Builder builder = new ReenrollmentRequest.Builder(result.getCsr(), username, password, profile, csrConfig, caName);
+        CsrUtils.storePrivateKey(result, keyDir, keyFile);
+        final String csr = result.getCsr();
+        System.out.println("CSR=" + csr);
+        final String username = "admin";
+        final String password = "1234";
+        final ReenrollmentRequest.Builder builder = new ReenrollmentRequest.Builder(csr, username, password, profile, csrConfig, caName);
         final ReenrollmentRequest reenrollmentRequest = builder.build();
-        String[] args = new String[]{"enroll", "-h", "localhost", "-p", "8089", "-a", new Gson().toJson(reenrollmentRequest)};
+        final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        final String jsonFile = "TestData/reenroll.json";
+        final String request = gson.toJson(reenrollmentRequest);
+        FileUtils.writeStringToFile(new File(jsonFile), request);
+
+        final String keyFilePath = String.join(File.separator, keyDir, keyFile);
+        String[] args = new String[]{"reenroll", "-h", "localhost", "-p", "8089", "-a", jsonFile, "-key", keyFilePath};
+        ReenrollCommand reenrollCommand = new ReenrollCommand();
         reenrollCommand.prepare(args);
         reenrollCommand.execute();
-
-        CsrUtils.storeMyPrivateKey(result, username);
     }
 }

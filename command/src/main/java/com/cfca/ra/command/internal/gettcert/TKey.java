@@ -24,9 +24,6 @@ class TKey {
 
     @Override
     public String toString() {
-        return "TKey{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                '}';
+        return "TKey{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
     }
 }

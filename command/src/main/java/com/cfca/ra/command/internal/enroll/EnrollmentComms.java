@@ -46,10 +46,7 @@ public class EnrollmentComms {
          * @return EnrollmentResponseNet
          */
         @POST("enroll")
-        Call<EnrollmentResponseNet> postWithEnrollData(
-                @Body EnrollmentRequestNet request,
-                @Header("Authorization") String auth
-        );
+        Call<EnrollmentResponseNet> postWithEnrollData(@Body EnrollmentRequestNet request, @Header("Authorization") String auth);
 
         /**
          * 使用 post 请求提交 enroll数据
@@ -58,19 +55,19 @@ public class EnrollmentComms {
          * @return EnrollmentResponseNet
          */
         @POST("enroll")
-        Call<EnrollmentResponseNet> postWithEnrollData(
-                @Body EnrollmentRequestNet request
-        );
+        Call<EnrollmentResponseNet> postWithEnrollData(@Body EnrollmentRequestNet request);
     }
 
     /**
-     * @param enrollmentRequest 申请证书的数据
+     * @param enrollmentRequest
+     *            申请证书的数据
      * @return EnrollmentResponseNet
-     * @throws IOException 网络请求失败
+     * @throws IOException
+     *             网络请求失败
      */
     public EnrollmentResponseNet request(EnrollmentRequestNet enrollmentRequest, String auth) throws CommandException {
         final String s = new Gson().toJson(enrollmentRequest);
-        logger.info("request>>>>>>" + Base64.toBase64String(s.getBytes()));
+        logger.info("EnrollmentComms@request : {}", Base64.toBase64String(s.getBytes()));
         final String baseurl = clientConfig.getUrl();
         if (MyStringUtils.isBlank(baseurl)) {
             throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "baseurl is empty");
@@ -115,7 +112,8 @@ public class EnrollmentComms {
             }
             return decodedResponse;
         } catch (IOException e) {
-            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : " + e.getMessage(), e);
+            throw new CommandException(CommandException.REASON_CODE_ENROLL_COMMAND_COMMS_FAILED, "failed to communicate with server, reaseon : "
+                    + e.getMessage(), e);
         }
     }
 

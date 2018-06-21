@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
  * @author zhangchong
  * @create 2018/6/8
  * @Description 用于处理鉴权信息的工具类
- * @CodeReviewer
- * @since
+ * @CodeReviewer helonglong
+ * @since v3.0.0
  */
 public class AuthUtils {
     private static final Logger logger = LoggerFactory.getLogger(AuthUtils.class);

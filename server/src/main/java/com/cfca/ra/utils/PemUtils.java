@@ -21,7 +21,7 @@ import java.util.Collections;
  * @author zhangchong
  * @create 2018/5/17
  * @Description Pem文件工具类, 用于读取证书和密钥写入 pem 格式文件
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class PemUtils {
@@ -52,7 +52,6 @@ public class PemUtils {
         final PemObject certObject = loadFile(fileName);
         final byte[] certDecoded = certObject.getContent();
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(certDecoded);
-//        logger.info("loadCert>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         return Certificate.getInstance(asn1Primitive);
     }
 
@@ -77,7 +76,6 @@ public class PemUtils {
         final PemObject certObject = loadFile(fileName);
         final byte[] content = certObject.getContent();
         final ASN1Primitive asn1Primitive = ASN1Primitive.fromByteArray(content);
-//        logger.info("loadPrivateKey>>>>>>" + ASN1Dump.dumpAsString(asn1Primitive, true));
         final PrivateKeyInfo info = PrivateKeyInfo.getInstance(asn1Primitive);
         return BouncyCastleProvider.getPrivateKey(info);
     }

@@ -69,7 +69,7 @@ public abstract class BaseClientCommand implements IClientCommand {
     protected Client client;
 
     protected String host;
-    private String port;
+    protected String port;
     protected String content;
 
     /**
@@ -82,8 +82,10 @@ public abstract class BaseClientCommand implements IClientCommand {
     /**
      * 检查命令行参数有效性
      *
-     * @param args 命令行参数
-     * @throws CommandException 遇到错误返回异常
+     * @param args
+     *            命令行参数
+     * @throws CommandException
+     *             遇到错误返回异常
      */
     public abstract void checkArgs(String[] args) throws CommandException;
 
@@ -95,41 +97,49 @@ public abstract class BaseClientCommand implements IClientCommand {
         }
     }
 
-    private void parseArgs(String[] args) throws CommandException {
+    protected void parseArgs(String[] args) throws CommandException {
         for (int i = 0, size = args.length; i < size; i++) {
             switch (args[i]) {
-                case "-h":
-                    if (i + 1 < size) {
-                        host = args[i + 1];
+            case "-h":
+                if (i + 1 < size) {
+                    host = args[i + 1];
+                }
+                break;
+            case "-p":
+                if (i + 1 < size) {
+                    port = args[i + 1];
+                }
+                break;
+            case "-a":
+                if (i + 1 < size) {
+                    String filename = args[i + 1];
+                    try {
+                        content = FileUtils.readFileToString(new File(filename), "UTF-8");
+                    }catch (IOException e) {
+                        throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, "fail to read file["+filename+"] to string", e);
                     }
-                    break;
-                case "-p":
-                    if (i + 1 < size) {
-                        port = args[i + 1];
-                    }
-                    break;
-                case "-a":
-                    if (i + 1 < size) {
-                        content = args[i + 1];
-                    }
-                    break;
-                default:
-                    break;
+                }
+                break;
+            default:
+                break;
             }
         }
         if (MyStringUtils.isEmpty(host)) {
             String expecting = "-h host -p port";
-            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args),
+                    expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_HOST, message);
         }
         if (MyStringUtils.isEmpty(port)) {
             String expecting = "-h host -p port -a<json string>";
-            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the host; found '%s' but expecting '%s'", Arrays.toString(args),
+                    expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_PORT, message);
         }
         if (MyStringUtils.isEmpty(content)) {
             String expecting = "-h host -p port -a<json string>";
-            String message = String.format("The args of the command[" + name + "] is missing the content; found '%s' but expecting '%s'", Arrays.toString(args), expecting);
+            String message = String.format("The args of the command[" + name + "] is missing the content; found '%s' but expecting '%s'",
+                    Arrays.toString(args), expecting);
             throw new CommandException(CommandException.REASON_CODE_BASE_COMMAND_ARGS_MISSING_CONTENT, message);
         }
         clientCfg.setUrl("http://" + host + ":" + port);
@@ -177,7 +187,8 @@ public abstract class BaseClientCommand implements IClientCommand {
 
     private boolean shouldCreateDefaultConfig(String cmdName) throws CommandException {
         if (MyStringUtils.isEmpty(cmdName)) {
-            throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION, "fail to create defaultConfig in 'shouldCreateDefaultConfig',because cmdName is empty");
+            throw new CommandException(CommandException.REASON_CODE_CLIENT_EXCEPTION,
+                    "fail to create defaultConfig in 'shouldCreateDefaultConfig',because cmdName is empty");
         }
         return COMMAND_NAME_ENROLL.equals(cmdName);
     }
@@ -221,7 +232,7 @@ public abstract class BaseClientCommand implements IClientCommand {
         }
 
         this.homeDirectory = MyFileUtils.makeFileAbs(this.homeDirectory).trim();
-        //如果末尾是'/' 去掉它
+        // 如果末尾是'/' 去掉它
         this.homeDirectory = MyStringUtils.trimRight(this.homeDirectory, File.separator);
 
         if (configFileSet && homeDirSet) {
@@ -241,16 +252,17 @@ public abstract class BaseClientCommand implements IClientCommand {
         String home = System.getProperty("user.dir");
 
         StringBuilder builder = new StringBuilder(1024);
-        return builder.append(home).append(File.separatorChar)
-                .append("ca-client").append(File.separatorChar)
-                .append("config").append(File.separatorChar)
+        return builder.append(home).append(File.separatorChar).append("ca-client").append(File.separatorChar).append("config").append(File.separatorChar)
                 .append(fname).toString();
     }
 
     /**
-     * @param clientCfg  客户端配置
-     * @param serverInfo 返回的 CA 服务器信息
-     * @throws CommandException 遇到错误返回异常
+     * @param clientCfg
+     *            客户端配置
+     * @param serverInfo
+     *            返回的 CA 服务器信息
+     * @throws CommandException
+     *             遇到错误返回异常
      */
     protected void storeCAChain(ClientConfig clientCfg, ServerInfo serverInfo) throws CommandException {
         final String mspDir = clientCfg.getMspDir();

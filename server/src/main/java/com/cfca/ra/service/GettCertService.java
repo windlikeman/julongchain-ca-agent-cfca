@@ -37,10 +37,12 @@ import java.util.List;
 /**
  * @author zhangchong
  * @create 2018/5/22
- * @Description 获取交易证书的服务
- * @CodeReviewer
+ * @Description 获取交易证书的服务 该版本暂不支持
+ * @CodeReviewer helonglong
  * @since v3.0.0
+ *
  */
+@Deprecated
 public class GettCertService {
     private static final Logger logger = LoggerFactory.getLogger(GettCertService.class);
 
@@ -67,38 +69,7 @@ public class GettCertService {
     }
 
     public GettCertResponseNet gettcert(GettCertRequestNet data, String auth, BouncyCastleProvider provider) {
-        try {
-            logger.info("gettcert Entered");
-            final int messageId = data.hashCode();
-            if (messageStore.containsMessage(messageId)){
-                throw new RAServerException(RAServerException.REASON_CODE_GETTCERT_SERVICE_MESSAGE_DUPLICATE,"messageId[" + messageId + "] is duplicate");
-            }
-
-            final String caname = data.getCaname();
-            String enrollmentID = getEnrollmentIdFromAuth(auth);
-            eCert = server.getEnrollmentCert(caname, enrollmentID);
-            verifyToken(caname, enrollmentID, auth);
-            GettCertResponseNet resp = new GettCertResponseNet(true, null);
-
-            IUser caller = server.getUser(caname,enrollmentID, null);
-
-            List<Attribute> attrs = caller.getAttributes(data.getAttrNames());
-            List<String> affiliationPath = caller.getAffiliationPath();
-
-            final TcertKeyTree tcertKeyTree = server.getTcertKeyTree(caname);
-            Key prekey = tcertKeyTree.getKey(affiliationPath);
-            String prekeyStr = new String(prekey.getEncoded());
-            final GettCertRequest tcertReq = new GettCertRequest.Builder(attrs, true, caname, data.getCount(), prekeyStr).build();
-            final TcertManager tcertMgr = server.getTcertMgr(caname);
-            final GettCertResponse tcertResponse = tcertMgr.getBatch(tcertReq, eCert, provider);
-            server.fillGettcertInfo(caname, resp, tcertResponse);
-
-            updateMessageId(messageId, tcertReq);
-            return resp;
-        } catch (RAServerException e) {
-            logger.error("gettcert >>>>>>Failure : " + e.getMessage());
-            return buildGettcertErrorServerResponse(e);
-        }
+        return null;
     }
 
     private void updateMessageId(int messageId, GettCertRequest data) throws RAServerException {

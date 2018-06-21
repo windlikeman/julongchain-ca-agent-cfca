@@ -31,10 +31,7 @@ public class KeyConfig {
 
     @Override
     public String toString() {
-        return "KeyConfig{" +
-                "algo='" + algo + '\'' +
-                ", size=" + size +
-                '}';
+        return "KeyConfig{" + "algo='" + algo + '\'' + ", size=" + size + '}';
     }
 
     @Override
@@ -46,8 +43,7 @@ public class KeyConfig {
             return false;
         }
         KeyConfig keyConfig = (KeyConfig) o;
-        return size == keyConfig.size &&
-                Objects.equals(algo, keyConfig.algo);
+        return size == keyConfig.size && Objects.equals(algo, keyConfig.algo);
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author zhangchong
  * @create 2018/5/18
  * @Description 服务器内部使用注册接口参数
- * @CodeReviewer
+ * @CodeReviewer helonglong
  * @since v3.0.0
  */
 public class RegistrationRequest {

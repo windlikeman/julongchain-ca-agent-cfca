@@ -10,7 +10,7 @@ package com.cfca.ra.command.internal.getcainfo;
 public class GetCAInfoRequest {
     private final String caName;
 
-    GetCAInfoRequest(String caName) {
+    public GetCAInfoRequest(String caName) {
         this.caName = caName;
     }
 
@@ -20,8 +20,6 @@ public class GetCAInfoRequest {
 
     @Override
     public String toString() {
-        return "GetCAInfoRequest{" +
-                "caName='" + caName + '\'' +
-                '}';
+        return "GetCAInfoRequest{" + "caName='" + caName + '\'' + '}';
     }
 }

@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class GettcertResponseNet {
 
-
     /**
      * Boolean indicating if the request was successful.
      */

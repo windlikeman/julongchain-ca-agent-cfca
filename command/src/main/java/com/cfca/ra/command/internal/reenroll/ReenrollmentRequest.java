@@ -19,7 +19,8 @@ public class ReenrollmentRequest {
     private final String password;
 
     /**
-     * Profile is the name of the signing profile to use in issuing the certificate
+     * Profile is the name of the signing profile to use in issuing the
+     * certificate
      */
     private final String profile;
 
@@ -73,12 +74,13 @@ public class ReenrollmentRequest {
         return request;
     }
 
+
     @Override
     public String toString() {
-        return "EnrollmentRequest{" +
+        return "ReenrollmentRequest{" +
                 "label='" + label + '\'' +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+                ", password='hide'" +
                 ", profile='" + profile + '\'' +
                 ", csrConfig=" + csrConfig +
                 ", caName='" + caName + '\'' +
@@ -97,7 +99,6 @@ public class ReenrollmentRequest {
          */
         private String label = "";
         public final String request;
-
 
         public Builder(String request, String username, String password, String profile, CsrConfig csrConfig, String caName) {
             this.request = request;

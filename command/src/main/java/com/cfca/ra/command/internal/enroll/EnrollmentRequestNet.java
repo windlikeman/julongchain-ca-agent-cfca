@@ -11,7 +11,8 @@ import java.util.Objects;
  */
 public class EnrollmentRequestNet {
     /**
-     * A encoded string containing the CSR (Certificate Signing Request) based on PKCS #10.
+     * A encoded string containing the CSR (Certificate Signing Request) based
+     * on PKCS #10.
      */
     private final String request;
     /**
