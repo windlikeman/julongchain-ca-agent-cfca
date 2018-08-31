@@ -99,12 +99,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>cfca.ra.ra36</groupId>
-			<artifactId>ratk</artifactId>
-			<version>3.6.6.5</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.59</version>
