@@ -1,0 +1,1 @@
+{"name":"zhangchong","type":"user","secret":"abcde","maxEnrollments":2,"affiliation":"org.department.c","attributes":[{"name":"hf.Revoker","value":"true","eCert":false},{"name":"hf.Registrar.Roles","value":"client,user,peer,validator,auditor","eCert":false}],"caName":"OCA"}

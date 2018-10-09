@@ -1,7 +1,7 @@
 package demo;
 
-import com.cfca.ra.command.internal.revoke.RevokeCommand;
-import com.cfca.ra.command.internal.revoke.RevokeRequest;
+import org.bica.julongchain.cfca.ra.command.internal.revoke.RevokeCommand;
+import org.bica.julongchain.cfca.ra.command.internal.revoke.RevokeRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -19,7 +19,7 @@ public class RevokeRequestDemo {
     private void testRevoke() throws Exception{
         String id = "admin";
         String aki = "ssss";
-        String serial = "1032940241";
+        String serial = "1033792875";
         String reason = "expire";
         String caname = "CFCA";
 

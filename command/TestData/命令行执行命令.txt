@@ -1,0 +1,8 @@
+java -Djava.ext.dirs=.\lib -Dlogback.configurationFile=.\config\logback.xml -jar RA-Command-3.0.0.2.jar enroll -h localhost -p 8089 -a .\TestData\enroll.json
+java -Djava.ext.dirs=.\lib -Dlogback.configurationFile=.\config\logback.xml -jar RA-Command-3.0.0.2.jar cainfo -h localhost -p 8089 -a .\TestData\cainfo.json
+java -Djava.ext.dirs=.\lib -Dlogback.configurationFile=.\config\logback.xml -jar RA-Command-3.0.0.2.jar reenroll -h localhost -p 8089 -a .\TestData\reenroll.json -key .\tmp\keystore\key.pem
+java -Djava.ext.dirs=.\lib -Dlogback.configurationFile=.\config\logback.xml -jar RA-Command-3.0.0.2.jar register -h localhost -p 8089 -a .\TestData\register.json
+java -Djava.ext.dirs=.\lib -Dlogback.configurationFile=.\config\logback.xml -jar RA-Command-3.0.0.2.jar revoke -h localhost -p 8089 -a .\TestData\revoke.json
+
+
+

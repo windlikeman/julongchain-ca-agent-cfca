@@ -22,7 +22,7 @@
     <appender name="sizeFileRollingBackup" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %10logger[%file:%line] - %msg%n
             </pattern>
         </layout>
         <file>${logging_home}/ra_server.log</file>
@@ -39,7 +39,7 @@
 
     </appender>
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="consoleAppender" />
         <appender-ref ref="sizeFileRollingBackup" />
     </root>

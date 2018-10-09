@@ -8,6 +8,7 @@ sadkLogs/backup/
 logs/
 ca-client/
 cacerts/
+release/
 ### STS ###
 .apt_generated
 .classpath

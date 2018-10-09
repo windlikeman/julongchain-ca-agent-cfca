@@ -1,0 +1,22 @@
+/.idea
+
+logs/
+RAServerLogs/
+sadkLogs/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+../.idea/
+.jupiter
+.idea/
+out/
+
+/*.iml
+target/
+/target
+
+CFCA/
+

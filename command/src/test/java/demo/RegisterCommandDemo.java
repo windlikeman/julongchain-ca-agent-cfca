@@ -1,8 +1,8 @@
 package demo;
 
-import com.cfca.ra.command.internal.register.RegisterCommand;
-import com.cfca.ra.command.internal.register.RegistrationRequest;
-import com.cfca.ra.command.internal.register.UserAttrs;
+import org.bica.julongchain.cfca.ra.command.internal.register.RegisterCommand;
+import org.bica.julongchain.cfca.ra.command.internal.register.RegistrationRequest;
+import org.bica.julongchain.cfca.ra.command.internal.register.UserAttrs;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.io.FileUtils;
@@ -23,9 +23,9 @@ public class RegisterCommandDemo {
         final ArrayList<UserAttrs> v = new ArrayList<>();
         v.add(new UserAttrs("hf.Revoker", "true"));
         v.add(new UserAttrs("hf.Registrar.Roles", "client,user,peer,validator,auditor"));
-        builder.name("zc10").caName("CFCA").affiliation("org.department.c").attributes(v).maxEnrollments(2).secret("1234").type("user");
+        builder.name("zhangchong").caName("OCA").affiliation("org.department.c").attributes(v).maxEnrollments(2)
+                .secret("abcde").type("user");
         final RegistrationRequest registrationRequest = builder.build();
-
 
         final String jsonFile = "TestData/register.json";
         final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
